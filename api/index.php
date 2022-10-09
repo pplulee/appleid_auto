@@ -64,12 +64,24 @@ switch ($_GET["action"]) {
                 );
             } else {
                 $account = new account($task->account_id);
+                $question1 = array_keys($account->question)[0];
+                $question2 = array_keys($account->question)[1];
+                $question3 = array_keys($account->question)[2];
+                $answer1 = $account->question[$question1];
+                $answer2 = $account->question[$question2];
+                $answer3 = $account->question[$question3];
                 $data = array(
                     'status' => 'success',
                     'message' => '获取成功',
-                    'id_username' => $account->username,
+                    'username' => $account->username,
+                    'password' => $account->password,
                     'id_dob' => $account->dob,
-                    'answer' => $account->question,
+                    'question1' => array_keys($account->question)[0],
+                    'question2' => array_keys($account->question)[1],
+                    'question3' => array_keys($account->question)[2],
+                    'answer1' => $account->question[$question1],
+                    'answer2' => $account->question[$question2],
+                    'answer3' => $account->question[$question3],
                     'check_interval' => $task->check_interval,
                     'tgbot_token' => $task->tgbot_token,
                     'tgbot_chatid' => $task->tgbot_chatid,

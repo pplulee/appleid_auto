@@ -1,0 +1,17 @@
+{
+  "id_username": "aaa@bbb.ccc",
+  "id_password": "12345678",
+  "id_dob": "01012000",
+  "answer": {
+    "朋友": "AAA",
+    "工作": "BBBB",
+    "父母": "CCCC"
+  },
+  "check_interval": 5,
+  "webdriver": "local",
+  "step_sleep": 3,
+  "api_url": "",
+  "api_key": "",
+  "tgbot_chatid": "",
+  "tgbot_token": ""
+}

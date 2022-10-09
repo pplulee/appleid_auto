@@ -1,0 +1,4 @@
+ddddocr>=1.4.7
+schedule>=1.1.0
+selenium>=4.4.3
+requests>=2.27.1
