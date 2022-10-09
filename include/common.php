@@ -37,5 +37,7 @@ echo '<!DOCTYPE html>
     <link rel="stylesheet" href="/resources/icons/bootstrap-icons.css">
     <link href=”https://fonts.googleapis.com/icon?family=Material+Icons” rel=”stylesheet”>
     <script src="/resources/js/bootstrap.bundle.min.js"></script>
+    <script src="/resources/js/sweetalert2.all.min.js"></script>
+    <link rel="stylesheet" href="/resources/css/sweetalert2.min.css">
 </head>
 ';

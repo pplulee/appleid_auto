@@ -3,7 +3,7 @@ function logout()
 {
     $_SESSION['isLogin'] = false;
     unset($_SESSION['user_id']);
-    exit("<script>alert('已成功注销');window.location.href='index.php';</script>");
+    exit("<script>Swal.fire({icon: 'success',title: '成功',text: '已成功注销！',timer:2000,timerProgressBar: true});setTimeout(\"javascript:location.href='index.php'\", 2000);</script>");
 }
 
 function random_string($length): string
@@ -131,8 +131,28 @@ function php_self()
     return substr($_SERVER['PHP_SELF'], strrpos($_SERVER['PHP_SELF'], '/') + 1);
 }
 
-function alert($message)
+function alert($type,$message,$delay,$dest)
 {
-    echo "<script>alert('{$message}');</script>";
+    switch ($type){
+        case "success":
+            $title = "成功";
+            break;
+        case "error":
+            $title = "错误";
+            break;
+        case "warning":
+            $title = "警告";
+            break;
+        case "info":
+            $title = "信息";
+            break;
+        case "question":
+            $title="请检查";
+            break;
+        default:
+            $title = "";
+            break;
+        }
+    echo "<script>Swal.fire({icon: '$type',title: '$title',text: '$message',timer:$delay,timerProgressBar: true});setTimeout(\"javascript:location.href='$dest'\", $delay);</script>";
 }
 
