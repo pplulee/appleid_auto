@@ -4,11 +4,14 @@ global $conn;
 if (isset($_POST['submit'])) {
     switch ($_GET['action']) {
         case "add":
+        {
             $conn->query("INSERT INTO task (account_id, check_interval,tgbot_chatid,tgbot_token,owner) VALUES ('{$_POST['account_id']}','{$_POST['check_interval']}','{$_POST['tgbot_chatid']}','{$_POST['tgbot_token']}','{$_SESSION['user_id']}');");
             echo "<div class='alert alert-success' role='alert'><p>添加成功，即将返回</p></div>";
             echo "<script>setTimeout(\"javascript:location.href='task.php'\", 800);</script>";
             exit;
+        }
         case "edit":
+        {
             $task = new task($_GET['id']);
             if ($task->owner == $_SESSION['user_id'] || $task->id) {
                 $task->update($_POST['account_id'], $_POST['check_interval'], $_POST['tgbot_chatid'], $_POST['tgbot_token'], $_SESSION['user_id']);
@@ -18,15 +21,19 @@ if (isset($_POST['submit'])) {
             }
             echo "<script>setTimeout(\"javascript:location.href='task.php'\", 800);</script>";
             exit;
+        }
         default:
+        {
             echo "<div class='alert alert-danger' role='alert'><p>未知错误</p></div>";
             echo "<script>setTimeout(\"javascript:location.href='task.php'\", 800);</script>";
             exit;
+        }
     }
 }
 if (isset($_GET['action'])) {
     switch ($_GET['action']) {
         case "delete":
+        {
             $task = new task($_GET['id']);
             if ($task->owner == $_SESSION['user_id'] || $task->id) {
                 $task->delete();
@@ -36,7 +43,9 @@ if (isset($_GET['action'])) {
             }
             echo "<script>setTimeout(\"javascript:location.href='task.php'\", 800);</script>";
             exit;
+        }
         case "add":
+        {
             $width = isMobile() ? "auto" : "60%";
             echo "<div class='container' style='margin-top: 2%; width: $width;'>
                     <div class='card border-dark'>
@@ -70,7 +79,9 @@ if (isset($_GET['action'])) {
                     </div>
                 </div>";
             exit;
+        }
         case "edit":
+        {
             $task = new task($_GET['id']);
             if ($task->owner == $_SESSION['user_id']) {
                 $width = isMobile() ? "auto" : "60%";
@@ -102,10 +113,6 @@ if (isset($_GET['action'])) {
                                 <span class='input-group-text' id='tgbot_chatid'>Telegram Bot Token</span>
                                 <input type='text' class='form-control' name='tgbot_token' autocomplete='off' placeholder='不需要请留空' value='$task->tgbot_token'>
                             </div>
-                            <div class='input-group mb-3'>
-                                <span class='input-group-text' id='last_update'>上次更新</span>
-                                <input type='text' class='form-control' name='last_update' autocomplete='off' disabled value='$task->last_update'>
-                            </div>
                             <input type='submit' name='submit' class='btn btn-primary btn-block' value='保存'>
                         </form>
                     </div>
@@ -115,9 +122,12 @@ if (isset($_GET['action'])) {
                 echo "<script>setTimeout(\"javascript:location.href='task.php'\", 800);</script>";
             }
             exit;
+        }
         default:
+        {
             echo "<div class='alert alert-danger' role='alert'><p>未知错误</p></div>";
             echo "<script>setTimeout(\"javascript:location.href='task.php'\", 800);</script>";
             exit;
+        }
     }
 }

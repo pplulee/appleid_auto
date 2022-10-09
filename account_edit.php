@@ -4,11 +4,14 @@ global $conn;
 if (isset($_POST['submit'])) {
     switch ($_GET['action']) {
         case "add":
+        {
             $conn->query("INSERT INTO account (username, password, remark, dob, question1, answer1,question2,answer2,question3,answer3,owner,share_link) VALUES ('{$_POST['username']}','{$_POST['password']}','{$_POST['remark']}','{$_POST['dob']}','{$_POST['question1']}','{$_POST['answer1']}','{$_POST['question2']}','{$_POST['answer2']}','{$_POST['question3']}','{$_POST['answer3']}','{$_SESSION['user_id']}','{$_POST['share_link']}');");
             echo "<div class='alert alert-success' role='alert'><p>添加成功，即将返回</p></div>";
             echo "<script>setTimeout(\"javascript:location.href='account.php'\", 800);</script>";
             exit;
+        }
         case "edit":
+        {
             $account = new account($_GET['id']);
             if ($account->owner == $_SESSION['user_id'] || $account->id) {
                 $account->update($_POST['username'], $_POST['password'], $_POST['remark'], $_POST['dob'], $_POST['question1'], $_POST['answer1'], $_POST['question2'], $_POST['answer2'], $_POST['question3'], $_POST['answer3'], $_SESSION['user_id'], $_POST['share_link']);
@@ -18,15 +21,19 @@ if (isset($_POST['submit'])) {
             }
             echo "<script>setTimeout(\"javascript:location.href='account.php'\", 800);</script>";
             exit;
+        }
         default:
+        {
             echo "<div class='alert alert-danger' role='alert'><p>未知错误</p></div>";
             echo "<script>setTimeout(\"javascript:location.href='account.php'\", 800);</script>";
             exit;
+        }
     }
 }
 if (isset($_GET['action'])) {
     switch ($_GET['action']) {
         case "delete":
+        {
             $account = new account($_GET['id']);
             if ($account->owner == $_SESSION['user_id'] || $account->id) {
                 $account->delete();
@@ -36,7 +43,9 @@ if (isset($_GET['action'])) {
             }
             echo "<script>setTimeout(\"javascript:location.href='account.php'\", 800);</script>";
             exit;
+        }
         case "add":
+        {
             $share_link = random_string(12);
             $width = isMobile() ? "auto" : "60%";
             echo "<div class='container' style='margin-top: 2%; width: $width;'>
@@ -92,7 +101,9 @@ if (isset($_GET['action'])) {
                     </div>
                 </div>";
             exit;
+        }
         case "edit":
+        {
             $account = new account($_GET['id']);
             if ($account->owner == $_SESSION['user_id']) {
                 $width = isMobile() ? "auto" : "60%";
@@ -159,9 +170,12 @@ if (isset($_GET['action'])) {
                 echo "<script>setTimeout(\"javascript:location.href='account.php'\", 800);</script>";
             }
             exit;
+        }
         default:
+        {
             echo "<div class='alert alert-danger' role='alert'><p>未知错误</p></div>";
             echo "<script>setTimeout(\"javascript:location.href='account.php'\", 800);</script>";
             exit;
+        }
     }
 }

@@ -18,12 +18,15 @@ if (isset($_POST['submit'])) {
 if (isset($_GET['action'])) {
     switch ($_GET['action']) {
         case "delete":
+        {
             $account = new account($_GET['id']);
             $account->delete();
             echo "<div class='alert alert-success' role='alert'><p>删除成功，即将返回</p></div>";
             echo "<script>setTimeout(\"javascript:location.href='account.php'\", 800);</script>";
             exit;
+        }
         case "edit":
+        {
             $account = new account($_GET['id']);
             $width = isMobile() ? "auto" : "60%";
             $question1 = array_keys($account->question)[0];
@@ -85,17 +88,24 @@ if (isset($_GET['action'])) {
                                 <input type='text' class='form-control' name='answer3' required autocomplete='off' value='$answer3'>
                             </div>
                             <div class='input-group mb-3'>
-                                <span class='input-group-text' id='question2'>分享代码</span>
+                                <span class='input-group-text' id='share_link'>分享代码</span>
                                 <input type='text' class='form-control' name='share_link' value='$account->share_link' required autocomplete='off'>
+                            </div>
+                            <div class='input-group mb-3'>
+                                <span class='input-group-text' id='last_check'>上次检查</span>
+                                <input type='text' class='form-control' name='share_link' value='$account->last_check' required disabled>
                             </div>
                             <input type='submit' name='submit' class='btn btn-primary btn-block' value='保存'>
                         </form>
                     </div>
                 </div>";
             exit;
+        }
         default:
+        {
             echo "<div class='alert alert-danger' role='alert'><p>未知错误</p></div>";
             echo "<script>setTimeout(\"javascript:location.href='account.php'\", 800);</script>";
             exit;
+        }
     }
 }

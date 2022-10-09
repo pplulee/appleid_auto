@@ -10,6 +10,7 @@ class account
     var array $question;
     var int $owner;
     var string $share_link;
+    var string $last_check;
 
     function __construct($id)
     {
@@ -31,6 +32,7 @@ class account
             );
             $this->owner = $result['owner'];
             $this->share_link = $result['share_link'];
+            $this->last_check = $result['last_check'];
         }
     }
 
@@ -49,6 +51,14 @@ class account
         $this->owner = $owner;
         $this->share_link = $share_link;
         $conn->query("UPDATE account SET username='$username',password='$password',remark='$remark',dob='$dob',question1='$question1',answer1='$answer1',question2='$question2',answer2='$answer2',question3='$question3',answer3='$answer3',owner='$owner',share_link='$share_link' WHERE id='$this->id';");
+    }
+
+    function update_password($password)
+    {
+        global $conn;
+        $this->password = $password;
+        $conn->query("UPDATE account SET password='$password' WHERE id='$this->id';");
+        $this->update_last_check();
     }
 
     function update_last_check()

@@ -18,12 +18,15 @@ if (isset($_POST['submit'])) {
 if (isset($_GET['action'])) {
     switch ($_GET['action']) {
         case "delete":
+        {
             $task = new task($_GET['id']);
             $task->delete();
             echo "<div class='alert alert-success' role='alert'><p>删除成功，即将返回</p></div>";
             echo "<script>setTimeout(\"javascript:location.href='task.php'\", 800);</script>";
             exit;
+        }
         case "edit":
+        {
             $task = new task($_GET['id']);
             $width = isMobile() ? "auto" : "60%";
             echo "<div class='container' style='margin-top: 2%; width: $width;'>
@@ -54,18 +57,17 @@ if (isset($_GET['action'])) {
                                 <span class='input-group-text' id='tgbot_chatid'>Telegram Bot Token</span>
                                 <input type='text' class='form-control' name='tgbot_token' autocomplete='off' placeholder='不需要请留空' value='$task->tgbot_token'>
                             </div>
-                            <div class='input-group mb-3'>
-                                <span class='input-group-text' id='last_update'>上次更新</span>
-                                <input type='text' class='form-control' name='last_update' autocomplete='off' disabled value='$task->last_update'>
-                            </div>
                             <input type='submit' name='submit' class='btn btn-primary btn-block' value='保存'>
                         </form>
                     </div>
                 </div>";
             exit;
+        }
         default:
+        {
             echo "<div class='alert alert-danger' role='alert'><p>未知错误</p></div>";
             echo "<script>setTimeout(\"javascript:location.href='task.php'\", 800);</script>";
             exit;
+        }
     }
 }

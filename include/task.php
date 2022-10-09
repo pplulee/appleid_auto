@@ -5,7 +5,6 @@ class task
     var int $id;
     var int $account_id;
     var int $check_interval;
-    var string $last_update;
     var bool $tgbot_enable;
     var string $tgbot_chatid = "";
     var string $tgbot_token = "";
@@ -22,12 +21,11 @@ class task
             $this->id = $task_id;
             $this->account_id = $result['account_id'];
             $this->check_interval = $result['check_interval'];
-            $this->last_update = $result['last_update'];
+            $this->owner = $result['owner'];
             if ($result['tgbot_chatid'] != "" && $result['tgbot_token'] != "") {
                 $this->tgbot_enable = true;
                 $this->tgbot_chatid = $result['tgbot_chatid'];
                 $this->tgbot_token = $result['tgbot_token'];
-                $this->owner = $result['owner'];
             } else {
                 $this->tgbot_enable = false;
             }

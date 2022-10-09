@@ -39,6 +39,17 @@ function get_id_by_username($username): int
     }
 }
 
+function get_accoubt_id($username): int
+{
+    global $conn;
+    $result = $conn->query("SELECT id FROM account WHERE username='$username';");
+    if ($result->num_rows == 0) {
+        return -1;
+    } else {
+        return $result->fetch_assoc()["id"];
+    }
+}
+
 function get_username_by_id($id): string
 {
     global $conn;
