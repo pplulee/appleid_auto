@@ -74,14 +74,13 @@ switch ($_GET["action"]) {
                     'status' => 'success',
                     'message' => '获取成功',
                     'username' => $account->username,
-                    'password' => $account->password,
-                    'id_dob' => $account->dob,
-                    'question1' => array_keys($account->question)[0],
-                    'question2' => array_keys($account->question)[1],
-                    'question3' => array_keys($account->question)[2],
-                    'answer1' => $account->question[$question1],
-                    'answer2' => $account->question[$question2],
-                    'answer3' => $account->question[$question3],
+                    'dob' => $account->dob,
+                    'q1' => array_keys($account->question)[0],
+                    'q2' => array_keys($account->question)[1],
+                    'q3' => array_keys($account->question)[2],
+                    'a1' => $account->question[$question1],
+                    'a2' => $account->question[$question2],
+                    'a3' => $account->question[$question3],
                     'check_interval' => $task->check_interval,
                     'tgbot_token' => $task->tgbot_token,
                     'tgbot_chatid' => $task->tgbot_chatid,
@@ -92,6 +91,30 @@ switch ($_GET["action"]) {
 
                 );
                 break;
+            }
+        }
+        break;
+    }
+    case "get_password":{
+        if (!isset($_GET['username'])){
+            $data = array(
+                'status' => 'fail',
+                'message' => 'username不能为空'
+            );
+        }else{
+            $result = $conn->query("SELECT password FROM account WHERE username = '".$_GET['username']."';");
+            if ($result->num_rows == 0) {
+                $data = array(
+                    'status' => 'fail',
+                    'message' => '账号不存在'
+                );
+            }else{
+                $row = $result->fetch_assoc();
+                $data = array(
+                    'status' => 'success',
+                    'message' => '获取成功',
+                    'password' => $row['password']
+                );
             }
         }
         break;
@@ -118,6 +141,14 @@ switch ($_GET["action"]) {
                 );
             }
         }
+        break;
+    }
+    case "check_api":
+    {
+        $data = array(
+            'status' => 'success',
+            'message' => 'API正常'
+        );
         break;
     }
     default:

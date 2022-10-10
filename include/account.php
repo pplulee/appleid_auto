@@ -65,7 +65,7 @@ class account
     {
         global $conn;
         $this->last_check = get_time();
-        $conn->query("UPDATE account SET last_check='{$this->last_check}' WHERE id='{$this->id}';");
+        $conn->query("UPDATE account SET last_check='$this->last_check' WHERE id='$this->id';");
     }
 
     function delete()

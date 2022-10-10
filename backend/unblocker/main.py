@@ -1,7 +1,6 @@
 import argparse
 import datetime
 import logging
-import os
 import random
 import re
 import string
@@ -15,78 +14,70 @@ from selenium import webdriver
 from telegram.ext import Updater, CommandHandler
 
 parser = argparse.ArgumentParser(description="")
-parser.add_argument("--config_path", help="配置文件路径")
-parser.add_argument("--username", help="Apple ID 用户名")
-parser.add_argument("--password", help="Apple ID 密码")
-parser.add_argument("--dob", help="Apple ID 生日")
-parser.add_argument("--question1", help="密保问题1")
-parser.add_argument("--answer1", help="密保答案1")
-parser.add_argument("--question2", help="密保问题2")
-parser.add_argument("--answer2", help="密保答案2")
-parser.add_argument("--question3", help="密保问题3")
-parser.add_argument("--answer3", help="密保答案3")
-parser.add_argument("--check_interval", help="检测间隔")
-parser.add_argument("--api_url", help="API URL")
-parser.add_argument("--api_key", help="API key")
-parser.add_argument("--tgbot_chatid", help="Telegram Bot Chat ID")
-parser.add_argument("--tgbot_token", help="Telegram Bot Token")
+parser.add_argument("-api_url", help="API URL")
+parser.add_argument("-api_key", help="API key")
+parser.add_argument("-taskid", help="Task ID")
 args = parser.parse_args()
 
 
+class API:
+    def __init__(self, url, key):
+        self.url = url
+        self.key = key
+
+    def get_password(self, username):
+        try:
+            result = loads(get(f"{self.url}?key={self.key}&action=get_password&username={username}").text)
+        except BaseException:
+            return False
+        else:
+            if result["status"] == "success":
+                return result["password"]
+            else:
+                return ""
+
+    def get_config(self, id):
+        try:
+            result = loads(get(f"{self.url}?key={self.key}&action=get_task_info&id={id}").text)
+        except BaseException:
+            return {"status": "fail"}
+        else:
+            if result["status"] == "success":
+                return result
+            else:
+                return {"status": "fail"}
+
+    def update(self, username, password):
+        try:
+            result = loads(
+                get(f"{self.url}?key={self.key}&username={username}&password=test1234&action=update_password").text)
+        except BaseException:
+            return {"status": "fail"}
+        else:
+            if result["status"] == "success":
+                return result
+            else:
+                return {"status": "fail"}
+
+
 class Config:
-    def __init__(self):
+    def __init__(self, username, dob, q1, a1, q2, a2, q3, a3, check_interval, tgbot_token, tgbot_chatid, step_sleep,
+                 webdriver):
         self.remote_driver = False
         self.tgbot_enable = False
-        self.api_enable = False
         self.password_length = 10
-        if args.config_path != "" or os.path.exists("config.example.json"):  # 读取配置文件
-            configfile = open("config.example.json" if args.config_path == "" else args.config_path, "r",
-                              encoding='utf-8')
-            self.configdata = loads(configfile.read())
-            configfile.close()
-            self.username = self.configdata["id_username"]
-            self.password = self.configdata["id_password"]
-            self.dob = self.configdata["id_dob"]
-            self.answer = self.configdata["answer"]
-            self.webdriver = self.configdata["webdriver"]
-            self.step_sleep = self.configdata["step_sleep"]
-            self.check_interval = self.configdata["check_interval"]
-            if self.configdata["api_url"] != "" and self.configdata["api_key"] != "":
-                self.api_enable = True
-                self.api_url = self.configdata["api_url"]
-                self.api_key = self.configdata["api_key"]
-            if self.webdriver != "local":
-                self.remote_driver = True
-            if self.configdata["tgbot_chatid"] != "" and self.configdata["tgbot_token"] != "":
-                self.tgbot_enable = True
-                self.tgbot_chatid = self.configdata["tgbot_chatid"]
-                self.tgbot_token = self.configdata["tgbot_token"]
-        else:  # 读取命令行参数
-            self.username = args.username
-            self.password = args.password
-            self.dob = args.dob
-            self.answer = {args.answer1: args.question1, args.answer2: args.question2, args.answer3: args.question3}
-            self.check_interval = args.check_interval
-            if args.api_url != "" and args.api_key != "":
-                self.api_enable = True
-                self.api_url = args.api_url
-                self.api_key = args.api_key
-            if args.tgbot_chatid != "" and args.tgbot_token != "":
-                self.tgbot_enable = True
-                self.tgbot_chatid = args.tgbot_chatid
-                self.tgbot_token = args.tgbot_token
-            if self.webdriver != "local":
-                self.remote_driver = True
-            if self.username == "" or self.password == "":
-                print("用户名或密码为空")
-                exit()
-            if self.webdriver == "":
-                print("webdriver为空")
-                exit()
-
-
-config = Config()
-ocr = ddddocr.DdddOcr()
+        self.username = username
+        self.dob = dob
+        self.answer = {q1: a1, q2: a2, q3: a3}
+        self.check_interval = check_interval
+        self.webdriver = webdriver
+        self.step_sleep = step_sleep
+        if tgbot_chatid != "" and tgbot_token != "":
+            self.tgbot_enable = True
+            self.tgbot_chatid = tgbot_chatid
+            self.tgbot_token = tgbot_token
+        if self.webdriver != "local":
+            self.remote_driver = True
 
 
 class TGbot:
@@ -109,32 +100,10 @@ class TGbot:
         return self.updater.bot.send_message(chat_id=config.tgbot_chatid, text=text)["message_id"]
 
 
-if config.tgbot_enable:
-    tgbot = TGbot(config.tgbot_chatid, config.tgbot_token)
-
-
-def notification(content):
-    if config.tgbot_enable:
-        tgbot.sendmessage(content)
-
-
-class API:
-    def __init__(self, url, key):
-        self.url = url
-        self.key = key
-
-    def update(self, username, password):
-        get(f"{self.url}?key={self.key}&username={username}password={password}")
-
-
-if config.api_enable:
-    api = API(config.api_url, config.api_key)
-
-
 class ID:
-    def __init__(self, username, password, dob, answer):
+    def __init__(self, username, dob, answer):
         self.username = username
-        self.password = password
+        self.password = ""
         self.dob = dob
         self.answer = answer
 
@@ -315,6 +284,28 @@ def error(text):
     print(datetime.datetime.now().strftime("%H:%M:%S"), "[ERROR]", text)
 
 
+api = API(args.api_url, args.api_key)
+config_result = api.get_config(args.taskid)
+if config_result["status"] == "fail":
+    error("从API获取配置失败")
+    exit()
+config = Config(config_result["username"], config_result["dob"], config_result["q1"], config_result["a1"],
+                config_result["q2"], config_result["a2"], config_result["q3"], config_result["a3"],
+                config_result["check_interval"], config_result["tgbot_token"], config_result["tgbot_chatid"],
+                config_result["step_sleep"], config_result["webdriver"])
+
+
+def notification(content):
+    if config.tgbot_enable:
+        tgbot.sendmessage(content)
+
+
+ocr = ddddocr.DdddOcr()
+
+if config.tgbot_enable:
+    tgbot = TGbot(config.tgbot_chatid, config.tgbot_token)
+
+
 def setup_driver():
     global driver
     options = webdriver.ChromeOptions()
@@ -334,15 +325,20 @@ def setup_driver():
             driver = webdriver.Remote(command_executor=config.webdriver, options=options)
         else:
             driver = webdriver.Chrome(options=options)
-    except BaseException as e:
-        print(e)
+    except BaseException:
         error("Webdriver调用失败")
     else:
         driver.set_page_load_timeout(15)
 
 
 def job():
+    global api
     schedule.clear()
+    password = api.get_password(config.username)
+    if password == "":
+        error("获取密码失败，可能是账号不存在")
+        exit()
+    id.password = password
     unlock = False
     setup_driver()
     id.login()
@@ -355,24 +351,21 @@ def job():
             info("检测到账号被锁定，开始解锁")
             id.unlock()
             unlock = True
-    info("账号检测完毕")
     driver.quit()
-    if config.api_enable:
-        api.update(id.username, id.password)
+    info("账号检测完毕")
+    update_result = api.update(id.username, id.password)
+    if update_result["status"] == "fail":
+        error("更新密码失败")
+    else:
+        info("更新密码成功")
     if unlock:
         notification(f"Apple ID解锁成功\n新密码：{id.password}")
     schedule.every(config.check_interval).minutes.do(job)
     return unlock
 
 
-def main():
-    global id
-    id = ID(config.username, config.password, config.dob, config.answer)
-    job()
-    while True:
-        schedule.run_pending()
-        time.sleep(1)
-
-
-if __name__ == '__main__':
-    main()
+id = ID(config.username, config.dob, config.answer)
+job()
+while True:
+    schedule.run_pending()
+    time.sleep(1)

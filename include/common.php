@@ -39,5 +39,6 @@ echo '<!DOCTYPE html>
     <script src="/resources/js/bootstrap.bundle.min.js"></script>
     <script src="/resources/js/sweetalert2.all.min.js"></script>
     <link rel="stylesheet" href="/resources/css/sweetalert2.min.css">
+    <script src="/resources/js/clipboard.min.js"></script>
 </head>
 ';
