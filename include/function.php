@@ -87,6 +87,16 @@ function login($username, $password): array
     }
 }
 
+function get_share_account_id($share_link): int{
+    global $conn;
+    $result = $conn->query("SELECT id FROM account WHERE share_link='$share_link';");
+    if ($result->num_rows == 0) {
+        return -1;
+    } else {
+        return $result->fetch_assoc()["id"];
+    }
+}
+
 function get_time()
 {
     #date_default_timezone_set('Europe/London');
