@@ -30,22 +30,15 @@ switch ($_GET["action"]) {
     case "get_task_list":
     {
         $result = $conn->query("SELECT id FROM task;");
-        if ($result->num_rows == 0) {
-            $data = array(
-                'status' => 'fail',
-                'message' => '没有任务'
-            );
-        } else {
-            $task_list = [];
-            while ($row = $result->fetch_assoc()) {
-                $task_list[] = $row['id'];
-            }
-            $data = array(
-                'status' => 'success',
-                'message' => '获取成功',
-                'data' => implode(",", $task_list)
-            );
+        $task_list = [];
+        while ($row = $result->fetch_assoc()) {
+            $task_list[] = $row['id'];
         }
+        $data = array(
+            'status' => 'success',
+            'message' => '获取成功',
+            'data' => implode(",", $task_list)
+        );
         break;
     }
     case "get_task_info":
