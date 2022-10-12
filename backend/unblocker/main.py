@@ -50,7 +50,7 @@ class API:
     def update(self, username, password):
         try:
             result = loads(
-                get(f"{self.url}?key={self.key}&username={username}&password=test1234&action=update_password").text)
+                get(f"{self.url}?key={self.key}&username={username}&password={password}&action=update_password").text)
         except BaseException:
             return {"status": "fail"}
         else:
