@@ -11,16 +11,27 @@
 
 unblocker_manager为后端管理程序，会定时从API获取任务列表并部署docker容器（每个task对应一个容器）
 
-**程序需要使用Chrome webdriver**，推荐使用Docker版 [selenium/standalone-chrome](https://hub.docker.com/r/selenium/standalone-chrome)，使用方法请见官方教程
+**程序需要使用Chrome webdriver**，推荐使用Docker版 [selenium/standalone-chrome](https://hub.docker.com/r/selenium/standalone-chrome)，使用方法请自行寻找
+
+# 问题反馈&交流
+本人水平和能力有限，程序可能存在bug，欢迎提出issue或PR，也欢迎各位大佬加入项目 \
+Telegram群：[@appleunblocker](https://t.me/appleunblocker)
 
 # 使用方法
-1. 部署前端网页，导入数据库并修改配置文件 \
+使用前请确保已部署好Webdriver \
+网页端运行环境推荐php7.4 & MySQL8.0
+1. 从Release下载网页源码并部署，导入数据库并修改配置文件（记得设置远程Webdriver地址） \
     默认账户：`admin` 密码：`admin`
 2. 登录网站后，添加Apple账号，填写账号信息
-3. 前往任务列表创建任务
-4. 部署`backend\unblocker_manager.py`（启动参数见下方）
+3. 前往面板中任务列表，创建账号对应的解锁任务
+4. 部署`backend\unblocker_manager.py`（提供一键部署交脚本，请见下方）
 5. 查看`unblocker_manager`是否成功获取到任务列表
 6. 查看容器是否部署并正常运行
+
+### 一键部署unblocker_manager：
+`wget https://raw.githubusercontent.com/pplulee/appleid_auto/main/backend/install_unblocker.sh && bash install_unblocker.sh`
+### 关于密保问题的说明：
+问题一栏仅需填写关键词即可，例如”生日“、”工作“等，但请注意账号**安全问题的语言**
 
 # 文件说明
 - `backend\unblocker_manager.py` 后端管理程序 \
@@ -42,7 +53,3 @@ unblocker_manager为后端管理程序，会定时从API获取任务列表并部
 - [x] 修改密码
 - [x] 上报密码
 - [x] Telegram Bot通知
-
-# 问题反馈&交流
-本人水平和能力有限，程序可能存在bug，欢迎提出issue或PR，也欢迎各位大佬加入项目 \
-Telegram群：[@appleunblocker](https://t.me/appleunblocker)
