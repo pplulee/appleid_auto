@@ -9,6 +9,7 @@ include("header.php");
             <table class="table table-striped">
                 <thead>
                 <tr>
+                    <th>任务ID</th>
                     <th>账号</th>
                     <th>检查间隔</th>
                     <th>启用通知</th>
@@ -22,7 +23,7 @@ include("header.php");
                     while ($row = $result->fetch_assoc()) {
                         $account_name = get_account_username($row['account_id']);
                         $enable_tgbot = ($row['tgbot_chatid'] != "" && $row['tgbot_token'] != "") ? "是" : "否";
-                        echo "<tr><td>$account_name</td><td>{$row['check_interval']}</td><td>$enable_tgbot</td><td><a href='task_edit.php?action=edit&id={$row['id']}' class='btn btn-secondary'>编辑</a> <a href='task_edit.php?action=delete&id={$row['id']}' class='btn btn-danger'>删除</a></td></tr>";
+                        echo "<tr><td>{$row['id']}</td><td>$account_name</td><td>{$row['check_interval']}</td><td>$enable_tgbot</td><td><a href='task_edit.php?action=edit&id={$row['id']}' class='btn btn-secondary'>编辑</a> <a href='task_edit.php?action=delete&id={$row['id']}' class='btn btn-danger'>删除</a></td></tr>";
                     }
                 }
                 ?>

@@ -1,7 +1,7 @@
 # 简介
 以全新方式管理你的 Apple ID
 
-基于密保问题的自动化Apple ID检测&解锁程序程序
+基于密保问题的自动化Apple ID检测&解锁程序
 
 前端用于管理账号，支持添加多个账号，并提供展示账号页面
 
@@ -36,10 +36,13 @@ Telegram群：[@appleunblocker](https://t.me/appleunblocker)
 # 文件说明
 - `backend\unblocker_manager.py` 后端管理程序 \
 说明：用于定时从API获取任务列表，并部署task对应的docker容器 \
-启动参数：`-api_url <API地址> -api_key <API key> ` （API地址格式为http://xxx.xxx 末尾不需要加后缀和斜杠）
+启动参数：`-api_url <API地址> -api_key <API key> ` （API地址格式为http://xxx.xxx 末尾不需要加斜杠和路径）
 - `backend\unlocker\main.py` 后端解锁程序 \
-说明：通过Webdriver实现账号改密解锁，并向API提交新密码。**该程序必须使用API运行** \
+说明：通过Webdriver实现账号改密解锁，并向API提交新密码。**该程序依赖API运行** \
 启动参数：`-api_url <API地址> -api_key <API key> -taskid <Task ID>`
+
+仅部署**后端管理程序**即可，该脚本会自动从API站点获取任务并部署容器，默认同步时间为10分钟（手动同步可重启服务） \
+若不想使用自动同步，也可以直接部署**后端解锁程序**，docker版 [sahuidhsu/appleid_auto](https://hub.docker.com/r/sahuidhsu/appleid_auto)
 
 # API说明
 等待添加……
