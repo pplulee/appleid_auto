@@ -4,7 +4,11 @@ if (!isset($_GET['share_link'])){
     echo "分享链接不存在";
     exit;
 }
-$account = new account(get_share_account_id($_GET['share_link']));
+$account = new account(get_share_account_id($_GET['link']));
+if ($account->id==-1){
+    echo "分享链接不存在";
+    exit;
+}
 ?>
 <html lang="zh-CN">
 <head>
