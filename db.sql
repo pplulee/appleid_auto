@@ -30,7 +30,7 @@ CREATE TABLE `account` (
   `share_link` varchar(16) COLLATE utf8_unicode_ci NOT NULL,
   `last_check` datetime NOT NULL DEFAULT '2000-01-01 00:00:00',
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 /*Data for the table `account` */
 
@@ -44,7 +44,7 @@ CREATE TABLE `task` (
   `tgbot_token` varchar(64) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL,
   `owner` int(11) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 /*Data for the table `task` */
 
