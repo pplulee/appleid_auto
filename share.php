@@ -1,6 +1,6 @@
 <?php
 include "include/common.php";
-if (!isset($_GET['share_link'])){
+if (!isset($_GET['link'])){
     echo "分享链接不存在";
     exit;
 }
