@@ -36,15 +36,15 @@ class API:
             result = json.loads(get(f"{self.url}/api/?key={self.key}&action=get_task_list").text)
         except Exception:
             error("获取任务列表失败")
-            return []
+            return False
         else:
             if result['status'] == "fail":
                 error("获取任务列表失败")
-                return []
+                return False
             elif result['data'] == ['']:
                 return []
             else:
-                return result['data']
+                return result['data'].split(",")
 
 
 class local_docker:
@@ -78,8 +78,12 @@ class local_docker:
 
     def get_remote_list(self):
         result_list = self.api.get_task_list()
-        info(f"从云端获取到{len(result_list)}个任务")
-        return result_list
+        if not result_list:
+            info("获取云端任务列表失败，使用本地列表")
+            return self.local_list
+        else:
+            info(f"从云端获取到{len(result_list)}个任务")
+            return result_list
 
     def sync(self):
         info("开始同步")
@@ -96,13 +100,6 @@ class local_docker:
                 self.deploy_docker(id)
                 self.local_list.append(id)
         info("同步完成")
-
-
-def clean_html(data):
-    pointer = len(data) - 1
-    while data[pointer] != ">" and pointer > 0:
-        pointer -= 1
-    return data[pointer:]
 
 
 def job():
