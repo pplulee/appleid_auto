@@ -41,7 +41,7 @@ class API:
             if result['status'] == "fail":
                 error("获取任务列表失败")
                 return False
-            elif result['data'] == ['']:
+            elif result['data'] == "":
                 return []
             else:
                 return result['data'].split(",")
