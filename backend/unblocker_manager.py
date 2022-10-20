@@ -108,7 +108,7 @@ def job():
     Local.sync()
 
 
-info("自动签到后端服务启动")
+info("AppleAuto后端管理服务启动")
 api = API()
 Local = local_docker(api)
 job()
