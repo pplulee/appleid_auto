@@ -27,7 +27,7 @@ class API:
 
     def get_password(self, username):
         try:
-            result = loads(get(f"{self.url}/api/?key={self.key}&action=get_password&username={username}").text)
+            result = loads(get(f"{self.url}/api/?key={self.key}&action=get_password&username={username}",verify=False).text)
         except BaseException:
             return False
         else:
@@ -38,7 +38,7 @@ class API:
 
     def get_config(self, id):
         try:
-            result = loads(get(f"{self.url}/api/?key={self.key}&action=get_task_info&id={id}").text)
+            result = loads(get(f"{self.url}/api/?key={self.key}&action=get_task_info&id={id}",verify=False).text)
         except BaseException:
             return {"status": "fail"}
         else:
@@ -50,7 +50,7 @@ class API:
     def update(self, username, password):
         try:
             result = loads(
-                get(f"{self.url}/api/?key={self.key}&username={username}&password={password}&action=update_password").text)
+                get(f"{self.url}/api/?key={self.key}&username={username}&password={password}&action=update_password",verify=False).text)
         except BaseException:
             return {"status": "fail"}
         else:

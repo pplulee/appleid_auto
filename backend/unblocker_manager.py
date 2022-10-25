@@ -33,8 +33,8 @@ class API:
 
     def get_task_list(self):
         try:
-            result = json.loads(get(f"{self.url}/api/?key={self.key}&action=get_task_list").text)
-        except Exception:
+            result = json.loads(get(f"{self.url}/api/?key={self.key}&action=get_task_list",verify=False).text)
+        except Exception as e:
             error("获取任务列表失败")
             return False
         else:
