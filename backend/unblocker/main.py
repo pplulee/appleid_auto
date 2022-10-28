@@ -79,6 +79,17 @@ class Config:
         if self.webdriver != "local":
             self.remote_driver = True
 
+    def __str__(self) -> str:
+        return f"Username: {self.username}\n" \
+               f"DOB: {self.dob}\n" \
+               f"Answer: {self.answer}\n" \
+               f"Check Interval: {self.check_interval}\n" \
+               f"Webdriver: {self.webdriver}\n" \
+               f"Step Sleep: {self.step_sleep}\n" \
+               f"Remote Driver: {self.remote_driver}\n" \
+               f"Telegram Bot: {self.tgbot_enable}\n" \
+               f"Password Length: {self.password_length}"
+
 
 class TGbot:
     def __init__(self, chatid, token):
@@ -325,8 +336,9 @@ def setup_driver():
             driver = webdriver.Remote(command_executor=config.webdriver, options=options)
         else:
             driver = webdriver.Chrome(options=options)
-    except BaseException:
-        error("Webdriver调用失败")
+    except BaseException as e:
+        error("Webdriver调用失败:", e)
+        exit(1)
     else:
         driver.set_page_load_timeout(15)
 
