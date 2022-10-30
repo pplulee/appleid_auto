@@ -57,7 +57,7 @@ if (isset($_GET['action'])) {
             </div>
             <div class="input-group mb-3">
                 <span class='input-group-text' id='username'>用户名</span>
-                <input type='text' class='form-control' name='user'
+                <input type='text' class='form-control' name='username'
                        autocomplete='off' <?php echo "value='$currentuser->username'"; ?>
                        required>
             </div>
