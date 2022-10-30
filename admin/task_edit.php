@@ -6,12 +6,10 @@ if (isset($_POST['submit'])) {
         case "edit":
             $task = new task($_GET['id']);
             $task->update($_POST['account_id'], $_POST['check_interval'], $_POST['tgbot_chatid'], $_POST['tgbot_token'], $_POST['owner']);
-            echo "<div class='alert alert-success' role='alert'><p>修改成功，即将返回</p></div>";
-            echo "<script>setTimeout(\"javascript:location.href='task.php'\", 800);</script>";
+            alert("success", "保存成功", 2000, "task.php");
             exit;
         default:
-            echo "<div class='alert alert-danger' role='alert'><p>未知错误</p></div>";
-            echo "<script>setTimeout(\"javascript:location.href='task.php'\", 800);</script>";
+            alert("error", "未知错误", 2000, "task.php");
             exit;
     }
 }
@@ -21,8 +19,7 @@ if (isset($_GET['action'])) {
         {
             $task = new task($_GET['id']);
             $task->delete();
-            echo "<div class='alert alert-success' role='alert'><p>删除成功，即将返回</p></div>";
-            echo "<script>setTimeout(\"javascript:location.href='task.php'\", 800);</script>";
+            alert("success", "删除成功", 2000, "task.php");
             exit;
         }
         case "edit":
@@ -65,8 +62,7 @@ if (isset($_GET['action'])) {
         }
         default:
         {
-            echo "<div class='alert alert-danger' role='alert'><p>未知错误</p></div>";
-            echo "<script>setTimeout(\"javascript:location.href='task.php'\", 800);</script>";
+            alert("error", "未知错误", 2000, "task.php");
             exit;
         }
     }

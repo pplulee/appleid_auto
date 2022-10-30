@@ -4,26 +4,25 @@ include("header.php");
 if (isset($_POST['submit'])) {
     $currentuser = new user($_POST['userid']);
     if (($currentuser->user_id) == -1) {
-        alert("用户不存在");
+        alert("error","用户不存在！",2000,"user.php");
         exit;
     }
-    $currentuser->update($_POST['email'], $_POST['isadmin']);
+    $currentuser->update($_POST['username'], $_POST['isadmin']);
     if ($_POST['password'] != "") {
         $currentuser->change_password($_POST['password']);
     }
-    echo '<div class="alert alert-success" role="alert"><p>保存成功</p></div>';
-    echo '<script>window.setTimeout("window.location=\'user.php\'",800);</script>';
+    alert("success","修改成功！",2000,"user.php");
     exit;
 }
 
 if (isset($_GET['action'])) {
     if (!isset($_GET["id"])) {
-        echo '<div class="alert alert-danger" role="alert"><p>参数错误</p></div>';
+        alert("error","参数错误！",2000,"user.php");
         exit;
     }
     $currentuser = new user($_GET["id"]);
     if ($currentuser->user_id == 0) {
-        echo '<div class="alert alert-danger" role="alert"><p>用户不存在</p></div>';
+        alert("error","用户不存在！",2000,"user.php");
         exit;
     }
     switch ($_GET["action"]) {
@@ -34,13 +33,12 @@ if (isset($_GET['action'])) {
         case "delete":
         {
             $currentuser->delete_account();
-            echo '<div class="alert alert-success" role="alert"><p>用户删除成功</p></div>';
-            echo '<script>window.setTimeout("window.location=\'user.php\'",800);</script>';
+            alert("success","删除成功！",2000,"user.php");
             exit;
         }
         default:
         {
-            echo '<div class="alert alert-danger" role="alert"><p>action参数错误</p></div>';
+            alert("error","参数错误！",2000,"user.php");
             exit;
         }
     }
@@ -59,7 +57,7 @@ if (isset($_GET['action'])) {
             </div>
             <div class="input-group mb-3">
                 <span class='input-group-text' id='username'>用户名</span>
-                <input type='email' class='form-control' name='user'
+                <input type='text' class='form-control' name='user'
                        autocomplete='off' <?php echo "value='$currentuser->username'"; ?>
                        required>
             </div>

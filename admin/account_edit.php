@@ -6,12 +6,10 @@ if (isset($_POST['submit'])) {
         case "edit":
             $account = new account($_GET['id']);
             $account->update($_POST['username'], $_POST['password'], $_POST['remark'], $_POST['dob'], $_POST['question1'], $_POST['answer1'], $_POST['question2'], $_POST['answer2'], $_POST['question3'], $_POST['answer3'], $_POST['owner'], $_POST['share_link']);
-            echo "<div class='alert alert-success' role='alert'><p>修改成功，即将返回</p></div>";
-            echo "<script>setTimeout(\"javascript:location.href='account.php'\", 800);</script>";
+            alert("success", "修改成功！", 2000, "account.php");
             exit;
         default:
-            echo "<div class='alert alert-danger' role='alert'><p>未知错误</p></div>";
-            echo "<script>setTimeout(\"javascript:location.href='account.php'\", 800);</script>";
+            alert("error", "未知错误", 2000, "account.php");
             exit;
     }
 }
@@ -21,8 +19,7 @@ if (isset($_GET['action'])) {
         {
             $account = new account($_GET['id']);
             $account->delete();
-            echo "<div class='alert alert-success' role='alert'><p>删除成功，即将返回</p></div>";
-            echo "<script>setTimeout(\"javascript:location.href='account.php'\", 800);</script>";
+            alert("success", "删除成功！", 2000, "account.php");
             exit;
         }
         case "edit":
@@ -103,8 +100,7 @@ if (isset($_GET['action'])) {
         }
         default:
         {
-            echo "<div class='alert alert-danger' role='alert'><p>未知错误</p></div>";
-            echo "<script>setTimeout(\"javascript:location.href='account.php'\", 800);</script>";
+            alert("danger", "未知操作！", 2000, "account.php");
             exit;
         }
     }
