@@ -1,25 +1,43 @@
-# 简介
-以全新方式管理你的 Apple ID
+<h1 align="center">Apple ID 一键解锁工具</h1>
+<p align="center">
+    <a href="https://github.com/pplulee/appleid_auto/issues" style="text-decoration:none">
+        <img src="https://img.shields.io/github/issues/pplulee/appleid_auto.svg" alt="GitHub issues"/>
+    </a>
+    <a href="https://github.com/pplulee/appleid_auto/stargazers" style="text-decoration:none" >
+        <img src="https://img.shields.io/github/stars/pplulee/appleid_auto.svg" alt="GitHub stars"/>
+    </a>
+    <a href="https://github.com/pplulee/appleid_auto/network" style="text-decoration:none" >
+        <img src="https://img.shields.io/github/forks/pplulee/appleid_auto.svg" alt="GitHub forks"/>
+    </a>
+    <a href="https://github.com/pplulee/apple_auto/blob/main/LICENSE" style="text-decoration:none" >
+        <img src="https://img.shields.io/github/license/pplulee/appleid_auto" alt="GitHub license"/>
+    </a>
+</p>
+<h3 align="center">请仔细阅读本文档以及未来我们会推出的 Wiki 文档，再使用。</h3>  
+<h3 align="center">本项目仍在更新当中。</h3>
 
-基于密保问题的自动化Apple ID检测&解锁程序
+# 基本简介
 
-前端用于管理账号，支持添加多个账号，并提供展示账号页面
+“以全新方式管理你的 Apple ID” —— 这是一款基于密保问题的自动化 Apple ID 检测&解锁程序。
 
-后端定时检测账号是否被锁定，若被锁定或开启二步验证则自动解锁，修改密码并向API回报密码
+前端用于管理账号，支持添加多个账号，并提供展示账号页面；
 
-目前后端运行基于docker，请确保机器已安装docker
+后端定时检测账号是否被锁定，若被锁定或开启二步验证则自动解锁，修改密码并向API回报密码。
 
-unblocker_manager为后端管理程序，会定时从API获取任务列表并部署docker容器（每个task对应一个容器）
+### 注意事项：
 
-**程序需要使用Chrome webdriver**，推荐使用Docker版 [selenium/standalone-chrome](https://hub.docker.com/r/selenium/standalone-chrome)，使用方法请自行寻找
+1. 目前**后端运行基于docker**，请确保机器已安装docker；
+2. unblocker_manager为**后端管理程序**，会定时从API获取任务列表并部署docker容器（每个task对应一个容器）；
+3. 程序**需要使用Chrome webdriver**，推荐使用Docker版 [selenium/standalone-chrome](https://hub.docker.com/r/selenium/standalone-chrome)，使用方法请自行寻找。
 
 # 问题反馈&交流
-本人水平和能力有限，程序可能存在bug，欢迎提出issue或PR，也欢迎各位大佬加入项目 \
+开发者水平和能力有限，程序可能存在诸多bug，欢迎提出 Issue 或 Pull Request ，也欢迎各位大佬加入项目！
 Telegram群：[@appleunblocker](https://t.me/appleunblocker)
 
 # 使用方法
-使用前请确保已部署好 Webdriver \
+**使用前请确保已部署好 Webdriver**
 网页端运行环境推荐 php7.4 & MySQL8.0
+
 1. 从Release下载网页源码并部署，导入数据库 (`db.sql`) 并修改配置文件 (`config.php`)（记得设置远程Webdriver地址） \
     默认账户：`admin` 密码：`admin`
 2. 登录网站后，添加Apple账号，填写账号信息
@@ -28,7 +46,8 @@ Telegram群：[@appleunblocker](https://t.me/appleunblocker)
 5. 查看`unblocker_manager`是否成功获取到任务列表
 6. 查看容器是否部署并正常运行
 
-`config.php` 示例
+`config.php` **正确示例**
+
 ```php
 <?php
 $Sys_config["debug"] = true;
@@ -63,7 +82,7 @@ $Sys_config["webdriver_url"] = "http://selenium:4444";
 # API说明
 等待添加……
 
-# TODO
+# TODO List
 - [x] 自动识别验证码
 - [x] 检测账号被锁
 - [x] 检测二步验证
