@@ -1,0 +1,42 @@
+version: '3'
+services:
+  webdrive:
+    image: "selenium/standalone-chrome:4.5.3-20221024"
+    ports:
+      - "4444:4444"
+      - "7900:7900"
+  apple:
+    build: .
+    ports:
+     - "8080:80"
+    links:
+      - webdrive:webdrive
+    depends_on:
+      - db
+      - webdrive
+    environment:
+      - DB_HOST=db
+      - DB_USER=root
+      - DB_PASS=root
+      - DB_NAME=appleid
+      - WEBDRIVE_URL=http://webdrive:4444
+  # for test only
+  # unblocker:
+  #   build:
+  #     context: ./backend/unblocker
+  #     dockerfile: Dockerfile
+  #   environment:
+  #     - API_URL=http://apple
+  #     - API_KEY=YOUR_API_KEY_HERE
+  #     - TASK_ID=1
+  #   depends_on:
+  #     - apple
+  #   links:
+  #     - webdrive:webdrive
+  db:
+    image: mysql:8.0
+    ports:
+      - 3306:3306
+    environment: 
+      - MYSQL_DATABASE=appleid
+      - MYSQL_ROOT_PASSWORD=root    
