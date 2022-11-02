@@ -35,9 +35,10 @@
 Telegram群：[@appleunblocker](https://t.me/appleunblocker)
 
 # 使用方法
-**使用前请确保已部署好 Webdriver**
 提供php环境和docker环境的部署方法，二选一即可。
 ## 使用PHP环境部署
+**使用前请确保已部署好 Webdriver**
+
 网页端运行环境推荐 php7.4 & MySQL8.0
 
 1. 从Release下载网页源码并部署，导入数据库 (`db.sql`) 并修改配置文件 (`config.php`)（记得设置远程Webdriver地址） \
@@ -66,19 +67,23 @@ $Sys_config["webdriver_url"] = "http://selenium:4444";
 ```
 
 ### 一键部署unblocker_manager：
-`wget https://raw.githubusercontent.com/pplulee/appleid_auto/main/backend/install_unblocker.sh && bash install_unblocker.sh`
+`wget https://raw.githubusercontent.com/pplulee/appleid_auto/main/backend/scheduling/install_unblocker.sh && bash install_unblocker.sh`
 ### 关于密保问题的说明：
 问题一栏仅需填写关键词即可，例如”生日“、”工作“等，但请注意账号**安全问题的语言**
 
 ## 使用docker部署
-docker部署方式目前还不提供unblocker_manager的自动处理。
+`docker compose`和原生二选一即可
 ### 使用docker compose
-根据你的需要修改`docker-compose.yml`文件，然后执行`docker compose up -d`
-现有的`docker compose`文件包含了数据库，解锁工具和 `webdrive`，数据库端口`3306`，解锁工具端口`8080`，`webdrive`端口`4444`。数据库默认账号和密码都是`root`。
+更简单，只需要确保你本地安装了`docker`和`docker compose`
 
-### 不使用docker compose
-1. 构建镜像 `docker build -t appleid .`
-2. 部署 `docker run -d -p 8080:80 -e DB_HOST=数据库地址 -e DB_USER=数据库用户名 -e DB_PASS=数据库密码 -e DB_NAME=数据库名称 -e WEBDRIVE_URL=webdrive的地址 appleid`
+根据你的需要修改`docker-compose.yml`文件，然后在根目录执行`docker compose up -d`，等待所有容器上线,不要忘了数据导入
+
+现有的`docker compose`文件包含了数据库，解锁工具，调度器和 `webdrive`，数据库端口`3306`，解锁工具端口`8080`，`webdrive`端口`4444`，数据库默认账号和密码都是`root`，使用此方法后端无需单独部署
+
+需要注意的是，因为容器内部互相隔离，所以`IP`不能填`127.0.0.1`或者`localhost`
+
+### 使用原生docker
+请参考`docker compose`文件的每一个`service`进行拆分，环境变量在该文件中都有说明。Dockerfile分别在根目录和`backend`的两个子目录
 
 # 文件说明
 - `backend\unblocker_manager.py` 后端管理程序 \
@@ -90,13 +95,6 @@ docker部署方式目前还不提供unblocker_manager的自动处理。
 
 仅部署**后端管理程序**即可，该脚本会自动从API站点获取任务并部署容器，默认同步时间为10分钟（手动同步可重启服务） \
 若不想使用自动同步，也可以直接部署**后端解锁程序**，docker版 [sahuidhsu/appleid_auto](https://hub.docker.com/r/sahuidhsu/appleid_auto)
-
-如果希望手动构建**后端解锁程序**镜像，可以执行如下命令：
-```shell
-cd backend/unblocker
-docker build -t unblocker .
-docker run -d -e api_url=API地址 -e api_key=API_KEY -e taskid=任务ID unblocker
-```
 
 
 # API说明

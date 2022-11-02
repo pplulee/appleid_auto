@@ -15,6 +15,8 @@ args = parser.parse_args()
 api_url = args.api_url
 api_key = args.api_key
 
+print(args)
+
 
 def info(text):
     print("[INFO] " + text)
@@ -55,8 +57,8 @@ class local_docker:
     def deploy_docker(self, id):
         info(f"部署容器{id}")
         os.system(f"docker run -d --name={prefix}{id} \
-        -e api_url={self.api.url} \
-        -e api_key={self.api.key} \
+        -e api_url={api_url} \
+        -e api_key={api_key} \
         -e taskid={id} \
         --log-opt max-size=1m \
         --log-opt max-file=1 \

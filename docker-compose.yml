@@ -4,13 +4,11 @@ services:
     image: "selenium/standalone-chrome:4.5.3-20221024"
     ports:
       - "4444:4444"
-      - "7900:7900"
+      # - "7900:7900"
   apple:
     build: .
     ports:
      - "8080:80"
-    links:
-      - webdrive:webdrive
     depends_on:
       - db
       - webdrive
@@ -19,7 +17,28 @@ services:
       - DB_USER=root
       - DB_PASS=root
       - DB_NAME=appleid
-      - WEBDRIVE_URL=http://webdrive:4444
+      - WEBDRIVE_URL=http://你的IP:4444
+      - API_URL=http://你的IP:8080
+      - API_KEY=你的密钥
+  db:
+    image: mysql:8.0
+    ports:
+      - 3306:3306
+    environment: 
+      - MYSQL_DATABASE=appleid
+      - MYSQL_ROOT_PASSWORD=root
+  scheduling:
+    # image: docker:cli
+    # command: docker run -d --name unblocker --network apple_default --link apple:apple --link webdrive:webdrive -e API_URL=http://apple -e API_KEY=YOUR_API_KEY_HERE -e TASK_ID=1 apple/unblocker
+    build:
+      context: ./backend/scheduling
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    environment:
+      - api_url=http://你的IP:8080
+      - api_key=你的密钥
+    depends_on:
+      - apple
   # for test only
   # unblocker:
   #   build:
@@ -33,10 +52,4 @@ services:
   #     - apple
   #   links:
   #     - webdrive:webdrive
-  db:
-    image: mysql:8.0
-    ports:
-      - 3306:3306
-    environment: 
-      - MYSQL_DATABASE=appleid
-      - MYSQL_ROOT_PASSWORD=root    
+  #     - apple:apple
