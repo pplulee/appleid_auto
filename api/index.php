@@ -127,7 +127,7 @@ switch ($_GET["action"]) {
                     'message' => '账号不存在'
                 );
             } else {
-                $account->update_password($_GET['password']);
+                $account->update_password($_GET['password']==""?$account->password:$_GET['password']);
                 $data = array(
                     'status' => 'success',
                     'message' => '更新成功'
