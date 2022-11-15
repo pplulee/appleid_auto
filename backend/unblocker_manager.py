@@ -3,11 +3,13 @@ import json
 import logging
 import os
 import time
+import platform
 
 import schedule
 from requests import get
 
 prefix = "apple-auto_"
+is_arm = platform.machine() == "aarch64"
 parser = argparse.ArgumentParser(description="")
 parser.add_argument("-api_url", help="API URL", required=True)
 parser.add_argument("-api_key", help="API key", required=True)
@@ -33,7 +35,7 @@ class API:
 
     def get_task_list(self):
         try:
-            result = json.loads(get(f"{self.url}/api/?key={self.key}&action=get_task_list",verify=False).text)
+            result = json.loads(get(f"{self.url}/api/?key={self.key}&action=get_task_list", verify=False).text)
         except Exception as e:
             error("获取任务列表失败")
             return False
@@ -54,6 +56,7 @@ class local_docker:
 
     def deploy_docker(self, id):
         info(f"部署容器{id}")
+        arm_command = ":arm64" if is_arm else ""
         os.system(f"docker run -d --name={prefix}{id} \
         -e api_url={self.api.url} \
         -e api_key={self.api.key} \
@@ -61,7 +64,7 @@ class local_docker:
         --log-opt max-size=1m \
         --log-opt max-file=1 \
         --restart=on-failure \
-        sahuidhsu/appleid_auto")
+        sahuidhsu/appleid_auto{arm_command}")
 
     def remove_docker(self, id):
         info(f"删除容器{id}")
