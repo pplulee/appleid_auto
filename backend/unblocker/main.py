@@ -25,20 +25,9 @@ class API:
         self.url = url
         self.key = key
 
-    def get_password(self, username):
-        try:
-            result = loads(get(f"{self.url}/api/?key={self.key}&action=get_password&username={username}",verify=False).text)
-        except BaseException:
-            return False
-        else:
-            if result["status"] == "success":
-                return result["password"]
-            else:
-                return ""
-
     def get_config(self, id):
         try:
-            result = loads(get(f"{self.url}/api/?key={self.key}&action=get_task_info&id={id}",verify=False).text)
+            result = loads(get(f"{self.url}/api/?key={self.key}&action=get_task_info&id={id}", verify=False).text)
         except BaseException:
             return {"status": "fail"}
         else:
@@ -50,7 +39,8 @@ class API:
     def update(self, username, password):
         try:
             result = loads(
-                get(f"{self.url}/api/?key={self.key}&username={username}&password={password}&action=update_password",verify=False).text)
+                get(f"{self.url}/api/?key={self.key}&username={username}&password={password}&action=update_password",
+                    verify=False).text)
         except BaseException:
             return {"status": "fail"}
         else:
@@ -63,7 +53,6 @@ class API:
 class Config:
     def __init__(self, username, dob, q1, a1, q2, a2, q3, a3, check_interval, tgbot_token, tgbot_chatid, step_sleep,
                  webdriver):
-        self.remote_driver = False
         self.tgbot_enable = False
         self.password_length = 10
         self.username = username
@@ -76,8 +65,6 @@ class Config:
             self.tgbot_enable = True
             self.tgbot_chatid = tgbot_chatid
             self.tgbot_token = tgbot_token
-        if self.webdriver != "local":
-            self.remote_driver = True
 
     def __str__(self) -> str:
         return f"Username: {self.username}\n" \
@@ -86,7 +73,6 @@ class Config:
                f"Check Interval: {self.check_interval}\n" \
                f"Webdriver: {self.webdriver}\n" \
                f"Step Sleep: {self.step_sleep}\n" \
-               f"Remote Driver: {self.remote_driver}\n" \
                f"Telegram Bot: {self.tgbot_enable}\n" \
                f"Password Length: {self.password_length}"
 
@@ -136,6 +122,14 @@ class ID:
             driver.switch_to.alert.accept()
         except BaseException:
             pass
+        try:
+            text = driver.find_element("xpath", "/html/body/center[1]/h1").text
+        except BaseException:
+            pass
+        else:
+            error("页面加载失败，疑似服务器IP被拒绝访问")
+            print(text)
+            exit()
         time.sleep(config.step_sleep)
 
     def login(self):
@@ -193,8 +187,13 @@ class ID:
 
     def unlock_2fa(self):
         if self.check_2fa():
-            driver.find_element("xpath",
-                                "/html/body/div[1]/iforgot-v2/app-container/div/iforgot-body/hsa-two-v2/recovery-web-app/idms-flow/div/div/trusted-phone-number/div/div/div[1]/idms-step/div/div/div/div[2]/div/div/div/button").click()
+            try:
+                driver.find_element("xpath",
+                                    "/html/body/div[1]/iforgot-v2/app-container/div/iforgot-body/hsa-two-v2/recovery-web-app/idms-flow/div/div/trusted-phone-number/div/div/div[1]/idms-step/div/div/div/div[2]/div/div/div/button").click()
+            except BaseException:
+                error("无法找到关闭验证按钮，可能是账号不允许关闭2FA，退出程序")
+                driver.quit()
+                exit()
             time.sleep(config.step_sleep)
             driver.find_element("xpath",
                                 "/html/body/div[5]/div/div/recovery-unenroll-start/div/idms-step/div/div/div/div[3]/idms-toolbar/div/div/div/button[1]").click()
@@ -332,13 +331,14 @@ def setup_driver():
     options.add_argument("user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) "
                          "Chrome/101.0.4951.54 Safari/537.36")
     try:
-        if config.remote_driver:
+        if config.webdriver != "local":
             driver = webdriver.Remote(command_executor=config.webdriver, options=options)
         else:
             driver = webdriver.Chrome(options=options)
     except BaseException as e:
-        error("Webdriver调用失败:", e)
-        exit(1)
+        error("Webdriver调用失败")
+        print(e)
+        exit()
     else:
         driver.set_page_load_timeout(15)
 
@@ -346,11 +346,6 @@ def setup_driver():
 def job():
     global api
     schedule.clear()
-    password = api.get_password(config.username)
-    if password == "":
-        error("获取密码失败，可能是账号不存在")
-        exit()
-    id.password = password
     unlock = False
     setup_driver()
     id.login()
@@ -365,13 +360,15 @@ def job():
             unlock = True
     driver.quit()
     info("账号检测完毕")
-    update_result = api.update(id.username, id.password)
+    if unlock:
+        notification(f"Apple ID解锁成功\n新密码：{id.password}")
+        update_result = api.update(id.username, id.password)
+    else:
+        update_result = api.update(id.username, "")
     if update_result["status"] == "fail":
         error("更新密码失败")
     else:
         info("更新密码成功")
-    if unlock:
-        notification(f"Apple ID解锁成功\n新密码：{id.password}")
     schedule.every(config.check_interval).minutes.do(job)
     return unlock
 
