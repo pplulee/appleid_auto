@@ -127,7 +127,7 @@ class ID:
         except BaseException:
             pass
         else:
-            error("页面加载失败，疑似服务器IP被拒绝访问")
+            error("页面加载失败，疑似服务器IP被拒绝访问，程序已退出")
             print(text)
             exit()
         time.sleep(config.step_sleep)
@@ -154,6 +154,13 @@ class ID:
             driver.find_element("xpath",
                                 "/html/body/div[1]/iforgot-v2/app-container/div/iforgot-body/global-v2/div/idms-flow/div/forgot-password/div/div/div[1]/idms-step/div/div/div/div[2]/div/div[1]/div[2]/div/iforgot-captcha/div/div[2]/idms-textbox/idms-error-wrapper/div/idms-error/div/div/span")
         except BaseException:
+            try:
+                driver.find_element("xpath","/html/body/div[1]/iforgot-v2/app-container/div/iforgot-body/global-v2/div/idms-flow/div/forgot-password/div/div/div[1]/idms-step/div/div/div/div[2]/div/div[1]/div[1]/div/idms-textbox/idms-error-wrapper/div/idms-error/div/div/span")
+            except BaseException:
+                pass
+            else:
+                error("无法处理请求，疑似服务器IP被拒绝访问，程序已退出")
+                exit()
             info("登录成功")
             return True
         else:
@@ -320,7 +327,6 @@ def setup_driver():
     global driver
     options = webdriver.ChromeOptions()
     options.add_argument("--no-sandbox")
-    options.add_argument("--headless")
     options.add_argument("--disable-gpu")
     options.add_argument("--disable-dev-shm-usage")
     options.add_argument("--ignore-certificate-errors")
