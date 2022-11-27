@@ -9,9 +9,8 @@ from json import loads
 
 import ddddocr
 import schedule
-from requests import get
+from requests import get, post
 from selenium import webdriver
-from telegram.ext import Updater, CommandHandler
 
 parser = argparse.ArgumentParser(description="")
 parser.add_argument("-api_url", help="API URL")
@@ -77,26 +76,6 @@ class Config:
                f"Password Length: {self.password_length}"
 
 
-class TGbot:
-    def __init__(self, chatid, token):
-        self.updater = Updater(token)
-        self.updater.dispatcher.add_handler(CommandHandler('ping', self.ping))
-        self.updater.dispatcher.add_handler(CommandHandler('job', self.job))
-        self.updater.start_polling()
-
-    def ping(self, bot, update):
-        info("Telegram 检测存活")
-        self.sendmessage("还活着捏")
-
-    def job(self, bot, update):
-        info("手动执行任务")
-        self.sendmessage("开始检测账号")
-        job()
-
-    def sendmessage(self, text):
-        return self.updater.bot.send_message(chat_id=config.tgbot_chatid, text=text)["message_id"]
-
-
 class ID:
     def __init__(self, username, dob, answer):
         self.username = username
@@ -155,11 +134,12 @@ class ID:
                                 "/html/body/div[1]/iforgot-v2/app-container/div/iforgot-body/global-v2/div/idms-flow/div/forgot-password/div/div/div[1]/idms-step/div/div/div/div[2]/div/div[1]/div[2]/div/iforgot-captcha/div/div[2]/idms-textbox/idms-error-wrapper/div/idms-error/div/div/span")
         except BaseException:
             try:
-                driver.find_element("xpath","/html/body/div[1]/iforgot-v2/app-container/div/iforgot-body/global-v2/div/idms-flow/div/forgot-password/div/div/div[1]/idms-step/div/div/div/div[2]/div/div[1]/div[1]/div/idms-textbox/idms-error-wrapper/div/idms-error/div/div/span")
+                driver.find_element("xpath",
+                                    "/html/body/div[1]/iforgot-v2/app-container/div/iforgot-body/global-v2/div/idms-flow/div/forgot-password/div/div/div[1]/idms-step/div/div/div/div[2]/div/div[1]/div[1]/div/idms-textbox/idms-error-wrapper/div/idms-error/div/div/span")
             except BaseException:
                 pass
             else:
-                error("无法处理请求，疑似服务器IP被拒绝访问，程序已退出")
+                error("无法处理请求，可能是账号被锁区，程序已退出")
                 exit()
             info("登录成功")
             return True
@@ -314,13 +294,11 @@ config = Config(config_result["username"], config_result["dob"], config_result["
 
 def notification(content):
     if config.tgbot_enable:
-        tgbot.sendmessage(content)
+        post(f"https://api.telegram.org/bot{config.tgbot_token}/sendMessage",
+             data={"chat_id": config.tgbot_chatid, "text": content})
 
 
 ocr = ddddocr.DdddOcr()
-
-if config.tgbot_enable:
-    tgbot = TGbot(config.tgbot_chatid, config.tgbot_token)
 
 
 def setup_driver():
@@ -335,7 +313,7 @@ def setup_driver():
     options.add_argument("start-maximized")
     options.add_argument("window-size=1920,1080")
     options.add_argument("user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) "
-                         "Chrome/101.0.4951.54 Safari/537.36")
+                         "Chrome/107.0.0.0 Safari/537.36")
     try:
         if config.webdriver != "local":
             driver = webdriver.Remote(command_executor=config.webdriver, options=options)
