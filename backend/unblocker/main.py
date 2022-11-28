@@ -107,6 +107,7 @@ class ID:
             pass
         else:
             error("页面加载失败，疑似服务器IP被拒绝访问，程序已退出")
+            driver.quit()
             print(text)
             exit()
         time.sleep(config.step_sleep)
@@ -134,12 +135,14 @@ class ID:
                                 "/html/body/div[1]/iforgot-v2/app-container/div/iforgot-body/global-v2/div/idms-flow/div/forgot-password/div/div/div[1]/idms-step/div/div/div/div[2]/div/div[1]/div[2]/div/iforgot-captcha/div/div[2]/idms-textbox/idms-error-wrapper/div/idms-error/div/div/span")
         except BaseException:
             try:
-                driver.find_element("xpath",
+                message = driver.find_element("xpath",
                                     "/html/body/div[1]/iforgot-v2/app-container/div/iforgot-body/global-v2/div/idms-flow/div/forgot-password/div/div/div[1]/idms-step/div/div/div/div[2]/div/div[1]/div[1]/div/idms-textbox/idms-error-wrapper/div/idms-error/div/div/span")
             except BaseException:
                 pass
             else:
-                error("无法处理请求，可能是账号被锁区，程序已退出")
+                error("无法处理请求，可能是账号已失效，程序已退出")
+                error(message.text)
+                driver.quit()
                 exit()
             info("登录成功")
             return True
