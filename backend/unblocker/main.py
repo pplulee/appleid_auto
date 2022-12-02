@@ -104,16 +104,17 @@ class ID:
         try:
             text = driver.find_element("xpath", "/html/body/center[1]/h1").text
         except BaseException:
-            pass
+            time.sleep(config.step_sleep)
+            return True
         else:
             error("页面加载失败，疑似服务器IP被拒绝访问，程序已退出")
+            error(text)
             driver.quit()
-            print(text)
-            exit()
-        time.sleep(config.step_sleep)
+            return False
 
     def login(self):
-        self.refresh()
+        if not (self.refresh()):
+            return False
         time.sleep(config.step_sleep)
         driver.find_element("xpath",
                             "/html/body/div[1]/iforgot-v2/app-container/div/iforgot-body/global-v2/div/idms-flow/div/forgot-password/div/div/div[1]/idms-step/div/div/div/div[2]/div/div[1]/div[1]/div/idms-textbox/idms-error-wrapper/div/div/input").send_keys(
@@ -136,14 +137,14 @@ class ID:
         except BaseException:
             try:
                 message = driver.find_element("xpath",
-                                    "/html/body/div[1]/iforgot-v2/app-container/div/iforgot-body/global-v2/div/idms-flow/div/forgot-password/div/div/div[1]/idms-step/div/div/div/div[2]/div/div[1]/div[1]/div/idms-textbox/idms-error-wrapper/div/idms-error/div/div/span")
+                                              "/html/body/div[1]/iforgot-v2/app-container/div/iforgot-body/global-v2/div/idms-flow/div/forgot-password/div/div/div[1]/idms-step/div/div/div/div[2]/div/div[1]/div[1]/div/idms-textbox/idms-error-wrapper/div/idms-error/div/div/span")
             except BaseException:
                 pass
             else:
                 error("无法处理请求，可能是账号已失效，程序已退出")
                 error(message.text)
                 driver.quit()
-                exit()
+                return False
             info("登录成功")
             return True
         else:
@@ -335,27 +336,29 @@ def job():
     schedule.clear()
     unlock = False
     setup_driver()
-    id.login()
-    if id.check_2fa():
-        info("检测到账号开启双重认证，开始解锁")
-        id.unlock_2fa()
-        unlock = True
-    else:
-        if not (id.check()):
-            info("检测到账号被锁定，开始解锁")
-            id.unlock()
+    if id.login():
+        if id.check_2fa():
+            info("检测到账号开启双重认证，开始解锁")
+            id.unlock_2fa()
             unlock = True
-    driver.quit()
-    info("账号检测完毕")
-    if unlock:
-        notification(f"Apple ID解锁成功\n新密码：{id.password}")
-        update_result = api.update(id.username, id.password)
+        else:
+            if not (id.check()):
+                info("检测到账号被锁定，开始解锁")
+                id.unlock()
+                unlock = True
+        driver.quit()
+        info("账号检测完毕")
+        if unlock:
+            notification(f"Apple ID解锁成功\n新密码：{id.password}")
+            update_result = api.update(id.username, id.password)
+        else:
+            update_result = api.update(id.username, "")
+        if update_result["status"] == "fail":
+            error("更新密码失败")
+        else:
+            info("更新密码成功")
     else:
-        update_result = api.update(id.username, "")
-    if update_result["status"] == "fail":
-        error("更新密码失败")
-    else:
-        info("更新密码成功")
+        error("任务执行失败，等待下次检测")
     schedule.every(config.check_interval).minutes.do(job)
     return unlock
 
