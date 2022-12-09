@@ -22,6 +22,8 @@
 
 前端用于管理账号，支持添加多个账号，并提供展示账号页面；
 
+支持创建包含多个账号的分享页面。
+
 后端定时检测账号是否被锁定，若被锁定或开启二步验证则自动解锁，修改密码并向API回报密码。
 
 ### 注意事项：
@@ -34,11 +36,21 @@
 开发者水平和能力有限，程序可能存在诸多bug，欢迎提出 Issue 或 Pull Request ，也欢迎各位大佬加入项目！
 Telegram群：[@appleunblocker](https://t.me/appleunblocker)
 
+# 前端更新
+从Release下载网页源码并覆盖原有文件，导入更新的数据库文件（开头为update_的文件）即可。请注意不要覆盖原先的config.php文件。
+
+# 后端更新
+更新后端需要删除所有现有的docker容器和镜像，然后重新部署。
+为方便使用，我们提供了基于Python3的更新脚本，一键指令如下
+```bash
+wget https://raw.githubusercontent.com/pplulee/appleid_auto/main/backend/upgrade.py -O upgrade_appleauto.py && python3 upgrade_appleauto.py
+```
+
 # 使用方法
 **使用前请确保已部署好 Webdriver**
-网页端运行环境推荐 php7.4 & MySQL8.0
+网页端运行环境推荐 php7.4 & MySQL8.0，理论支持MySQL5.x，未测试其他版本php环境。
 
-1. 从Release下载网页源码并部署，导入数据库 (`db.sql`) 并修改配置文件 (`config.php`)（记得设置远程Webdriver地址） \
+1. 从Release下载网页源码并部署，导入数据库 (`sql/db.sql`) ，复制配置文件`config.bak.php`到`config.php`并修改（记得设置远程Webdriver地址） \
     默认账户：`admin` 密码：`admin`
 2. 登录网站后，添加Apple账号，填写账号信息
 3. 前往面板中任务列表，创建账号对应的解锁任务
@@ -63,7 +75,7 @@ $Sys_config["backend_step_sleep"] = 3; # 后端脚本步骤执行间隔，单位
 $Sys_config["webdriver_url"] = "http://selenium:4444";
 ```
 
-### 一键部署unblocker_manager：
+### 一键部署unblocker_manager（后端）：
 `wget https://raw.githubusercontent.com/pplulee/appleid_auto/main/backend/install_unblocker.sh && bash install_unblocker.sh`
 ### 关于密保问题的说明：
 问题一栏仅需填写关键词即可，例如”生日“、”工作“等，但请注意账号**安全问题的语言**
@@ -86,6 +98,7 @@ $Sys_config["webdriver_url"] = "http://selenium:4444";
 - [x] 自动识别验证码
 - [x] 检测账号被锁
 - [x] 检测二步验证
+- [x] 分享页面支持多个账号
 - [ ] 检查密码正确
 - [ ] 删除设备
 - [x] 修改密码

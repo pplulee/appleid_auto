@@ -107,7 +107,7 @@ class ID:
             time.sleep(config.step_sleep)
             return True
         else:
-            error("页面加载失败，疑似服务器IP被拒绝访问，程序已退出")
+            error("页面加载失败，疑似服务器IP被拒绝访问")
             error(text)
             driver.quit()
             return False
@@ -141,7 +141,7 @@ class ID:
             except BaseException:
                 pass
             else:
-                error("无法处理请求，可能是账号已失效，程序已退出")
+                error("无法处理请求，可能是账号已失效")
                 error(message.text)
                 driver.quit()
                 return False
