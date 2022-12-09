@@ -39,7 +39,7 @@ function get_id_by_username($username): int
     }
 }
 
-function get_accoubt_id($username): int
+function get_account_id($username): int
 {
     global $conn;
     $result = $conn->query("SELECT id FROM account WHERE username='$username';");
@@ -87,7 +87,8 @@ function login($username, $password): array
     }
 }
 
-function get_share_account_id($share_link): int{
+function get_share_account_id($share_link): int
+{
     global $conn;
     $result = $conn->query("SELECT id FROM account WHERE share_link='$share_link';");
     if ($result->num_rows == 0) {
@@ -141,9 +142,9 @@ function php_self()
     return substr($_SERVER['PHP_SELF'], strrpos($_SERVER['PHP_SELF'], '/') + 1);
 }
 
-function alert($type,$message,$delay,$dest)
+function alert($type, $message, $delay, $dest)
 {
-    switch ($type){
+    switch ($type) {
         case "success":
             $title = "成功";
             break;
@@ -157,12 +158,12 @@ function alert($type,$message,$delay,$dest)
             $title = "信息";
             break;
         case "question":
-            $title="请检查";
+            $title = "请检查";
             break;
         default:
             $title = "";
             break;
-        }
-    echo "<script>Swal.fire({icon: '$type',title: '$title',text: '$message',timer:$delay,timerProgressBar: true});setTimeout(\"javascript:location.href='$dest'\", $delay);</script>";
+    }
+    echo "<script>Swal.fire({icon: '$type',title: '$title',text: '$message',timer:$delay,showConfirmButton: false,timerProgressBar: true});setTimeout(\"javascript:location.href='$dest'\", $delay);</script>";
 }
 

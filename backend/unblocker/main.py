@@ -196,9 +196,14 @@ class ID:
             driver.find_element("xpath",
                                 "/html/body/div[1]/iforgot-v2/app-container/div/iforgot-body/hsa-two-v2/recovery-web-app/idms-flow/div/div/verify-birthday/div/div/div[1]/idms-step/div/div/div/div[3]/idms-toolbar/div/div/div/button[1]").click()
             time.sleep(config.step_sleep)
-            question1 = driver.find_element("xpath",
-                                            "/html/body/div[1]/iforgot-v2/app-container/div/iforgot-body/hsa-two-v2/recovery-web-app/idms-flow/div/div/verify-security-questions/div/div/div/step-challenge-security-questions/idms-step/div/div/div/div[2]/div/div[1]/div/label").get_attribute(
-                "innerHTML")
+            try:
+                question1 = driver.find_element("xpath",
+                                                "/html/body/div[1]/iforgot-v2/app-container/div/iforgot-body/hsa-two-v2/recovery-web-app/idms-flow/div/div/verify-security-questions/div/div/div/step-challenge-security-questions/idms-step/div/div/div/div[2]/div/div[1]/div/label").get_attribute(
+                    "innerHTML")
+            except BaseException:
+                error("无法找到问题，可能是账号不允许关闭2FA，退出程序")
+                driver.quit()
+                exit()
             question2 = driver.find_element("xpath",
                                             "/html/body/div[1]/iforgot-v2/app-container/div/iforgot-body/hsa-two-v2/recovery-web-app/idms-flow/div/div/verify-security-questions/div/div/div/step-challenge-security-questions/idms-step/div/div/div/div[2]/div/div[2]/div/label").get_attribute(
                 "innerHTML")
@@ -246,9 +251,14 @@ class ID:
             driver.find_element("id", "action").click()
             time.sleep(config.step_sleep)
             # 判断问题
-            question1 = driver.find_element("xpath",
-                                            "//*[@id='content']/iforgot-v2/app-container/div/iforgot-body/sa/idms-flow/div/section/div/verify-security-questions/div[2]/div[1]/label").get_attribute(
-                "innerHTML")
+            try:
+                question1 = driver.find_element("xpath",
+                                                "//*[@id='content']/iforgot-v2/app-container/div/iforgot-body/sa/idms-flow/div/section/div/verify-security-questions/div[2]/div[1]/label").get_attribute(
+                    "innerHTML")
+            except BaseException:
+                error("安全问题获取失败，可能是上一步生日填写错误")
+                driver.quit()
+                exit()
             question2 = driver.find_element("xpath",
                                             "//*[@id='content']/iforgot-v2/app-container/div/iforgot-body/sa/idms-flow/div/section/div/verify-security-questions/div[2]/div[2]/label").get_attribute(
                 "innerHTML")
@@ -260,8 +270,13 @@ class ID:
                 self.get_answer(question2))
             driver.find_element("id", "action").click()
             time.sleep(config.step_sleep)
-            driver.find_element("xpath",
-                                "/html/body/div[1]/iforgot-v2/app-container/div/iforgot-body/sa/idms-flow/div/section/div/web-reset-options/div[2]/div[1]/button").click()
+            try:
+                driver.find_element("xpath",
+                                    "/html/body/div[1]/iforgot-v2/app-container/div/iforgot-body/sa/idms-flow/div/section/div/web-reset-options/div[2]/div[1]/button").click()
+            except BaseException:
+                error("无法重置密码，可能是上一步问题回答错误")
+                driver.quit()
+                exit()
             time.sleep(config.step_sleep)
             self.password = self.generate_password()
             info(f"新密码：{self.password}")

@@ -6,8 +6,7 @@ if (isset($_POST['submit'])) {
         case "add":
         {
             $conn->query("INSERT INTO task (account_id, check_interval,tgbot_chatid,tgbot_token,owner) VALUES ('{$_POST['account_id']}','{$_POST['check_interval']}','{$_POST['tgbot_chatid']}','{$_POST['tgbot_token']}','{$_SESSION['user_id']}');");
-            echo "<div class='alert alert-success' role='alert'><p>添加成功，即将返回</p></div>";
-            echo "<script>setTimeout(\"javascript:location.href='task.php'\", 800);</script>";
+            alert("success", "添加成功", 2000, "task.php");
             exit;
         }
         case "edit":
@@ -15,17 +14,15 @@ if (isset($_POST['submit'])) {
             $task = new task($_GET['id']);
             if ($task->owner == $_SESSION['user_id'] || $task->id) {
                 $task->update($_POST['account_id'], $_POST['check_interval'], $_POST['tgbot_chatid'], $_POST['tgbot_token'], $_SESSION['user_id']);
-                echo "<div class='alert alert-success' role='alert'><p>修改成功，即将返回</p></div>";
+                alert("success", "修改成功", 2000, "task.php");
             } else {
-                echo "<div class='alert alert-danger' role='alert'><p>修改失败</p></div>";
+                alert("error", "修改失败", 2000, "task.php");
             }
-            echo "<script>setTimeout(\"javascript:location.href='task.php'\", 800);</script>";
             exit;
         }
         default:
         {
-            echo "<div class='alert alert-danger' role='alert'><p>未知错误</p></div>";
-            echo "<script>setTimeout(\"javascript:location.href='task.php'\", 800);</script>";
+            alert("error", "未知错误", 2000, "task.php");
             exit;
         }
     }
@@ -34,14 +31,17 @@ if (isset($_GET['action'])) {
     switch ($_GET['action']) {
         case "delete":
         {
+            if (!isset($_GET['id'])) {
+                alert("error", "缺少参数", 2000, "task.php");
+                exit;
+            }
             $task = new task($_GET['id']);
             if ($task->owner == $_SESSION['user_id'] || $task->id) {
                 $task->delete();
-                echo "<div class='alert alert-success' role='alert'><p>删除成功，即将返回</p></div>";
+                alert("success", "删除成功", 2000, "task.php");
             } else {
-                echo "<div class='alert alert-danger' role='alert'><p>删除失败</p></div>";
+                alert("error", "删除失败", 2000, "task.php");
             }
-            echo "<script>setTimeout(\"javascript:location.href='task.php'\", 800);</script>";
             exit;
         }
         case "add":
@@ -82,6 +82,10 @@ if (isset($_GET['action'])) {
         }
         case "edit":
         {
+            if (!isset($_GET['id'])) {
+                alert("error", "缺少参数", 2000, "task.php");
+                exit;
+            }
             $task = new task($_GET['id']);
             if ($task->owner == $_SESSION['user_id']) {
                 $width = isMobile() ? "auto" : "60%";
@@ -118,16 +122,16 @@ if (isset($_GET['action'])) {
                     </div>
                 </div>";
             } else {
-                echo "<div class='alert alert-danger' role='alert'><p>修改失败</p></div>";
-                echo "<script>setTimeout(\"javascript:location.href='task.php'\", 800);</script>";
+                alert("error", "修改失败", 2000, "task.php");
             }
             exit;
         }
         default:
         {
-            echo "<div class='alert alert-danger' role='alert'><p>未知错误</p></div>";
-            echo "<script>setTimeout(\"javascript:location.href='task.php'\", 800);</script>";
+            alert("error", "未知错误", 2000, "task.php");
             exit;
         }
     }
+} else {
+    alert("error", "缺少参数", 2000, "account.php");
 }

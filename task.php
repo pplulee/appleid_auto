@@ -25,6 +25,8 @@ include("header.php");
                         $enable_tgbot = ($row['tgbot_chatid'] != "" && $row['tgbot_token'] != "") ? "是" : "否";
                         echo "<tr><td>{$row['id']}</td><td>$account_name</td><td>{$row['check_interval']}</td><td>$enable_tgbot</td><td><a href='task_edit.php?action=edit&id={$row['id']}' class='btn btn-secondary'>编辑</a> <a href='task_edit.php?action=delete&id={$row['id']}' class='btn btn-danger'>删除</a></td></tr>";
                     }
+                } else {
+                    echo "<tr><td colspan='5'>没有任务</td></tr>";
                 }
                 ?>
             </table>

@@ -4,7 +4,7 @@ $currentuser = new user($_SESSION['user_id']);
 if (isset($_POST['submit'])) {
     if ($_POST['password'] != "") {
         $currentuser->change_password($_POST['password']);
-        echo "<script>alert('修改成功!');window.location.href='userindex.php';</script>";
+        alert("success", "修改成功", 2000,"userindex.php");
     }
 }
 ?>

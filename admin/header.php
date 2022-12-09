@@ -24,6 +24,9 @@ if (!isset($_SESSION['isLogin']) or !isset($_SESSION["user_id"]) or !isadmin($_S
                     <a class="nav-link" href="account.php">账号管理</a>
                 </li>
                 <li class="nav-item">
+                    <a class="nav-link" href="shares.php">分享页管理</a>
+                </li>
+                <li class="nav-item">
                     <a class="nav-link" href="../userindex.php">返回个人中心</a>
                 </li>
             </ul>

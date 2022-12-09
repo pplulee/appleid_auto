@@ -51,7 +51,8 @@ include "include/common.php";
         <article id="login">
             <?php
             if (isset($_SESSION['isLogin']) and $_SESSION['isLogin']) {
-                echo "<script>alert('您已登录，自动跳转到用户界面！');window.location.href='userindex.php';</script>";
+                alert("warning","您已登录，自动跳转到用户界面！",1000, "userindex.php");
+                exit;
             }
             ?>
             <h2 class="major">登录</h2>
@@ -72,7 +73,8 @@ include "include/common.php";
         <article id="register">
             <?php
             if (isset($_SESSION['isLogin']) and $_SESSION['isLogin']) {
-                echo "<script>alert('您已登录，自动跳转到用户界面！');window.location.href='userindex.php';</script>";
+                alert("warning","您已登录，自动跳转到用户界面！",1000, "userindex.php");
+                exit;
             }
             ?>
             <h2 class="major">注册</h2>

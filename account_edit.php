@@ -5,9 +5,12 @@ if (isset($_POST['submit'])) {
     switch ($_GET['action']) {
         case "add":
         {
+            if (get_account_id($_POST['username']) != -1) {
+                alert("warning", "账号已存在", 2000, "account.php");
+                exit;
+            }
             $conn->query("INSERT INTO account (username, password, remark, dob, question1, answer1,question2,answer2,question3,answer3,owner,share_link) VALUES ('{$_POST['username']}','{$_POST['password']}','{$_POST['remark']}','{$_POST['dob']}','{$_POST['question1']}','{$_POST['answer1']}','{$_POST['question2']}','{$_POST['answer2']}','{$_POST['question3']}','{$_POST['answer3']}','{$_SESSION['user_id']}','{$_POST['share_link']}');");
-            echo "<div class='alert alert-success' role='alert'><p>添加成功，即将返回</p></div>";
-            echo "<script>setTimeout(\"javascript:location.href='account.php'\", 800);</script>";
+            alert("success", "添加成功", 2000, "account.php");
             exit;
         }
         case "edit":
@@ -15,17 +18,15 @@ if (isset($_POST['submit'])) {
             $account = new account($_GET['id']);
             if ($account->owner == $_SESSION['user_id'] || $account->id) {
                 $account->update($_POST['username'], $_POST['password'], $_POST['remark'], $_POST['dob'], $_POST['question1'], $_POST['answer1'], $_POST['question2'], $_POST['answer2'], $_POST['question3'], $_POST['answer3'], $_SESSION['user_id'], $_POST['share_link']);
-                echo "<div class='alert alert-success' role='alert'><p>修改成功，即将返回</p></div>";
+                alert("success", "修改成功", 2000, "account.php");
             } else {
-                echo "<div class='alert alert-danger' role='alert'><p>修改失败</p></div>";
+                alert("error", "修改失败", 2000, "account.php");
             }
-            echo "<script>setTimeout(\"javascript:location.href='account.php'\", 800);</script>";
             exit;
         }
         default:
         {
-            echo "<div class='alert alert-danger' role='alert'><p>未知错误</p></div>";
-            echo "<script>setTimeout(\"javascript:location.href='account.php'\", 800);</script>";
+            alert("error", "未知错误", 2000, "account.php");
             exit;
         }
     }
@@ -34,14 +35,17 @@ if (isset($_GET['action'])) {
     switch ($_GET['action']) {
         case "delete":
         {
+            if (!isset($_GET['id'])) {
+                alert("error", "缺少参数", 2000, "account.php");
+                exit;
+            }
             $account = new account($_GET['id']);
             if ($account->owner == $_SESSION['user_id'] || $account->id) {
                 $account->delete();
-                echo "<div class='alert alert-success' role='alert'><p>删除成功，即将返回</p></div>";
+                alert("success", "删除成功", 2000, "account.php");
             } else {
-                echo "<div class='alert alert-danger' role='alert'><p>删除失败</p></div>";
+                alert("error", "删除失败", 2000, "account.php");
             }
-            echo "<script>setTimeout(\"javascript:location.href='account.php'\", 800);</script>";
             exit;
         }
         case "add":
@@ -104,7 +108,15 @@ if (isset($_GET['action'])) {
         }
         case "edit":
         {
+            if (!isset($_GET['id'])) {
+                alert("error", "缺少参数", 2000, "account.php");
+                exit;
+            }
             $account = new account($_GET['id']);
+            if ($account->id == -1) {
+                alert("error", "账号不存在", 2000, "account.php");
+                exit;
+            }
             if ($account->owner == $_SESSION['user_id']) {
                 $width = isMobile() ? "auto" : "60%";
                 $question1 = array_keys($account->question)[0];
@@ -166,16 +178,16 @@ if (isset($_GET['action'])) {
                     </div>
                 </div>";
             } else {
-                echo "<div class='alert alert-danger' role='alert'><p>修改失败</p></div>";
-                echo "<script>setTimeout(\"javascript:location.href='account.php'\", 800);</script>";
+                alert("error", "修改失败", 2000, "account.php");
             }
             exit;
         }
         default:
         {
-            echo "<div class='alert alert-danger' role='alert'><p>未知错误</p></div>";
-            echo "<script>setTimeout(\"javascript:location.href='account.php'\", 800);</script>";
+            alert("error", "未知错误", 2000, "account.php");
             exit;
         }
     }
+} else {
+    alert("error", "缺少参数", 2000, "account.php");
 }

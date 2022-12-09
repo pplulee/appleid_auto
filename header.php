@@ -29,6 +29,9 @@ if ((!$_SESSION['isLogin']) and (!in_array(php_self(), array("index.php", "login
                     <a class='nav-link' href='task.php'>任务管理</a>
                 </li>
                 <li class='nav-item'>
+                    <a class='nav-link' href='shares.php'>分享页管理</a>
+                </li>
+                <li class='nav-item'>
                     <a class='nav-link' href='user_info.php'>个人信息</a>
                 </li>";
                 } else {

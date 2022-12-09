@@ -120,7 +120,7 @@ switch ($_GET["action"]) {
                 'message' => 'ID或密码不能为空'
             );
         } else {
-            $account = new account(get_accoubt_id($_GET['username']));
+            $account = new account(get_account_id($_GET['username']));
             if ($account->id == -1) {
                 $data = array(
                     'status' => 'fail',

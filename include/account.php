@@ -71,8 +71,25 @@ class account
     function delete()
     {
         global $conn;
-        $conn->query("DELETE FROM account WHERE id = '$this->id';");
+        // 修改相关分享页面
+        $result = $conn->query("SELECT share_id,account_list FROM share WHERE locate('$this->id',account_list);");
+        if ($result->num_rows != 0) {
+            while ($row = $result->fetch_assoc()) {
+                $account_list = explode(",", $row["account_list"]);
+                if (sizeof($account_list) == 1 && $account_list[0] == $this->id) {
+                    $conn->query("DELETE FROM share WHERE share_id='{$row["share_id"]}';");
+                } else {
+                    $account_list = array_diff($account_list, array($this->id));
+                    $account_list = implode(",", $account_list);
+                    $conn->query("UPDATE share SET account_list='$account_list' WHERE share_id='{$row["share_id"]}';");
+                }
+            }
+        }
+
+        // 删除所有相关的任务
         $conn->query("DELETE FROM task WHERE account_id = '$this->id';");
+        // 删除账号
+        $conn->query("DELETE FROM account WHERE id = '$this->id';");
         $this->id = -1;
     }
 }
