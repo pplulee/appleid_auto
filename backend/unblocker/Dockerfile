@@ -1,4 +1,4 @@
-FROM python:slim-bullseye
+FROM python:3.9-slim
 
 WORKDIR /app
 ADD main.py /app
