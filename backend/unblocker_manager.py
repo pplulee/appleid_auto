@@ -2,8 +2,8 @@ import argparse
 import json
 import logging
 import os
-import time
 import platform
+import time
 
 import schedule
 from requests import get
@@ -104,18 +104,48 @@ class local_docker:
                 self.local_list.append(id)
         info("同步完成")
 
+    def clean_local_docker(self):
+        info("开始清理本地容器")
+        self.local_list = self.get_local_list()
+        for name in self.local_list:
+            self.remove_docker(name)
+        info("清理完成")
+
+    def update(self):
+        info("开始检查更新")
+        self.local_list = self.get_local_list()
+        if len(self.local_list) == 0:
+            info("没有容器需要更新")
+            return
+        local_list_str = " ".join(self.local_list)
+        os.system(f"docker run --rm \
+        -v /var/run/docker.sock:/var/run/docker.sock \
+        containrrr/watchtower \
+        --cleanup \
+        --run-once \
+        {local_list_str}")
+
 
 def job():
     global Local
     info("开始定时任务")
     Local.sync()
 
+def update():
+    global Local
+    info("开始更新任务")
+    Local.update()
 
 info("AppleAuto后端管理服务启动")
 api = API()
 Local = local_docker(api)
+info("拉取最新镜像")
+os.system(f"docker pull sahuidhsu/appleid_auto{':arm64' if is_arm else ''}")
+info("删除本地所有容器")
+Local.clean_local_docker()
 job()
 schedule.every(10).minutes.do(job)
+schedule.every().day.at("00:00").do(update)
 while True:
     schedule.run_pending()
     time.sleep(1)
