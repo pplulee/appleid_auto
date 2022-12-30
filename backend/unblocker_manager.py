@@ -9,7 +9,6 @@ import schedule
 from requests import get
 
 prefix = "apple-auto_"
-is_arm = platform.machine() == "aarch64"
 parser = argparse.ArgumentParser(description="")
 parser.add_argument("-api_url", help="API URL", required=True)
 parser.add_argument("-api_key", help="API key", required=True)
@@ -56,7 +55,6 @@ class local_docker:
 
     def deploy_docker(self, id):
         info(f"部署容器{id}")
-        arm_command = ":arm64" if is_arm else ""
         os.system(f"docker run -d --name={prefix}{id} \
         -e api_url={self.api.url} \
         -e api_key={self.api.key} \
@@ -64,7 +62,7 @@ class local_docker:
         --log-opt max-size=1m \
         --log-opt max-file=1 \
         --restart=on-failure \
-        sahuidhsu/appleid_auto{arm_command}")
+        sahuidhsu/appleid_auto")
 
     def remove_docker(self, id):
         info(f"删除容器{id}")
@@ -140,7 +138,7 @@ info("AppleAuto后端管理服务启动")
 api = API()
 Local = local_docker(api)
 info("拉取最新镜像")
-os.system(f"docker pull sahuidhsu/appleid_auto{':arm64' if is_arm else ''}")
+os.system(f"docker pull sahuidhsu/appleid_auto")
 info("删除本地所有容器")
 Local.clean_local_docker()
 job()
