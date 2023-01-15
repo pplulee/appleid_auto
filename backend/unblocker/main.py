@@ -97,7 +97,13 @@ class ID:
         return ""
 
     def refresh(self):
-        driver.get("https://iforgot.apple.com/password/verify/appleid?language=en_US")
+        try:
+            driver.get("https://iforgot.apple.com/password/verify/appleid?language=en_US")
+            time.sleep(config.step_sleep)
+        except BaseException:
+            error("刷新页面失败")
+            driver.quit()
+            return False
         try:
             driver.switch_to.alert.accept()
         except BaseException:
@@ -245,8 +251,13 @@ class ID:
     def unlock(self):
         if not (self.check()):
             # 选择选项
-            driver.find_element("xpath",
-                                "/html/body/div[1]/iforgot-v2/app-container/div/iforgot-body/sa/idms-flow/div/section/div/authentication-method/div[2]/div[2]/label/span").click()
+            try:
+                driver.find_element("xpath",
+                                    "/html/body/div[1]/iforgot-v2/app-container/div/iforgot-body/sa/idms-flow/div/section/div/authentication-method/div[2]/div[2]/label/span").click()
+            except BaseException:
+                error("选择选项失败，无法使用安全问题解锁")
+                driver.quit()
+                return False
             time.sleep(config.step_sleep)
             driver.find_element("id", "action").click()
             # 填写生日
