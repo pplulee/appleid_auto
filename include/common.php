@@ -17,6 +17,11 @@ if (!isset($conn)) {
     }
 }
 
+//检查php_self()是否可用
+if (php_self() == "") {
+    die("无法获取php文件名，请检查php.ini中的cgi.fix_pathinfo是否为1");
+}
+
 //Initialize session
 session_start();
 if (!isset($_SESSION["isLogin"])) {
@@ -24,7 +29,6 @@ if (!isset($_SESSION["isLogin"])) {
 }
 
 include($_SERVER['DOCUMENT_ROOT'] . "/include/user.php");
-include($_SERVER['DOCUMENT_ROOT'] . "/include/task.php");
 include($_SERVER['DOCUMENT_ROOT'] . "/include/account.php");
 
 //Initialize CSS

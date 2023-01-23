@@ -29,7 +29,10 @@ CREATE TABLE `account` (
   `owner` int(10) unsigned NOT NULL,
   `share_link` varchar(16) COLLATE utf8_unicode_ci NOT NULL,
   `last_check` datetime NOT NULL DEFAULT '2000-01-01 00:00:00',
-  PRIMARY KEY (`id`)
+  `check_interval` int(10) unsigned NOT NULL DEFAULT '10',
+  PRIMARY KEY (`id`),
+  KEY `owner` (`owner`),
+  CONSTRAINT `account_ibfk_1` FOREIGN KEY (`owner`) REFERENCES `user` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 /*Data for the table `account` */
@@ -41,24 +44,12 @@ CREATE TABLE `share` (
   `share_link` varchar(16) COLLATE utf8_unicode_ci NOT NULL,
   `account_list` varchar(512) COLLATE utf8_unicode_ci NOT NULL,
   `owner` int(10) unsigned NOT NULL,
-  PRIMARY KEY (`share_id`)
+  PRIMARY KEY (`share_id`),
+  KEY `owner` (`owner`),
+  CONSTRAINT `share_ibfk_1` FOREIGN KEY (`owner`) REFERENCES `user` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 /*Data for the table `share` */
-
-/*Table structure for table `task` */
-
-CREATE TABLE `task` (
-  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
-  `account_id` int(10) unsigned NOT NULL,
-  `check_interval` int(10) unsigned NOT NULL,
-  `tgbot_chatid` varchar(64) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL,
-  `tgbot_token` varchar(64) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL,
-  `owner` int(11) NOT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
-
-/*Data for the table `task` */
 
 /*Table structure for table `user` */
 
@@ -68,13 +59,12 @@ CREATE TABLE `user` (
   `password` varchar(64) COLLATE utf8_unicode_ci NOT NULL,
   `is_admin` tinyint(1) unsigned NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 /*Data for the table `user` */
 
 insert  into `user`(`id`,`username`,`password`,`is_admin`) values 
-(1,'admin','$2y$10$aLTHxzuhUrSyHs6m.qKrEeSqmYMXKoTdpfepO0a8OmEIddeQjDcTG',1),
-(2,'test','$2y$10$O256sPnNzqq0Gy5t7VHVcu3WMSHL22azbkuyGPXUB23P2GdDF7ZCm',1);
+(1,'admin','$2y$10$aLTHxzuhUrSyHs6m.qKrEeSqmYMXKoTdpfepO0a8OmEIddeQjDcTG',1);
 
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
 /*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;
