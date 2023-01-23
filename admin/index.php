@@ -15,9 +15,6 @@ if (isset($_GET['logout'])) {
         <h3 class="card-header">服务器信息</h3>
         <ul class="list-group">
             <li class="list-group-item">
-                <b>总任务数:</b> <?php echo $conn->query("SELECT id FROM task;")->num_rows; ?>
-            </li>
-            <li class="list-group-item">
                 <b>总账号数:</b> <?php echo $conn->query("SELECT id FROM account;")->num_rows; ?>
             </li>
             <li class="list-group-item">

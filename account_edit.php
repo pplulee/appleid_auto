@@ -9,7 +9,7 @@ if (isset($_POST['submit'])) {
                 alert("warning", "账号已存在", 2000, "account.php");
                 exit;
             }
-            $conn->query("INSERT INTO account (username, password, remark, dob, question1, answer1,question2,answer2,question3,answer3,owner,share_link) VALUES ('{$_POST['username']}','{$_POST['password']}','{$_POST['remark']}','{$_POST['dob']}','{$_POST['question1']}','{$_POST['answer1']}','{$_POST['question2']}','{$_POST['answer2']}','{$_POST['question3']}','{$_POST['answer3']}','{$_SESSION['user_id']}','{$_POST['share_link']}');");
+            $conn->query("INSERT INTO account (username, password, remark, dob, question1, answer1,question2,answer2,question3,answer3,owner,share_link,check_interval) VALUES ('{$_POST['username']}','{$_POST['password']}','{$_POST['remark']}','{$_POST['dob']}','{$_POST['question1']}','{$_POST['answer1']}','{$_POST['question2']}','{$_POST['answer2']}','{$_POST['question3']}','{$_POST['answer3']}','{$_SESSION['user_id']}','{$_POST['share_link']}','{$_POST['check_interval']}');");
             alert("success", "添加成功", 2000, "account.php");
             exit;
         }
@@ -17,7 +17,7 @@ if (isset($_POST['submit'])) {
         {
             $account = new account($_GET['id']);
             if ($account->owner == $_SESSION['user_id'] || $account->id) {
-                $account->update($_POST['username'], $_POST['password'], $_POST['remark'], $_POST['dob'], $_POST['question1'], $_POST['answer1'], $_POST['question2'], $_POST['answer2'], $_POST['question3'], $_POST['answer3'], $_SESSION['user_id'], $_POST['share_link']);
+                $account->update($_POST['username'], $_POST['password'], $_POST['remark'], $_POST['dob'], $_POST['question1'], $_POST['answer1'], $_POST['question2'], $_POST['answer2'], $_POST['question3'], $_POST['answer3'], $_SESSION['user_id'], $_POST['share_link'], $_POST['check_interval']);
                 alert("success", "修改成功", 2000, "account.php");
             } else {
                 alert("error", "修改失败", 2000, "account.php");
@@ -100,6 +100,10 @@ if (isset($_GET['action'])) {
                                 <span class='input-group-text' id='question2'>分享代码</span>
                                 <input type='text' class='form-control' name='share_link' value='$share_link' required autocomplete='off'>
                             </div>
+                            <div class='input-group mb-3'>
+                                <span class='input-group-text' id='check_interval'>检查间隔</span>
+                                <input type='number' class='form-control' name='check_interval' required autocomplete='off' placeholder='单位：分钟' value='10'>
+                            </div>
                             <input type='submit' name='submit' class='btn btn-primary btn-block' value='添加'>
                         </form>
                     </div>
@@ -125,6 +129,7 @@ if (isset($_GET['action'])) {
                 $answer1 = $account->question[$question1];
                 $answer2 = $account->question[$question2];
                 $answer3 = $account->question[$question3];
+                $check_interval = $account->check_interval;
                 echo "<div class='container' style='margin-top: 2%; width: $width;'>
                     <div class='card border-dark'>
                         <h4 class='card-header bg-primary text-white text-center'>编辑账号</h4>
@@ -172,6 +177,10 @@ if (isset($_GET['action'])) {
                             <div class='input-group mb-3'>
                                 <span class='input-group-text' id='question2'>分享代码</span>
                                 <input type='text' class='form-control' name='share_link' value='$account->share_link' required autocomplete='off'>
+                            </div>
+                            <div class='input-group mb-3'>
+                                <span class='input-group-text' id='check_interval'>检查间隔</span>
+                                <input type='number' class='form-control' name='check_interval' required autocomplete='off' value='$check_interval'>
                             </div>
                             <input type='submit' name='submit' class='btn btn-primary btn-block' value='保存'>
                         </form>

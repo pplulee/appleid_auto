@@ -18,9 +18,6 @@ if (!isset($_SESSION['isLogin']) or !isset($_SESSION["user_id"]) or !isadmin($_S
                     <a class="nav-link" href="user.php">用户列表</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="task.php">任务管理</a>
-                </li>
-                <li class="nav-item">
                     <a class="nav-link" href="account.php">账号管理</a>
                 </li>
                 <li class="nav-item">

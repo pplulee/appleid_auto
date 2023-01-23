@@ -11,6 +11,7 @@ class account
     var int $owner;
     var string $share_link;
     var string $last_check;
+    var int $check_interval;
 
     function __construct($id)
     {
@@ -33,10 +34,11 @@ class account
             $this->owner = $result['owner'];
             $this->share_link = $result['share_link'];
             $this->last_check = $result['last_check'];
+            $this->check_interval = $result['check_interval'];
         }
     }
 
-    function update($username, $password, $remark, $dob, $question1, $answer1, $question2, $answer2, $question3, $answer3, $owner, $share_link)
+    function update($username, $password, $remark, $dob, $question1, $answer1, $question2, $answer2, $question3, $answer3, $owner, $share_link, $check_interval)
     {
         global $conn;
         $this->username = $username;
@@ -50,14 +52,17 @@ class account
         );
         $this->owner = $owner;
         $this->share_link = $share_link;
-        $conn->query("UPDATE account SET username='$username',password='$password',remark='$remark',dob='$dob',question1='$question1',answer1='$answer1',question2='$question2',answer2='$answer2',question3='$question3',answer3='$answer3',owner='$owner',share_link='$share_link' WHERE id='$this->id';");
+        $this->check_interval = $check_interval;
+        $conn->query("UPDATE account SET username='$username',password='$password',remark='$remark',dob='$dob',question1='$question1',answer1='$answer1',question2='$question2',answer2='$answer2',question3='$question3',answer3='$answer3',owner='$owner',share_link='$share_link', check_interval='$check_interval' WHERE id='$this->id';");
     }
 
     function update_password($password)
     {
         global $conn;
-        $this->password = $password;
-        $conn->query("UPDATE account SET password='$password' WHERE id='$this->id';");
+        if ($password != "") {
+            $this->password = $password;
+            $conn->query("UPDATE account SET password='$password' WHERE id='$this->id';");
+        }
         $this->update_last_check();
     }
 
@@ -86,8 +91,6 @@ class account
             }
         }
 
-        // 删除所有相关的任务
-        $conn->query("DELETE FROM task WHERE account_id = '$this->id';");
         // 删除账号
         $conn->query("DELETE FROM account WHERE id = '$this->id';");
         $this->id = -1;
