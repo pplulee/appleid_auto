@@ -1,5 +1,4 @@
 import argparse
-import datetime
 import logging
 import random
 import re
@@ -17,6 +16,15 @@ parser.add_argument("-api_url", help="API URL")
 parser.add_argument("-api_key", help="API key")
 parser.add_argument("-taskid", help="Task ID")
 args = parser.parse_args()
+
+logger = logging.getLogger()
+logger.setLevel('INFO')
+BASIC_FORMAT = "%(asctime)s [%(levelname)s] %(message)s"
+DATE_FORMAT = "%Y-%m-%d %H:%M:%S"
+formatter = logging.Formatter(BASIC_FORMAT, DATE_FORMAT)
+chlr = logging.StreamHandler()
+chlr.setFormatter(formatter)
+logger.addHandler(chlr)
 
 
 class API:
@@ -101,7 +109,7 @@ class ID:
             driver.get("https://iforgot.apple.com/password/verify/appleid?language=en_US")
             time.sleep(config.step_sleep)
         except BaseException:
-            error("刷新页面失败")
+            logger.error("刷新页面失败")
             driver.quit()
             return False
         try:
@@ -114,8 +122,8 @@ class ID:
             time.sleep(config.step_sleep)
             return True
         else:
-            error("页面加载失败，疑似服务器IP被拒绝访问")
-            error(text)
+            logger.error("页面加载失败，疑似服务器IP被拒绝访问")
+            logger.error(text)
             driver.quit()
             return False
 
@@ -148,14 +156,14 @@ class ID:
             except BaseException:
                 pass
             else:
-                error("无法处理请求，可能是账号已失效")
-                error(message.text)
+                logger.error("无法处理请求，可能是账号已失效")
+                logger.error(message.text)
                 driver.quit()
                 return False
-            info("登录成功")
+            logger.info("登录成功")
             return True
         else:
-            info("验证码错误，重新登录")
+            logger.info("验证码错误，重新登录")
             return self.login()
 
     def check(self):
@@ -166,10 +174,10 @@ class ID:
                                 "/html/body/div[1]/iforgot-v2/app-container/div/iforgot-body/sa/idms-flow/div/section/div/authentication-method/div[1]/p[1]").get_attribute(
                 "innerHTML")
         except BaseException:
-            info("当前账号未被锁定")
+            logger.info("当前账号未被锁定")
             return True  # 未被锁定
         else:
-            info("当前账号已被锁定")
+            logger.info("当前账号已被锁定")
             return False  # 被锁定
 
     def check_2fa(self):
@@ -177,10 +185,10 @@ class ID:
             driver.find_element("xpath",
                                 "/html/body/div[1]/iforgot-v2/app-container/div/iforgot-body/hsa-two-v2/recovery-web-app/idms-flow/div/div/trusted-phone-number/div/h1")
         except BaseException:
-            info("当前账号未开启2FA")
+            logger.info("当前账号未开启2FA")
             return False  # 未开启2FA
         else:
-            info("当前账号已开启2FA")
+            logger.info("当前账号已开启2FA")
             return True  # 已开启2FA
 
     def unlock_2fa(self):
@@ -189,7 +197,7 @@ class ID:
                 driver.find_element("xpath",
                                     "/html/body/div[1]/iforgot-v2/app-container/div/iforgot-body/hsa-two-v2/recovery-web-app/idms-flow/div/div/trusted-phone-number/div/div/div[1]/idms-step/div/div/div/div[2]/div/div/div/button").click()
             except BaseException:
-                error("无法找到关闭验证按钮，可能是账号不允许关闭2FA，退出程序")
+                logger.error("无法找到关闭验证按钮，可能是账号不允许关闭2FA，退出程序")
                 driver.quit()
                 exit()
             time.sleep(config.step_sleep)
@@ -211,13 +219,13 @@ class ID:
                                                 "/html/body/div[1]/iforgot-v2/app-container/div/iforgot-body/hsa-two-v2/recovery-web-app/idms-flow/div/div/verify-security-questions/div/div/div/step-challenge-security-questions/idms-step/div/div/div/div[2]/div/div[2]/div/label").get_attribute(
                     "innerHTML")
             except BaseException:
-                error("安全问题获取失败，可能是上一步生日填写错误")
+                logger.error("安全问题获取失败，可能是上一步生日填写错误")
                 driver.quit()
                 return False
             answer1 = self.get_answer(question1)
             answer2 = self.get_answer(question2)
             if answer1 == "" or answer2 == "":
-                error("无法找到答案，请检查安全问题是否正确，语言是否匹配")
+                logger.error("无法找到答案，请检查安全问题是否正确，语言是否匹配")
                 driver.quit()
                 return False
             driver.find_element("xpath",
@@ -245,7 +253,7 @@ class ID:
             time.sleep(config.step_sleep)
             driver.find_element("xpath",
                                 "/html/body/div[5]/div/div/div[1]/idms-step/div/div/div/div[3]/idms-toolbar/div/div/div/button[1]").click()
-            info(f"新密码：{self.password}")
+            logger.info(f"新密码：{self.password}")
             time.sleep(10)
 
     def unlock(self):
@@ -255,7 +263,7 @@ class ID:
                 driver.find_element("xpath",
                                     "/html/body/div[1]/iforgot-v2/app-container/div/iforgot-body/sa/idms-flow/div/section/div/authentication-method/div[2]/div[2]/label/span").click()
             except BaseException:
-                error("选择选项失败，无法使用安全问题解锁")
+                logger.error("选择选项失败，无法使用安全问题解锁")
                 driver.quit()
                 return False
             time.sleep(config.step_sleep)
@@ -277,13 +285,13 @@ class ID:
                                                 "//*[@id='content']/iforgot-v2/app-container/div/iforgot-body/sa/idms-flow/div/section/div/verify-security-questions/div[2]/div[2]/label").get_attribute(
                     "innerHTML")
             except BaseException:
-                error("安全问题获取失败，可能是上一步生日填写错误")
+                logger.error("安全问题获取失败，可能是上一步生日填写错误")
                 driver.quit()
                 return False
             answer1 = self.get_answer(question1)
             answer2 = self.get_answer(question2)
             if answer1 == "" or answer2 == "":
-                error("无法找到答案，请检查安全问题是否正确，语言是否匹配")
+                logger.error("无法找到答案，请检查安全问题是否正确，语言是否匹配")
                 driver.quit()
                 return False
             driver.find_element("xpath",
@@ -298,12 +306,12 @@ class ID:
                 driver.find_element("xpath",
                                     "/html/body/div[1]/iforgot-v2/app-container/div/iforgot-body/sa/idms-flow/div/section/div/web-reset-options/div[2]/div[1]/button").click()
             except BaseException:
-                error("无法重置密码，可能是上一步问题回答错误")
+                logger.error("无法重置密码，可能是上一步问题回答错误")
                 driver.quit()
                 return False
             time.sleep(config.step_sleep)
             self.password = self.generate_password()
-            info(f"新密码：{self.password}")
+            logger.info(f"新密码：{self.password}")
             driver.find_element("xpath",
                                 "/html/body/div[1]/iforgot-v2/app-container/div/iforgot-body/sa/idms-flow/div/section/div/reset-password/div[2]/div[1]/div[1]/div/web-password-input/div/input").send_keys(
                 self.password)
@@ -314,20 +322,10 @@ class ID:
             time.sleep(10)
 
 
-def info(text):
-    logging.info(text)
-    print(datetime.datetime.now().strftime("%H:%M:%S"), "[INFO]", text)
-
-
-def error(text):
-    logging.critical(text)
-    print(datetime.datetime.now().strftime("%H:%M:%S"), "[ERROR]", text)
-
-
 api = API(args.api_url, args.api_key)
 config_result = api.get_config(args.taskid)
 if config_result["status"] == "fail":
-    error("从API获取配置失败")
+    logger.error("从API获取配置失败")
     exit()
 config = Config(config_result["username"], config_result["dob"], config_result["q1"], config_result["a1"],
                 config_result["q2"], config_result["a2"], config_result["q3"], config_result["a3"],
@@ -363,8 +361,8 @@ def setup_driver():
         else:
             driver = webdriver.Chrome(options=options)
     except BaseException as e:
-        error("Webdriver调用失败")
-        print(e)
+        logger.error("Webdriver调用失败")
+        logger.error(e)
         exit()
     else:
         driver.set_page_load_timeout(15)
@@ -377,27 +375,27 @@ def job():
     setup_driver()
     if id.login():
         if id.check_2fa():
-            info("检测到账号开启双重认证，开始解锁")
+            logger.info("检测到账号开启双重认证，开始解锁")
             id.unlock_2fa()
             unlock = True
         else:
             if not (id.check()):
-                info("检测到账号被锁定，开始解锁")
+                logger.info("检测到账号被锁定，开始解锁")
                 id.unlock()
                 unlock = True
         driver.quit()
-        info("账号检测完毕")
+        logger.info("账号检测完毕")
         if unlock:
             notification(f"Apple ID解锁成功\n新密码：{id.password}")
             update_result = api.update(id.username, id.password)
         else:
             update_result = api.update(id.username, "")
         if update_result["status"] == "fail":
-            error("更新密码失败")
+            logger.error("更新密码失败")
         else:
-            info("更新密码成功")
+            logger.info("更新密码成功")
     else:
-        error("任务执行失败，等待下次检测")
+        logger.error("任务执行失败，等待下次检测")
     schedule.every(config.check_interval).minutes.do(job)
     return unlock
 
