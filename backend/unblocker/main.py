@@ -219,15 +219,15 @@ class ID:
                                                 "/html/body/div[1]/iforgot-v2/app-container/div/iforgot-body/hsa-two-v2/recovery-web-app/idms-flow/div/div/verify-security-questions/div/div/div/step-challenge-security-questions/idms-step/div/div/div/div[2]/div/div[2]/div/label").get_attribute(
                     "innerHTML")
             except BaseException:
-                logger.error("安全问题获取失败，可能是上一步生日填写错误")
+                logger.error("安全问题获取失败，可能是生日错误，程序已退出")
                 driver.quit()
-                return False
+                exit()
             answer1 = self.get_answer(question1)
             answer2 = self.get_answer(question2)
             if answer1 == "" or answer2 == "":
-                logger.error("无法找到答案，请检查安全问题是否正确，语言是否匹配")
+                logger.error("无法找到答案，可能是安全问题错误，程序已退出")
                 driver.quit()
-                return False
+                exit()
             driver.find_element("xpath",
                                 "/html/body/div[1]/iforgot-v2/app-container/div/iforgot-body/hsa-two-v2/recovery-web-app/idms-flow/div/div/verify-security-questions/div/div/div/step-challenge-security-questions/idms-step/div/div/div/div[2]/div/div[1]/div/div/idms-textbox/idms-error-wrapper/div/div/input").send_keys(
                 answer1)
@@ -263,9 +263,9 @@ class ID:
                 driver.find_element("xpath",
                                     "/html/body/div[1]/iforgot-v2/app-container/div/iforgot-body/sa/idms-flow/div/section/div/authentication-method/div[2]/div[2]/label/span").click()
             except BaseException:
-                logger.error("选择选项失败，无法使用安全问题解锁")
+                logger.error("选择选项失败，无法使用安全问题解锁，程序已退出")
                 driver.quit()
-                return False
+                exit()
             time.sleep(config.step_sleep)
             driver.find_element("id", "action").click()
             # 填写生日
@@ -285,15 +285,15 @@ class ID:
                                                 "//*[@id='content']/iforgot-v2/app-container/div/iforgot-body/sa/idms-flow/div/section/div/verify-security-questions/div[2]/div[2]/label").get_attribute(
                     "innerHTML")
             except BaseException:
-                logger.error("安全问题获取失败，可能是上一步生日填写错误")
+                logger.error("安全问题获取失败，可能是生日错误，程序已退出")
                 driver.quit()
-                return False
+                exit()
             answer1 = self.get_answer(question1)
             answer2 = self.get_answer(question2)
             if answer1 == "" or answer2 == "":
-                logger.error("无法找到答案，请检查安全问题是否正确，语言是否匹配")
+                logger.error("无法找到答案，可能是安全问题错误，程序已退出")
                 driver.quit()
-                return False
+                exit()
             driver.find_element("xpath",
                                 "/html/body/div[1]/iforgot-v2/app-container/div/iforgot-body/sa/idms-flow/div/section/div/verify-security-questions/div[2]/div[1]/idms-textbox/idms-error-wrapper/div/div/input").send_keys(
                 answer1)
@@ -306,9 +306,9 @@ class ID:
                 driver.find_element("xpath",
                                     "/html/body/div[1]/iforgot-v2/app-container/div/iforgot-body/sa/idms-flow/div/section/div/web-reset-options/div[2]/div[1]/button").click()
             except BaseException:
-                logger.error("无法重置密码，可能是上一步问题回答错误")
+                logger.error("无法重置密码，可能是上一步问题回答错误，程序已退出")
                 driver.quit()
-                return False
+                exit()
             time.sleep(config.step_sleep)
             self.password = self.generate_password()
             logger.info(f"新密码：{self.password}")
@@ -378,8 +378,7 @@ def job():
             logger.info("检测到账号开启双重认证，开始解锁")
             id.unlock_2fa()
             unlock = True
-        else:
-            if not (id.check()):
+        elif not (id.check()):
                 logger.info("检测到账号被锁定，开始解锁")
                 id.unlock()
                 unlock = True
