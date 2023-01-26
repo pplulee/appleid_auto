@@ -18,7 +18,7 @@ api_key = args.api_key
 
 
 logger = logging.getLogger()
-logger.setLevel('logger.info')
+logger.setLevel('INFO')
 BASIC_FORMAT = "%(asctime)s [%(levelname)s] %(message)s"
 DATE_FORMAT = "%Y-%m-%d %H:%M:%S"
 formatter = logging.Formatter(BASIC_FORMAT, DATE_FORMAT)
