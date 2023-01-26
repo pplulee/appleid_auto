@@ -37,14 +37,10 @@
 Telegram群：[@appleunblocker](https://t.me/appleunblocker)
 
 # 前端更新
-从Release下载网页源码并覆盖原有文件，导入更新的数据库文件（开头为update_的文件）即可。请注意不要覆盖原先的config.php文件。
+从Release下载网页源码并覆盖原有文件，重新填写config.php，导入更新的数据库文件（开头为update_的文件）即可。
 
 # 后端更新
-更新后端需要删除所有现有的docker容器和镜像，然后重新部署。
-为方便使用，我们提供了基于Python3的更新脚本，一键指令如下
-```bash
-wget https://raw.githubusercontent.com/pplulee/appleid_auto/main/backend/upgrade.py -O upgrade_appleauto.py && python3 upgrade_appleauto.py
-```
+若是最新版本的后端管理脚本，只需重启appleauto服务即可。若无效，可重新执行安装脚本
 
 # 使用方法
 **使用前请确保已部署好 Webdriver**
@@ -58,7 +54,7 @@ wget https://raw.githubusercontent.com/pplulee/appleid_auto/main/backend/upgrade
 5. 查看`unblocker_manager`是否成功获取到任务列表
 6. 查看容器是否部署并正常运行
 
-`config.php` **正确示例**
+`config.php` **填写示例仅供参考，非所有配置**
 
 ```php
 <?php
