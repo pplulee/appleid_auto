@@ -59,7 +59,7 @@ class API:
 
 class Config:
     def __init__(self, username, dob, q1, a1, q2, a2, q3, a3, check_interval, tgbot_token, tgbot_chatid, step_sleep,
-                 webdriver):
+                 webdriver,proxy):
         self.tgbot_enable = False
         self.password_length = 10
         self.username = username
@@ -68,6 +68,7 @@ class Config:
         self.check_interval = check_interval
         self.webdriver = webdriver
         self.step_sleep = step_sleep
+        self.proxy = proxy
         if tgbot_chatid != "" and tgbot_token != "":
             self.tgbot_enable = True
             self.tgbot_chatid = tgbot_chatid
@@ -156,7 +157,7 @@ class ID:
             except BaseException:
                 pass
             else:
-                logger.error("无法处理请求，可能是账号已失效")
+                logger.error("无法处理请求，可能是服务器IP被苹果拉黑")
                 logger.error(message.text)
                 driver.quit()
                 return False
@@ -330,7 +331,7 @@ if config_result["status"] == "fail":
 config = Config(config_result["username"], config_result["dob"], config_result["q1"], config_result["a1"],
                 config_result["q2"], config_result["a2"], config_result["q3"], config_result["a3"],
                 config_result["check_interval"], config_result["tgbot_token"], config_result["tgbot_chatid"],
-                config_result["step_sleep"], config_result["webdriver"])
+                config_result["step_sleep"], config_result["webdriver"],config_result["proxy"])
 
 
 def notification(content):
@@ -353,8 +354,9 @@ def setup_driver():
     options.add_argument("--disable-extensions")
     options.add_argument("start-maximized")
     options.add_argument("window-size=1920,1080")
-    options.add_argument("user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) "
-                         "Chrome/107.0.0.0 Safari/537.36")
+    if config.proxy != "":
+        options.add_argument(f"--proxy-server={config.proxy}")
+    options.add_argument("user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/108.0.0.0 Safari/537.36")
     try:
         if config.webdriver != "local":
             driver = webdriver.Remote(command_executor=config.webdriver, options=options)
@@ -365,7 +367,7 @@ def setup_driver():
         logger.error(e)
         exit()
     else:
-        driver.set_page_load_timeout(15)
+        driver.set_page_load_timeout(30)
 
 
 def job():
