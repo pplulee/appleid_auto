@@ -115,7 +115,7 @@ class local_docker:
         if len(self.local_list) == 0:
             logger.info("没有容器需要更新")
             return
-        local_list_str = " ".join(self.local_list)
+        local_list_str = " ".join([f"{prefix}{id}" for id in self.local_list])
         os.system(f"docker run --rm \
         -v /var/run/docker.sock:/var/run/docker.sock \
         containrrr/watchtower \
