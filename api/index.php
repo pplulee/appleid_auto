@@ -78,7 +78,8 @@ switch ($_GET["action"]) {
                     'API_key' => $Sys_config['apikey'],
                     'API_url' => $Sys_config['apiurl'],
                     'step_sleep' => $Sys_config['backend_step_sleep'],
-                    'webdriver' => $Sys_config['webdriver_url']
+                    'webdriver' => $Sys_config['webdriver_url'],
+                    'proxy' => $Sys_config['webdriver_proxy']
 
                 );
                 break;
