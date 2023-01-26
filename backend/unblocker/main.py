@@ -328,10 +328,21 @@ config_result = api.get_config(args.taskid)
 if config_result["status"] == "fail":
     logger.error("从API获取配置失败")
     exit()
-config = Config(config_result["username"], config_result["dob"], config_result["q1"], config_result["a1"],
-                config_result["q2"], config_result["a2"], config_result["q3"], config_result["a3"],
-                config_result["check_interval"], config_result["tgbot_token"], config_result["tgbot_chatid"],
-                config_result["step_sleep"], config_result["webdriver"],config_result["proxy"])
+
+config = Config(config_result["username"],
+                config_result["dob"],
+                config_result["q1"],
+                config_result["a1"],
+                config_result["q2"],
+                config_result["a2"],
+                config_result["q3"],
+                config_result["a3"],
+                config_result["check_interval"],
+                config_result["tgbot_token"] if "tgbot_token" in config_result.keys() else "",
+                config_result["tgbot_chatid"] if "tgbot_chatid" in config_result.keys() else "",
+                config_result["step_sleep"],
+                config_result["webdriver"],
+                config_result["proxy"] if "proxy" in config_result.keys() else "")
 
 
 def notification(content):
