@@ -111,6 +111,7 @@ class ID:
             time.sleep(config.step_sleep)
         except BaseException:
             logger.error("刷新页面失败")
+            logger.error("若启用了代理，请检查代理是否可用")
             driver.quit()
             return False
         try:
@@ -132,9 +133,15 @@ class ID:
         if not (self.refresh()):
             return False
         time.sleep(config.step_sleep)
-        driver.find_element("xpath",
-                            "/html/body/div[1]/iforgot-v2/app-container/div/iforgot-body/global-v2/div/idms-flow/div/forgot-password/div/div/div[1]/idms-step/div/div/div/div[2]/div/div[1]/div[1]/div/idms-textbox/idms-error-wrapper/div/div/input").send_keys(
-            self.username)
+        try:
+            driver.find_element("xpath",
+                                "/html/body/div[1]/iforgot-v2/app-container/div/iforgot-body/global-v2/div/idms-flow/div/forgot-password/div/div/div[1]/idms-step/div/div/div/div[2]/div/div[1]/div[1]/div/idms-textbox/idms-error-wrapper/div/div/input").send_keys(
+                self.username)
+        except BaseException:
+            logger.error("无法获取页面内容，即将退出程序")
+            logger.error("若启用了代理，请检查代理是否可用")
+            driver.quit()
+            exit()
         img = driver.find_element("xpath",
                                   "/html/body/div[1]/iforgot-v2/app-container/div/iforgot-body/global-v2/div/idms-flow/div/forgot-password/div/div/div[1]/idms-step/div/div/div/div[2]/div/div[1]/div[2]/div/iforgot-captcha/div/div[1]/idms-captcha/div/div/img").get_attribute(
             "src")
@@ -366,6 +373,7 @@ def setup_driver():
     options.add_argument("start-maximized")
     options.add_argument("window-size=1920,1080")
     if config.proxy != "":
+        logger.info("已启用代理")
         options.add_argument(f"--proxy-server={config.proxy}")
     options.add_argument("user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/108.0.0.0 Safari/537.36")
     try:
