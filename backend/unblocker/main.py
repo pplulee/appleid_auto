@@ -372,8 +372,8 @@ class ID:
             exit()
         # 跳过双重验证
         driver.switch_to.frame(WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.TAG_NAME, "iframe"))))
-        driver.find_element(By.XPATH,
-                            "/html/body/div[1]/appleid-repair/idms-widget/div/div/div/hsa2-enrollment-flow/div/div/idms-step/div/div/div/div[3]/idms-toolbar/div/div[1]/div/button[2]").click()
+        WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.XPATH,
+                            "/html/body/div[1]/appleid-repair/idms-widget/div/div/div/hsa2-enrollment-flow/div/div/idms-step/div/div/div/div[3]/idms-toolbar/div/div[1]/div/button[2]"))).click()
         driver.find_element(By.CLASS_NAME, "nav-cancel").click()
         WebDriverWait(driver, 10).until_not(EC.presence_of_element_located((By.CLASS_NAME, "nav-cancel")))
         # 删除设备
