@@ -344,9 +344,11 @@ class ID:
         driver.switch_to.frame(WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.TAG_NAME, "iframe"))))
         WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.ID, "account_name_text_field"))).send_keys(
             self.username)
+        time.sleep(1)
         driver.find_element(By.ID, "account_name_text_field").send_keys(Keys.ENTER)
-        time.sleep(config.step_sleep)
+        time.sleep(1)
         driver.find_element(By.ID, "password_text_field").send_keys(self.password)
+        time.sleep(1)
         driver.find_element(By.ID, "account_name_text_field").send_keys(Keys.ENTER)
         time.sleep(config.step_sleep)
         try:
@@ -372,13 +374,18 @@ class ID:
             exit()
         # 跳过双重验证
         driver.switch_to.frame(WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.TAG_NAME, "iframe"))))
-        WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.XPATH,
-                            "/html/body/div[1]/appleid-repair/idms-widget/div/div/div/hsa2-enrollment-flow/div/div/idms-step/div/div/div/div[3]/idms-toolbar/div/div[1]/div/button[2]"))).click()
-        driver.find_element(By.CLASS_NAME, "nav-cancel").click()
-        WebDriverWait(driver, 10).until_not(EC.presence_of_element_located((By.CLASS_NAME, "nav-cancel")))
+        try:
+            WebDriverWait(driver, 5).until(EC.presence_of_element_located((By.XPATH,
+                                                                            "/html/body/div[1]/appleid-repair/idms-widget/div/div/div/hsa2-enrollment-flow/div/div/idms-step/div/div/div/div[3]/idms-toolbar/div/div[1]/div/button[2]"))).click()
+            driver.find_element(By.CLASS_NAME, "nav-cancel").click()
+            WebDriverWait(driver, 5).until_not(EC.presence_of_element_located((By.CLASS_NAME, "nav-cancel")))
+        except BaseException:
+            pass
         # 删除设备
-        WebDriverWait(driver, 10).until(EC.presence_of_element_located(
-            (By.XPATH, "//*[@id=\"root\"]/div[3]/main/div/div[1]/div/nav/ul/li[5]/a"))).click()
+        time.sleep(config.step_sleep)
+        driver.get("https://appleid.apple.com/account/manage/section/devices")
+        WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.XPATH, "//*[@id=\"root\"]/div[3]/main/div/div[2]/div[3]/div/div/header/h1")))
+        time.sleep(config.step_sleep)
         devices = driver.find_elements(By.CLASS_NAME, "medium-12")
         logger.info(f"共有{len(devices)}个设备")
         for i in range(len(devices)):
@@ -386,7 +393,7 @@ class ID:
             WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.CLASS_NAME, "button-secondary"))).click()
             WebDriverWait(driver, 10).until(EC.presence_of_element_located(
                 (By.XPATH, "/html/body/aside[2]/div/div[2]/fieldset/div/div/button[2]"))).click()
-            time.sleep(config.step_sleep)
+            WebDriverWait(driver, 10).until_not(EC.presence_of_element_located((By.CLASS_NAME,"button-bar-working")))
             if i != len(devices) - 1:
                 devices[i + 1].click()
         logger.info("设备删除完毕")
