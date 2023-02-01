@@ -75,33 +75,28 @@ class API:
 
 
 class Config:
-    def __init__(self, username, password, dob, q1, a1, q2, a2, q3, a3, check_interval, tgbot_token, tgbot_chatid,
-                 step_sleep,
-                 webdriver, proxy):
-        self.tgbot_enable = False
+    def __init__(self, config_result):
         self.password_length = 10
-        self.username = username
-        self.password = password
-        self.dob = dob
-        self.answer = {q1: a1, q2: a2, q3: a3}
-        self.check_interval = check_interval
-        self.webdriver = webdriver
-        self.step_sleep = step_sleep
-        self.proxy = proxy
-        if tgbot_chatid != "" and tgbot_token != "":
-            self.tgbot_enable = True
-            self.tgbot_chatid = tgbot_chatid
-            self.tgbot_token = tgbot_token
-
-    def __str__(self) -> str:
-        return f"Username: {self.username}\n" \
-               f"DOB: {self.dob}\n" \
-               f"Answer: {self.answer}\n" \
-               f"Check Interval: {self.check_interval}\n" \
-               f"Webdriver: {self.webdriver}\n" \
-               f"Step Sleep: {self.step_sleep}\n" \
-               f"Telegram Bot: {self.tgbot_enable}\n" \
-               f"Password Length: {self.password_length}"
+        self.username = config_result["username"]
+        self.password = config_result["password"] if "password" in config_result.keys() else api.get_password(
+            self.username)
+        self.dob = config_result["dob"]
+        self.answer = {config_result["q1"]: config_result["a1"],
+                       config_result["q2"]: config_result["a2"],
+                       config_result["q3"]: config_result["a3"]}
+        self.check_interval = config_result["check_interval"]
+        self.webdriver = config_result["webdriver"]
+        self.step_sleep = config_result["step_sleep"]
+        self.proxy = config_result["proxy"] if "proxy" in config_result.keys() else ""
+        self.tgbot_chatid = config_result["tgbot_chatid"] if "tgbot_chatid" in config_result.keys() else ""
+        self.tgbot_token = config_result["tgbot_token"] if "tgbot_token" in config_result.keys() else ""
+        self.tgbot_enable = self.tgbot_chatid != "" and self.tgbot_token != ""
+        self.enable_check_password_correct = "check_password_correct" in config_result.keys()
+        self.enable_delete_devices = "delete_devices" in config_result.keys()
+        if self.enable_delete_devices:
+            logger.info("已启用 删除设备")
+        if self.enable_check_password_correct:
+            logger.info("已启用 检查密码正确")
 
 
 class ID:
@@ -147,56 +142,61 @@ class ID:
             driver.quit()
             return False
 
+    def process_verify(self):
+        # 需要先调用login到达页面
+        try:
+            img = WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.TAG_NAME, "img"))).get_attribute(
+                "src").replace('data:image/jpeg;base64, ', '')
+            code = ocr.classification(img)
+            driver.find_element(By.CLASS_NAME, "captcha-input").send_keys(code)
+        except BaseException:
+            logger.error("无法获取验证码")
+            return False
+        else:
+            return True
+
     def login(self):
         if not (self.refresh()):
             return False
-        time.sleep(config.step_sleep)
         try:
-            driver.find_element(By.XPATH,
-                                "/html/body/div[1]/iforgot-v2/app-container/div/iforgot-body/global-v2/div/idms-flow/div/forgot-password/div/div/div[1]/idms-step/div/div/div/div[2]/div/div[1]/div[1]/div/idms-textbox/idms-error-wrapper/div/div/input").send_keys(
-                self.username)
+            WebDriverWait(driver, 7).until(
+                EC.presence_of_element_located((By.CLASS_NAME, "iforgot-apple-id"))).send_keys(self.username)
         except BaseException:
             logger.error("无法获取页面内容，即将退出程序")
             logger.error("若启用了代理，请检查代理是否可用")
             driver.quit()
             exit()
-        img = driver.find_element(By.XPATH,
-                                  "/html/body/div[1]/iforgot-v2/app-container/div/iforgot-body/global-v2/div/idms-flow/div/forgot-password/div/div/div[1]/idms-step/div/div/div/div[2]/div/div[1]/div[2]/div/iforgot-captcha/div/div[1]/idms-captcha/div/div/img").get_attribute(
-            "src")
-        img = img.replace('data:image/jpeg;base64, ', '')
-        code = ocr.classification(img)
-        driver.find_element(By.XPATH,
-                            "/html/body/div[1]/iforgot-v2/app-container/div/iforgot-body/global-v2/div/idms-flow/div/forgot-password/div/div/div[1]/idms-step/div/div/div/div[2]/div/div[1]/div[2]/div/iforgot-captcha/div/div[2]/idms-textbox/idms-error-wrapper/div/div/input").send_keys(
-            code)
-        time.sleep(config.step_sleep)
-        driver.find_element(By.XPATH,
-                            "/html/body/div[1]/iforgot-v2/app-container/div/iforgot-body/global-v2/div/idms-flow/div/forgot-password/div/div/div[1]/idms-step/div/div/div/div[3]/idms-toolbar/div/div/div/button").click()
-        time.sleep(5)
-        try:
-            driver.find_element(By.XPATH,
-                                "/html/body/div[1]/iforgot-v2/app-container/div/iforgot-body/global-v2/div/idms-flow/div/forgot-password/div/div/div[1]/idms-step/div/div/div/div[2]/div/div[1]/div[2]/div/iforgot-captcha/div/div[2]/idms-textbox/idms-error-wrapper/div/idms-error/div/div/span")
-        except BaseException:
-            try:
-                message = driver.find_element(By.XPATH,
-                                              "/html/body/div[1]/iforgot-v2/app-container/div/iforgot-body/global-v2/div/idms-flow/div/forgot-password/div/div/div[1]/idms-step/div/div/div/div[2]/div/div[1]/div[1]/div/idms-textbox/idms-error-wrapper/div/idms-error/div/div/span")
-            except BaseException:
-                pass
-            else:
-                logger.error("无法处理请求，可能是服务器IP被苹果拉黑")
-                logger.error(message.text)
+        while True:
+            if not self.process_verify():
                 return False
+            time.sleep(1)
+            WebDriverWait(driver, 5).until(EC.presence_of_element_located((By.CLASS_NAME, "button-primary"))).click()
+            try:
+                # 验证码错误
+                WebDriverWait(driver, 3).until(EC.presence_of_element_located((By.XPATH,
+                                                                               "/html/body/div[1]/iforgot-v2/app-container/div/iforgot-body/global-v2/div/idms-flow/div/forgot-password/div/div/div[1]/idms-step/div/div/div/div[2]/div/div[1]/div[2]/div/iforgot-captcha/div/div[2]/idms-textbox/idms-error-wrapper/div/idms-error/div/div/span")))
+            except BaseException:
+                logger.info("验证码正确")
+                break
+            else:
+                logger.info("验证码错误，重新输入")
+                continue
+
+        try:
+            msg = driver.find_element(By.XPATH,
+                                      "/html/body/div[1]/iforgot-v2/app-container/div/iforgot-body/global-v2/div/idms-flow/div/forgot-password/div/div/div[1]/idms-step/div/div/div/div[2]/div/div[1]/div[1]/div/idms-textbox/idms-error-wrapper/div/idms-error/div/div/span").get_attribute(
+                "innerHTML")
+        except BaseException:
             logger.info("登录成功")
             return True
         else:
-            logger.info("验证码错误，重新登录")
-            return self.login()
+            logger.error(f"无法处理请求，可能是账号失效或服务器IP被拉黑\n错误信息：{msg}")
+            return False
 
     def check(self):
-        time.sleep(config.step_sleep)
         try:
             driver.find_element(By.XPATH,
-                                "/html/body/div[1]/iforgot-v2/app-container/div/iforgot-body/sa/idms-flow/div/section/div/authentication-method/div[1]/p[1]").get_attribute(
-                "innerHTML")
+                                "/html/body/div[1]/iforgot-v2/app-container/div/iforgot-body/sa/idms-flow/div/section/div/authentication-method/div[1]/p[1]")
         except BaseException:
             logger.info("当前账号未被锁定")
             return True  # 未被锁定
@@ -205,7 +205,6 @@ class ID:
             return False  # 被锁定
 
     def check_2fa(self):
-        time.sleep(config.step_sleep)
         try:
             driver.find_element(By.XPATH,
                                 "/html/body/div[1]/iforgot-v2/app-container/div/iforgot-body/hsa-two-v2/recovery-web-app/idms-flow/div/div/trusted-phone-number/div/h1")
@@ -228,46 +227,10 @@ class ID:
             WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.XPATH,
                                                                             "/html/body/div[5]/div/div/recovery-unenroll-start/div/idms-step/div/div/div/div[3]/idms-toolbar/div/div/div/button[1]"))).click()
             time.sleep(1)
-            driver.find_element(By.CLASS_NAME, "generic-input-field").send_keys(self.dob)
-            time.sleep(1)
-            WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.CLASS_NAME, "button-primary"))).click()
-            try:
-                WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.CLASS_NAME, "question")))
-                question_element = driver.find_elements(By.CLASS_NAME, "question")
-            except BaseException:
-                logger.error("安全问题获取失败，可能是生日错误，程序已退出")
-                driver.quit()
-                exit()
-            answer_inputs = driver.find_elements(By.CLASS_NAME, "generic-input-field")
-            answer_inputs[0].send_keys(self.get_answer(question_element[0].get_attribute("innerHTML")))
-            time.sleep(1)
-            answer_inputs[1].send_keys(self.get_answer(question_element[1].get_attribute("innerHTML")))
-            WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.CLASS_NAME, "button-primary"))).click()
-            time.sleep(5)
-
-            try:
-                msg = driver.find_element(By.CLASS_NAME, "form-message").get_attribute("innerHTML").strip()
-            except BaseException:
-                pass
-            else:
-                logger.error(f"安全问题错误，程序已退出\n错误信息：{msg}")
-                driver.quit()
-                exit()
-            WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.CLASS_NAME, "pull-right"))).click()
-            self.password = self.generate_password()
-            WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.XPATH,
-                                                                            "/html/body/div[1]/iforgot-v2/app-container/div/iforgot-body/hsa-two-v2/recovery-web-app/idms-flow/div/div/reset-password/div/div/div/div[1]/idms-password/idms-step/div/div/div/div[2]/div/div[1]/div/div[1]/div/new-password/div/idms-textbox/idms-error-wrapper/div/div/input"))).send_keys(
-                self.password)
-            driver.find_element(By.XPATH,
-                                "/html/body/div[1]/iforgot-v2/app-container/div/iforgot-body/hsa-two-v2/recovery-web-app/idms-flow/div/div/reset-password/div/div/div/div[1]/idms-password/idms-step/div/div/div/div[2]/div/div[1]/div/div[2]/div/confirm-password-input/div/idms-textbox/idms-error-wrapper/div/div/input").send_keys(
-                self.password)
-            time.sleep(1)
-            driver.find_element(By.CLASS_NAME, "pull-right").click()
-            WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.XPATH,
-                                                                            "/html/body/div[5]/div/div/div[1]/idms-step/div/div/div/div[3]/idms-toolbar/div/div/div/button[1]"))).click()
-            logger.info(f"新密码：{self.password}")
-            WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.XPATH,
-                                                                            "/html/body/div[5]/div/div/div[1]/idms-step/div/div/div/div[3]/idms-toolbar/div/div/div/button[1]")))
+            self.process_dob()
+            self.process_security_question()
+            driver.find_element(By.CLASS_NAME, "button-primary").click()
+            self.process_password()
 
     def unlock(self):
         if not (self.check()):
@@ -334,8 +297,8 @@ class ID:
             driver.find_element(By.ID, "action").click()
             time.sleep(10)
 
-    def delete_devices(self):
-        logger.info("开始删除设备")
+    def login_appleid(self):
+        logger.info("开始登录AppleID")
         driver.get("https://appleid.apple.com/sign-in")
         try:
             driver.switch_to.alert.accept()
@@ -354,9 +317,9 @@ class ID:
         try:
             msg = driver.find_element(By.ID, "errMsg").get_attribute("innerHTML")
         except BaseException:
-            pass  # 没有错误信息
+            pass
         else:
-            logger.error(f"登陆失败，等待下次检测，错误信息：\n{msg}")
+            logger.error(f"登录失败，错误信息：\n{msg}")
             return False
         question_element = driver.find_elements(By.CLASS_NAME, "question")
         answer_inputs = driver.find_elements(By.CLASS_NAME, "generic-input-field")
@@ -376,15 +339,24 @@ class ID:
         driver.switch_to.frame(WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.TAG_NAME, "iframe"))))
         try:
             WebDriverWait(driver, 5).until(EC.presence_of_element_located((By.XPATH,
-                                                                            "/html/body/div[1]/appleid-repair/idms-widget/div/div/div/hsa2-enrollment-flow/div/div/idms-step/div/div/div/div[3]/idms-toolbar/div/div[1]/div/button[2]"))).click()
+                                                                           "/html/body/div[1]/appleid-repair/idms-widget/div/div/div/hsa2-enrollment-flow/div/div/idms-step/div/div/div/div[3]/idms-toolbar/div/div[1]/div/button[2]"))).click()
             driver.find_element(By.CLASS_NAME, "nav-cancel").click()
             WebDriverWait(driver, 5).until_not(EC.presence_of_element_located((By.CLASS_NAME, "nav-cancel")))
         except BaseException:
             pass
+        WebDriverWait(driver, 10).until(EC.presence_of_element_located(
+            (By.XPATH, "//*[@id=\"ac-localnav\"]/div/div[2]/div[2]/div[2]/div[2]/a")))  # 找到登出按钮
+        logger.info("登录成功")
+        return True
+
+    def delete_devices(self):
+        # 需要先登录，不能直接执行
+        logger.info("开始删除设备")
         # 删除设备
         time.sleep(config.step_sleep)
         driver.get("https://appleid.apple.com/account/manage/section/devices")
-        WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.XPATH, "//*[@id=\"root\"]/div[3]/main/div/div[2]/div[3]/div/div/header/h1")))
+        WebDriverWait(driver, 10).until(EC.presence_of_element_located(
+            (By.XPATH, "//*[@id=\"root\"]/div[3]/main/div/div[2]/div[3]/div/div/header/h1")))
         time.sleep(config.step_sleep)
         devices = driver.find_elements(By.CLASS_NAME, "medium-12")
         logger.info(f"共有{len(devices)}个设备")
@@ -393,10 +365,82 @@ class ID:
             WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.CLASS_NAME, "button-secondary"))).click()
             WebDriverWait(driver, 10).until(EC.presence_of_element_located(
                 (By.XPATH, "/html/body/aside[2]/div/div[2]/fieldset/div/div/button[2]"))).click()
-            WebDriverWait(driver, 10).until_not(EC.presence_of_element_located((By.CLASS_NAME,"button-bar-working")))
+            WebDriverWait(driver, 10).until_not(EC.presence_of_element_located((By.CLASS_NAME, "button-bar-working")))
             if i != len(devices) - 1:
                 devices[i + 1].click()
         logger.info("设备删除完毕")
+        return True
+
+    def process_dob(self):
+        try:
+            WebDriverWait(driver, 5).until(EC.presence_of_element_located((By.CLASS_NAME, "date-input"))).send_keys(
+                self.dob)
+            time.sleep(1)
+            driver.find_element(By.CLASS_NAME, "button-primary").click()
+        except BaseException:
+            return False
+        else:
+            return True
+
+    def process_security_question(self):
+        try:
+            question_element = WebDriverWait(driver, 5).until(
+                EC.presence_of_all_elements_located((By.CLASS_NAME, "question")))
+        except BaseException:
+            logger.error("安全问题获取失败，可能是生日错误，程序已退出")
+            driver.quit()
+            exit()
+        answer_inputs = driver.find_elements(By.CLASS_NAME, "generic-input-field")
+        answer_inputs[0].send_keys(self.get_answer(question_element[0].get_attribute("innerHTML")))
+        time.sleep(1)
+        answer_inputs[1].send_keys(self.get_answer(question_element[1].get_attribute("innerHTML")))
+        time.sleep(1)
+        driver.find_element(By.CLASS_NAME, "button-primary").click()
+        time.sleep(5)
+        try:
+            msg = driver.find_element(By.CLASS_NAME, "form-message").get_attribute("innerHTML").strip()
+        except BaseException:
+            return True
+        else:
+            logger.error(f"安全问题错误，程序已退出\n错误信息：{msg}")
+            driver.quit()
+            exit()
+
+    def process_password(self):
+        pwd_input_box = WebDriverWait(driver, 5).until(EC.presence_of_all_elements_located((By.CLASS_NAME, "override")))
+        self.password = self.generate_password()
+        for item in pwd_input_box:
+            item.send_keys(self.password)
+        time.sleep(1)
+        driver.find_element(By.CLASS_NAME, "button-primary").click()
+        logger.info(f"新密码：{self.password}")
+        time.sleep(2)
+        try:
+            driver.find_element(By.XPATH,
+                                "/html/body/div[5]/div/div/div[1]/idms-step/div/div/div/div[3]/idms-toolbar/div/div/div/button[1]").click()
+        except BaseException:
+            pass
+        else:
+            WebDriverWait(driver, 6).until_not(EC.presence_of_element_located((By.XPATH,
+                                                                               "/html/body/div[5]/div/div/div[1]/idms-step/div/div/div/div[3]/idms-toolbar/div/div/div/button[1]")))
+
+    def change_password(self):
+        if not self.login():
+            return False
+        logger.info("开始修改密码")
+        driver.find_element(By.XPATH,
+                            "//*[@id=\"content\"]/iforgot-v2/app-container/div/iforgot-body/sa/idms-flow/div/section/div/recovery-options/div[2]/div/div[1]/label/span").click()
+        driver.find_element(By.ID, "action").click()
+        try:
+            WebDriverWait(driver, 5).until(EC.presence_of_element_located((By.XPATH,
+                                                                           "//*[@id=\"content\"]/iforgot-v2/app-container/div/iforgot-body/sa/idms-flow/div/section/div/authentication-method/div[2]/div[2]/label/span"))).click()
+            driver.find_element(By.ID, "action").click()
+        except BaseException:
+            logger.error("无法使用安全问题重设密码，修改失败")
+            return False
+        self.process_dob()
+        self.process_security_question()
+        self.process_password()
         return True
 
 
@@ -406,22 +450,7 @@ if config_result["status"] == "fail":
     logger.error("从API获取配置失败")
     exit()
 
-config = Config(config_result["username"],
-                config_result["password"] if "password" in config_result.keys() else api.get_password(
-                    config_result["username"]),
-                config_result["dob"],
-                config_result["q1"],
-                config_result["a1"],
-                config_result["q2"],
-                config_result["a2"],
-                config_result["q3"],
-                config_result["a3"],
-                config_result["check_interval"],
-                config_result["tgbot_token"] if "tgbot_token" in config_result.keys() else "",
-                config_result["tgbot_chatid"] if "tgbot_chatid" in config_result.keys() else "",
-                config_result["step_sleep"],
-                config_result["webdriver"],
-                config_result["proxy"] if "proxy" in config_result.keys() else "")
+config = Config(config_result)
 
 
 def notification(content):
@@ -486,7 +515,24 @@ def job():
             logger.error("更新密码失败")
         else:
             logger.info("更新密码成功")
-        id.delete_devices()
+        if config.enable_delete_devices or config.enable_check_password_correct:
+            login_result = id.login_appleid()
+            if not login_result and config.enable_check_password_correct:
+                logger.info("密码错误，开始修改密码")
+                id.change_password()
+                notification(f"Apple ID密码修改成功\n新密码：{id.password}")
+                update_result = api.update(id.username, id.password)
+                if update_result["status"] == "fail":
+                    logger.error("更新密码失败")
+                else:
+                    logger.info("更新密码成功")
+            if config.enable_delete_devices:
+                if id.login_appleid():
+                    id.delete_devices()
+                else:
+                    logger.error("登录Apple ID失败，无法删除设备")
+
+
     else:
         logger.error("任务执行失败，等待下次检测")
     try:

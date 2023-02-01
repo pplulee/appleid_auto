@@ -65,6 +65,7 @@ switch ($_GET["action"]) {
                     'status' => 'success',
                     'message' => '获取成功',
                     'username' => $account->username,
+                    'password' => $account->password,
                     'dob' => $account->dob,
                     'q1' => array_keys($account->question)[0],
                     'q2' => array_keys($account->question)[1],
