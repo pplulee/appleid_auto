@@ -191,6 +191,7 @@ class ID:
             return True
         else:
             logger.error(f"无法处理请求，可能是账号失效或服务器IP被拉黑\n错误信息：{msg}")
+            notification(f"Apple ID解锁登录失败，可能是账号失效或服务器IP被拉黑")
             return False
 
     def check(self):
