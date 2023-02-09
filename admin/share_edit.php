@@ -15,23 +15,30 @@ if (isset($_POST['submit'])) {
             }
             $share_link = $_POST['share_link'];
             $share_id = $_GET['id'];
-            $share_id_check = $conn->query("SELECT * FROM share WHERE share_id = '$share_id';");
-            if ($share_id_check->num_rows == 0) {
+            $share_id_check = $conn->prepare("SELECT * FROM share WHERE share_id = :share_id;");
+            $share_id_check->bindParam(':share_id', $share_id);
+            $share_id_check->execute();
+            if ($share_id_check->rowCount() == 0) {
                 alert("error", "分享页面ID不存在", 2000, "shares.php");
                 exit;
             } else {
-                $share_id_check = $share_id_check->fetch_assoc();
+                $share_id_check = $share_id_check->fetch();
             }
             $origin_share_link = $share_id_check['share_link'];
-            $share_link_result = $conn->query("SELECT owner FROM share WHERE share_link = '$share_link';");
-            if ($origin_share_link != $share_link && $share_link_result->num_rows != 0) {
+            $share_link_result = $conn->prepare("SELECT owner FROM share WHERE share_link = :share_link;");
+            if ($origin_share_link != $share_link && $share_link_result->rowCount() != 0) {
                 alert("error", "分享链接已存在，无法重复添加", 2000, "shares.php");
                 exit;
             } else {
-                $share_link_result = $share_link_result->fetch_assoc();
+                $share_link_result = $share_link_result->fetch();
             }
             $accounts = implode(",", $_POST['account_list']);
-            $conn->query("UPDATE share SET account_list = '$accounts', share_link='{$_POST['share_link']}', owner='{$_POST['owner']}' WHERE share_id = '$share_id';");
+            $stmt = $conn->prepare("UPDATE share SET account_list = :accounts, share_link=:share_link, owner=:owner WHERE share_id = :share_id;");
+            $stmt->execute([
+                'accounts' => $accounts,
+                'share_link' => $share_link,
+                'owner' => $_POST['owner'],
+                'share_id' => $share_id]);
             alert("success", "修改成功", 2000, "shares.php");
             exit;
         }
@@ -47,7 +54,8 @@ if (isset($_GET['action'])) {
     switch ($_GET['action']) {
         case "delete":
         {
-            $conn->query("DELETE FROM share WHERE share_id='{$_GET['id']}';");
+            $stmt = $conn->prepare("DELETE FROM share WHERE share_id = :share_id;");
+            $stmt->execute(['share_id' => $_GET['id']]);
             alert("success", "删除成功", 2000, "shares.php");
             exit;
         }
@@ -58,20 +66,22 @@ if (isset($_GET['action'])) {
                 exit;
             }
             $width = isMobile() ? "auto" : "60%";
-            $page_result = $conn->query("SELECT * FROM share WHERE share_id='{$_GET['id']}';");
-            if ($page_result->num_rows == 0) {
+            $page_result = $conn->prepare("SELECT * FROM share WHERE share_id = :share_id;");
+            $page_result->execute(['share_id' => $_GET['id']]);
+            if ($page_result->rowCount() == 0) {
                 alert("error", "页面ID不存在", 2000, "shares.php");
                 exit;
             } else {
-                $share_result_detail = $page_result->fetch_assoc();
+                $share_result_detail = $page_result->fetch();
             }
-            $account_list_result = $conn->query("SELECT id,username FROM account WHERE owner='{$share_result_detail['owner']}';");
-            if ($account_list_result->num_rows == 0) {
+            $account_list_result = $conn->prepare("SELECT id,username FROM account WHERE owner=:owner;");
+            $account_list_result->execute(['owner' => $_SESSION['user_id']]);
+            if ($account_list_result->rowCount() == 0) {
                 alert("warning", "用户没有账号", 2000, "account.php");
                 exit;
             } else {
                 $account_list = array();
-                while ($row = $account_list_result->fetch_assoc()) {
+                while ($row = $account_list_result->fetch()) {
                     $account_list[$row['id']] = $row['username'];
                 }
                 $share_account_list = explode(",", $share_result_detail['account_list']);

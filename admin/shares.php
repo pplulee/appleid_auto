@@ -5,7 +5,6 @@ include("header.php");
 <div class="container" style="padding-top:70px;">
     <div class="col-md-12 center-block" style="float: none;">
         <div class="table-responsive">
-            <a href='share_edit.php?action=add' class='btn btn-secondary'>添加分享页</a>
             <table class="table table-striped">
                 <thead>
                 <tr>
@@ -32,8 +31,10 @@ include("header.php");
                 <?php
                 global $conn;
                 $result = $conn->query("SELECT * FROM share;");
-                if ($result->num_rows > 0) {
-                    while ($row = $result->fetch_assoc()) {
+                $stmt = $conn->prepare("SELECT * FROM share;");
+                $stmt->execute();
+                if ($stmt->rowCount() > 0) {
+                    while ($row = $stmt->fetch()){
                         $account_list = explode(',', $row['account_list']);
                         $account_count = count($account_list);
                         $share_link = "{$Sys_config['apiurl']}/share_accounts.php?link={$row['share_link']}";

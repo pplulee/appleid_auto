@@ -8,6 +8,7 @@ if (isset($_POST['submit'])) {
     }
 }
 ?>
+<title>个人信息</title>
 <div class="container" style="margin-top: 2%;width: <?php echo (isMobile()) ? "auto" : "50%"; ?>;">
     <div class='card border-dark'>
         <h4 class='card-header bg-primary text-white text-center'>个人信息</h4>

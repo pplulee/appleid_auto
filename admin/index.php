@@ -15,10 +15,10 @@ if (isset($_GET['logout'])) {
         <h3 class="card-header">服务器信息</h3>
         <ul class="list-group">
             <li class="list-group-item">
-                <b>总账号数:</b> <?php echo $conn->query("SELECT id FROM account;")->num_rows; ?>
+                <b>总账号数:</b> <?php echo $conn->query("SELECT id FROM account;")->rowCount(); ?>
             </li>
             <li class="list-group-item">
-                <b>总用户数:</b> <?php echo $conn->query("SELECT id FROM user;")->num_rows; ?>
+                <b>总用户数:</b> <?php echo $conn->query("SELECT id FROM user;")->rowCount(); ?>
             </li>
             <li class="list-group-item">
                 <b>PHP版本:</b><?php echo phpversion() ?>

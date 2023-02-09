@@ -7,6 +7,7 @@ if (isset($_GET['logout'])) {
 }
 $current_user = new user($_SESSION['user_id']);
 ?>
+<title>用户中心</title>
 <div class="container" style="margin-top: 1%">
     <div class="card border-dark">
         <h4 class="card-header">用户中心</h4>

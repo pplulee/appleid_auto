@@ -3,7 +3,8 @@ function logout()
 {
     $_SESSION['isLogin'] = false;
     unset($_SESSION['user_id']);
-    exit("<script>Swal.fire({icon: 'success',title: '成功',text: '已成功注销！',timer:2000,timerProgressBar: true});setTimeout(\"javascript:location.href='index.php'\", 2000);</script>");
+    alert("success","已成功注销！",2000,"index.php");
+    exit;
 }
 
 function random_string($length): string
