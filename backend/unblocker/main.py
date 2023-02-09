@@ -608,7 +608,8 @@ def job():
     logger.info("已设置下次检测任务")
     return unlock
 
-
+logger.info("启动AppleID_Auto\n项目地址 https://github.com/pplulee/appleid_auto\nTelegram交流群 @appleunblocker")
+logger.info("当前版本：v1.3-20230209")
 id = ID(config.username, config.password, config.dob, config.answer)
 job()
 while True:
