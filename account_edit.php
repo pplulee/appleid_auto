@@ -9,7 +9,9 @@ if (isset($_POST['submit'])) {
                 alert("warning", "账号已存在", 2000, "account.php");
                 exit;
             }
-            $conn->query("INSERT INTO account (username, password, remark, dob, question1, answer1,question2,answer2,question3,answer3,owner,share_link,check_interval) VALUES ('{$_POST['username']}','{$_POST['password']}','{$_POST['remark']}','{$_POST['dob']}','{$_POST['question1']}','{$_POST['answer1']}','{$_POST['question2']}','{$_POST['answer2']}','{$_POST['question3']}','{$_POST['answer3']}','{$_SESSION['user_id']}','{$_POST['share_link']}','{$_POST['check_interval']}');");
+            $enable_check_password_correct = isset($_POST['enable_check_password_correct']) ? 1 : 0;
+            $enable_delete_devices = isset($_POST['enable_delete_devices']) ? 1 : 0;
+            $conn->query("INSERT INTO account (username, password, remark, dob, question1, answer1,question2,answer2,question3,answer3,owner,share_link,check_interval,frontend_remark,message,enable_check_password_correct, enable_delete_devices) VALUES ('{$_POST['username']}','{$_POST['password']}','{$_POST['remark']}','{$_POST['dob']}','{$_POST['question1']}','{$_POST['answer1']}','{$_POST['question2']}','{$_POST['answer2']}','{$_POST['question3']}','{$_POST['answer3']}','{$_SESSION['user_id']}','{$_POST['share_link']}','{$_POST['check_interval']}','{$_POST['frontend_remark']}','未执行任务',$enable_check_password_correct,$enable_delete_devices);");
             alert("success", "添加成功", 2000, "account.php");
             exit;
         }
@@ -17,7 +19,9 @@ if (isset($_POST['submit'])) {
         {
             $account = new account($_GET['id']);
             if ($account->owner == $_SESSION['user_id'] || $account->id) {
-                $account->update($_POST['username'], $_POST['password'], $_POST['remark'], $_POST['dob'], $_POST['question1'], $_POST['answer1'], $_POST['question2'], $_POST['answer2'], $_POST['question3'], $_POST['answer3'], $_SESSION['user_id'], $_POST['share_link'], $_POST['check_interval']);
+                $enable_check_password_correct = isset($_POST['enable_check_password_correct']) ? 1 : 0;
+                $enable_delete_devices = isset($_POST['enable_delete_devices']) ? 1 : 0;
+                $account->update($_POST['username'], $_POST['password'], $_POST['remark'], $_POST['dob'], $_POST['question1'], $_POST['answer1'], $_POST['question2'], $_POST['answer2'], $_POST['question3'], $_POST['answer3'], $_SESSION['user_id'], $_POST['share_link'], $_POST['check_interval'], $_POST['frontend_remark'], $enable_check_password_correct, $enable_delete_devices);
                 alert("success", "修改成功", 2000, "account.php");
             } else {
                 alert("error", "修改失败", 2000, "account.php");
@@ -69,8 +73,12 @@ if (isset($_GET['action'])) {
                                 <input type='text' class='form-control' name='remark' autocomplete='off'>
                             </div>
                             <div class='input-group mb-3'>
+                                <span class='input-group-text' id='frontend_remark'>前端备注</span>
+                                <input type='text' class='form-control' name='frontend_remark' placeholder='账号的说明，在分享页显示' autocomplete='off'>
+                            </div>
+                            <div class='input-group mb-3'>
                                 <span class='input-group-text' id='dob'>生日</span>
-                                <input type='text' class='form-control' name='dob' placeholder='mmddyyyy' required autocomplete='off'>
+                                <input type='text' class='form-control' name='dob' placeholder='格式：mmddyyyy' required autocomplete='off'>
                             </div>
                             <div class='input-group mb-3'>
                                 <span class='input-group-text' id='question1'>问题1</span>
@@ -104,6 +112,17 @@ if (isset($_GET['action'])) {
                                 <span class='input-group-text' id='check_interval'>检查间隔</span>
                                 <input type='number' class='form-control' name='check_interval' required autocomplete='off' placeholder='单位：分钟' value='10'>
                             </div>
+                            <div class='input-group mb-3'>
+                                <div class='form-check form-switch'>
+                                  开启密码正确检测<input class='form-check-input' type='checkbox' name='enable_check_password_correct'>
+                                  若密码错误则自动修改密码
+                                </div>
+                            </div>
+                            <div class='input-group mb-3'>
+                                <div class='form-check form-switch'>
+                                  开启删除设备<input class='form-check-input' type='checkbox' name='enable_delete_devices'>
+                                </div>
+                            </div>
                             <input type='submit' name='submit' class='btn btn-primary btn-block' value='添加'>
                         </form>
                     </div>
@@ -130,6 +149,8 @@ if (isset($_GET['action'])) {
                 $answer2 = $account->question[$question2];
                 $answer3 = $account->question[$question3];
                 $check_interval = $account->check_interval;
+                $check_password_checked = $account->enable_check_password_correct ? "checked" : "";
+                $delete_devices_checked = $account->enable_delete_devices ? "checked" : "";
                 echo "<div class='container' style='margin-top: 2%; width: $width;'>
                     <div class='card border-dark'>
                         <h4 class='card-header bg-primary text-white text-center'>编辑账号</h4>
@@ -147,8 +168,12 @@ if (isset($_GET['action'])) {
                                 <input type='text' class='form-control' name='remark' autocomplete='off' value='$account->remark'>
                             </div>
                             <div class='input-group mb-3'>
+                                <span class='input-group-text' id='frontend_remark'>前端备注</span>
+                                <input type='text' class='form-control' name='frontend_remark' placeholder='账号的说明，在分享页显示' autocomplete='off' value='$account->frontend_remark'>
+                            </div>
+                            <div class='input-group mb-3'>
                                 <span class='input-group-text' id='dob'>生日</span>
-                                <input type='text' class='form-control' name='dob' placeholder='mmddyyyy' required autocomplete='off' value='$account->dob'>
+                                <input type='text' class='form-control' name='dob' placeholder='格式：mmddyyyy' required autocomplete='off' value='$account->dob'>
                             </div>
                             <div class='input-group mb-3'>
                                 <span class='input-group-text' id='question1'>问题1</span>
@@ -175,12 +200,30 @@ if (isset($_GET['action'])) {
                                 <input type='text' class='form-control' name='answer3' required autocomplete='off' value='$answer3'>
                             </div>
                             <div class='input-group mb-3'>
-                                <span class='input-group-text' id='question2'>分享代码</span>
+                                <span class='input-group-text' id='share_link'>分享代码</span>
                                 <input type='text' class='form-control' name='share_link' value='$account->share_link' required autocomplete='off'>
                             </div>
                             <div class='input-group mb-3'>
+                                <span class='input-group-text' id='last_check'>上次检查</span>
+                                <input type='text' class='form-control' name='share_link' value='$account->last_check' required disabled>
+                            </div>
+                            <div class='input-group mb-3'>
+                                <span class='input-group-text' id='message'>状态</span>
+                                <input type='text' class='form-control' name='message' value='$account->message' required autocomplete='off' disabled>
+                            </div>
+                            <div class='input-group mb-3'>
+                                <div class='form-check form-switch'>
+                                  开启密码正确检测<input class='form-check-input' type='checkbox' name='enable_check_password_correct' $check_password_checked>
+                                </div>
+                            </div>
+                            <div class='input-group mb-3'>
+                                <div class='form-check form-switch'>
+                                  开启删除设备<input class='form-check-input' type='checkbox' name='enable_delete_devices' $delete_devices_checked>
+                                </div>
+                            </div>
+                            <div class='input-group mb-3'>
                                 <span class='input-group-text' id='check_interval'>检查间隔</span>
-                                <input type='number' class='form-control' name='check_interval' required autocomplete='off' value='$check_interval'>
+                                <input type='number' class='form-control' name='check_interval' placeholder='单位：分钟' required autocomplete='off' value='$check_interval'>
                             </div>
                             <input type='submit' name='submit' class='btn btn-primary btn-block' value='保存'>
                         </form>

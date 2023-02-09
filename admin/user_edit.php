@@ -4,25 +4,25 @@ include("header.php");
 if (isset($_POST['submit'])) {
     $currentuser = new user($_POST['userid']);
     if (($currentuser->user_id) == -1) {
-        alert("error","用户不存在！",2000,"user.php");
+        alert("error", "用户不存在！", 2000, "user.php");
         exit;
     }
     $currentuser->update($_POST['username'], $_POST['isadmin']);
     if ($_POST['password'] != "") {
         $currentuser->change_password($_POST['password']);
     }
-    alert("success","修改成功！",2000,"user.php");
+    alert("success", "修改成功！", 2000, "user.php");
     exit;
 }
 
 if (isset($_GET['action'])) {
     if (!isset($_GET["id"])) {
-        alert("error","参数错误！",2000,"user.php");
+        alert("error", "参数错误！", 2000, "user.php");
         exit;
     }
     $currentuser = new user($_GET["id"]);
     if ($currentuser->user_id == 0) {
-        alert("error","用户不存在！",2000,"user.php");
+        alert("error", "用户不存在！", 2000, "user.php");
         exit;
     }
     switch ($_GET["action"]) {
@@ -33,12 +33,12 @@ if (isset($_GET['action'])) {
         case "delete":
         {
             $currentuser->delete_account();
-            alert("success","删除成功！",2000,"user.php");
+            alert("success", "删除成功！", 2000, "user.php");
             exit;
         }
         default:
         {
-            alert("error","参数错误！",2000,"user.php");
+            alert("error", "参数错误！", 2000, "user.php");
             exit;
         }
     }

@@ -5,7 +5,9 @@ if (isset($_POST['submit'])) {
     switch ($_GET['action']) {
         case "edit":
             $account = new account($_GET['id']);
-            $account->update($_POST['username'], $_POST['password'], $_POST['remark'], $_POST['dob'], $_POST['question1'], $_POST['answer1'], $_POST['question2'], $_POST['answer2'], $_POST['question3'], $_POST['answer3'], $_POST['owner'], $_POST['share_link'], $_POST['check_interval']);
+            $enable_check_password_correct = isset($_POST['enable_check_password_correct']) ? 1 : 0;
+            $enable_delete_devices = isset($_POST['enable_delete_devices']) ? 1 : 0;
+            $account->update($_POST['username'], $_POST['password'], $_POST['remark'], $_POST['dob'], $_POST['question1'], $_POST['answer1'], $_POST['question2'], $_POST['answer2'], $_POST['question3'], $_POST['answer3'], $_POST['owner'], $_POST['share_link'], $_POST['check_interval'], $_POST['frontend_remark'], $enable_check_password_correct, $enable_delete_devices);
             alert("success", "修改成功！", 2000, "account.php");
             exit;
         default:
@@ -33,6 +35,8 @@ if (isset($_GET['action'])) {
             $answer2 = $account->question[$question2];
             $answer3 = $account->question[$question3];
             $check_interval = $account->check_interval;
+            $check_password_checked = $account->enable_check_password_correct ? "checked" : "";
+            $delete_devices_checked = $account->enable_delete_devices ? "checked" : "";
             echo "<div class='container' style='margin-top: 2%; width: $width;'>
                     <div class='card border-dark'>
                         <h4 class='card-header bg-primary text-white text-center'>编辑账号</h4>
@@ -56,6 +60,10 @@ if (isset($_GET['action'])) {
                             <div class='input-group mb-3'>
                                 <span class='input-group-text' id='remark'>备注</span>
                                 <input type='text' class='form-control' name='remark' autocomplete='off' value='$account->remark'>
+                            </div>
+                            <div class='input-group mb-3'>
+                                <span class='input-group-text' id='frontend_remark'>前端备注</span>
+                                <input type='text' class='form-control' name='frontend_remark' placeholder='账号的说明，在分享页显示' autocomplete='off' value='$account->frontend_remark'>
                             </div>
                             <div class='input-group mb-3'>
                                 <span class='input-group-text' id='dob'>生日</span>
@@ -92,6 +100,20 @@ if (isset($_GET['action'])) {
                             <div class='input-group mb-3'>
                                 <span class='input-group-text' id='last_check'>上次检查</span>
                                 <input type='text' class='form-control' name='share_link' value='$account->last_check' required disabled>
+                            </div>
+                            <div class='input-group mb-3'>
+                                <span class='input-group-text' id='message'>状态</span>
+                                <input type='text' class='form-control' name='message' value='$account->message' required autocomplete='off' disabled>
+                            </div>
+                            <div class='input-group mb-3'>
+                                <div class='form-check form-switch'>
+                                  开启密码正确检测<input class='form-check-input' type='checkbox' name='enable_check_password_correct' $check_password_checked>
+                                </div>
+                            </div>
+                            <div class='input-group mb-3'>
+                                <div class='form-check form-switch'>
+                                  开启删除设备<input class='form-check-input' type='checkbox' name='enable_delete_devices' $delete_devices_checked>
+                                </div>
                             </div>
                             <div class='input-group mb-3'>
                                 <span class='input-group-text' id='check_interval'>检查间隔</span>

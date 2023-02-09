@@ -164,6 +164,6 @@ function alert($type, $message, $delay, $dest)
             $title = "";
             break;
     }
-    echo "<script>Swal.fire({icon: '$type',title: '$title',text: '$message',timer:$delay,showConfirmButton: false,timerProgressBar: true});setTimeout(\"javascript:location.href='$dest'\", $delay);</script>";
+    echo ", $delay)</script>";
 }
 

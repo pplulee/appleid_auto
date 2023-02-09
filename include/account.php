@@ -12,6 +12,10 @@ class account
     var string $share_link;
     var string $last_check;
     var int $check_interval;
+    var string $message;
+    var string $frontend_remark;
+    var bool $enable_check_password_correct;
+    var bool $enable_delete_devices;
 
     function __construct($id)
     {
@@ -35,10 +39,14 @@ class account
             $this->share_link = $result['share_link'];
             $this->last_check = $result['last_check'];
             $this->check_interval = $result['check_interval'];
+            $this->message = $result['message'];
+            $this->frontend_remark = $result['frontend_remark'];
+            $this->enable_check_password_correct = $result['enable_check_password_correct'];
+            $this->enable_delete_devices = $result['enable_delete_devices'];
         }
     }
 
-    function update($username, $password, $remark, $dob, $question1, $answer1, $question2, $answer2, $question3, $answer3, $owner, $share_link, $check_interval)
+    function update($username, $password, $remark, $dob, $question1, $answer1, $question2, $answer2, $question3, $answer3, $owner, $share_link, $check_interval, $frontend_remark, $enable_check_password_correct, $enable_delete_devices)
     {
         global $conn;
         $this->username = $username;
@@ -53,7 +61,10 @@ class account
         $this->owner = $owner;
         $this->share_link = $share_link;
         $this->check_interval = $check_interval;
-        $conn->query("UPDATE account SET username='$username',password='$password',remark='$remark',dob='$dob',question1='$question1',answer1='$answer1',question2='$question2',answer2='$answer2',question3='$question3',answer3='$answer3',owner='$owner',share_link='$share_link', check_interval='$check_interval' WHERE id='$this->id';");
+        $this->frontend_remark = $frontend_remark;
+        $this->enable_check_password_correct = $enable_check_password_correct;
+        $this->enable_delete_devices = $enable_delete_devices;
+        $conn->query("UPDATE account SET username='$username',password='$password',remark='$remark',dob='$dob',question1='$question1',answer1='$answer1',question2='$question2',answer2='$answer2',question3='$question3',answer3='$answer3',owner='$owner',share_link='$share_link', check_interval='$check_interval', frontend_remark='$frontend_remark', enable_check_password_correct='$enable_check_password_correct', enable_delete_devices='$enable_delete_devices' WHERE id='$this->id';");
     }
 
     function update_password($password)
@@ -64,6 +75,7 @@ class account
             $conn->query("UPDATE account SET password='$password' WHERE id='$this->id';");
         }
         $this->update_last_check();
+        $this->update_message("正常");
     }
 
     function update_last_check()
@@ -71,6 +83,13 @@ class account
         global $conn;
         $this->last_check = get_time();
         $conn->query("UPDATE account SET last_check='$this->last_check' WHERE id='$this->id';");
+    }
+
+    function update_message($message)
+    {
+        global $conn;
+        $this->message = $message;
+        $conn->query("UPDATE account SET message='$message' WHERE id='$this->id';");
     }
 
     function delete()

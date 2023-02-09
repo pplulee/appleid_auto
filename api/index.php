@@ -83,7 +83,37 @@ switch ($_GET["action"]) {
                     'proxy' => $Sys_config['webdriver_proxy']
 
                 );
+                if ($account->enable_check_password_correct) {
+                    $data['check_password_correct'] = true;
+                }
+                if ($account->enable_delete_devices) {
+                    $data['delete_devices'] = true;
+                }
                 break;
+            }
+        }
+        break;
+    }
+    case "update_message":
+    {
+        if (!isset($_GET['username'])) {
+            $data = array(
+                'status' => 'fail',
+                'message' => 'ID不能为空'
+            );
+        } else {
+            $account = new account(get_account_id($_GET['username']));
+            if ($account->id == -1) {
+                $data = array(
+                    'status' => 'fail',
+                    'message' => '账号不存在'
+                );
+            } else {
+                $account->update_message($_GET['message']);
+                $data = array(
+                    'status' => 'success',
+                    'message' => '更新成功'
+                );
             }
         }
         break;

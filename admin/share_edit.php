@@ -62,7 +62,7 @@ if (isset($_GET['action'])) {
             if ($page_result->num_rows == 0) {
                 alert("error", "页面ID不存在", 2000, "shares.php");
                 exit;
-            }else{
+            } else {
                 $share_result_detail = $page_result->fetch_assoc();
             }
             $account_list_result = $conn->query("SELECT id,username FROM account WHERE owner='{$share_result_detail['owner']}';");
