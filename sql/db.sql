@@ -30,6 +30,10 @@ CREATE TABLE `account` (
   `share_link` varchar(16) COLLATE utf8_unicode_ci NOT NULL,
   `last_check` datetime NOT NULL DEFAULT '2000-01-01 00:00:00',
   `check_interval` int(10) unsigned NOT NULL DEFAULT '10',
+  `frontend_remark` text CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL,
+  `message` text CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL,
+  `enable_check_password_correct` tinyint(1) NOT NULL,
+  `enable_delete_devices` tinyint(1) NOT NULL,
   PRIMARY KEY (`id`),
   KEY `owner` (`owner`),
   CONSTRAINT `account_ibfk_1` FOREIGN KEY (`owner`) REFERENCES `user` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
