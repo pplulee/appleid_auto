@@ -124,6 +124,26 @@ function get_time()
     return date('Y-m-d H:i:s');
 }
 
+function check_sharelink_exist($share_link): bool
+{
+    global $conn;
+    $stmt = $conn->prepare("SELECT id FROM share WHERE share_link = :share_link;");
+    $stmt->execute(['share_link' => $share_link]);
+    return $stmt->rowCount() != 0;
+}
+
+function get_share_id($share_link): int
+{
+    global $conn;
+    $stmt = $conn->prepare("SELECT id FROM share WHERE share_link = :share_link;");
+    $stmt->execute(['share_link' => $share_link]);
+    if ($stmt->rowCount() == 0) {
+        return -1;
+    } else {
+        return $stmt->fetch()["id"];
+    }
+}
+
 function isMobile(): bool
 {
     // 如果有HTTP_X_WAP_PROFILE则一定是移动设备

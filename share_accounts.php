@@ -5,17 +5,27 @@ if (!isset($_GET['link'])) {
     echo "分享链接不存在";
     exit;
 }
-$stmt = $conn->prepare("SELECT * FROM share WHERE share_link = :link;");
-$stmt->execute(['link' => $_GET['link']]);
-if ($stmt->rowCount() == 0) {
-    echo "分享链接不存在";
+$sharepage = new sharepage(get_share_id($_GET['link']));
+if ($sharepage->id == -1) {
+    echo "分享页面不存在";
     exit;
-} else {
-    $account_list = $stmt->fetch()['account_list'];
-    $account_list = explode(",", $account_list);
-    if (sizeof($account_list) == 0) {
-        echo "无法找到账号";
+}
+if (sizeof($sharepage->account_list) == 0) {
+    echo "无法找到账号";
+    exit;
+}
+if ($sharepage->password != "") {
+    if (!isset($_POST['password'])) {
+        echo "<form action='share_accounts.php?link=" . $_GET['link'] . "' method='post'>
+                <input type='password' name='password' placeholder='请输入密码'>
+                <input type='submit' value='提交'>
+              </form>";
         exit;
+    } else {
+        if ($sharepage->password != $_POST['password']) {
+            echo "密码错误";
+            exit;
+        }
     }
 }
 ?>
@@ -42,7 +52,7 @@ if ($stmt->rowCount() == 0) {
      style="align-self: center; position: absolute;width: <?php echo((isMobile()) ? "auto" : "20%"); ?>; margin-top:1rem">
 
 <?php
-foreach ($account_list as $account_id) {
+foreach ($sharepage->account_list as $account_id) {
     $account = new account($account_id);
     if ($account->id == -1) {
         continue;
