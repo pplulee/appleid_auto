@@ -29,7 +29,7 @@ if (isset($_GET['logout'])) {
                 } ?>
             </li>
             <li class="list-group-item">
-                <b>MySQL版本:</b> <?php echo mysqli_get_server_version($conn) ?>
+                <b>MySQL版本:</b> <?php echo $conn->query("SELECT version()")->fetch()[0] ?>
             </li>
             <li class="list-group-item">
                 <b>网页服务器:</b> <?php echo $_SERVER['SERVER_SOFTWARE'] ?>
