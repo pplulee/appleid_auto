@@ -3,6 +3,7 @@ include($_SERVER['DOCUMENT_ROOT'] . "/config.php");
 include($_SERVER['DOCUMENT_ROOT'] . "/include/function.php");
 include($_SERVER['DOCUMENT_ROOT'] . "/include/user.php");
 include($_SERVER['DOCUMENT_ROOT'] . "/include/account.php");
+include($_SERVER['DOCUMENT_ROOT'] . "/include/sharepage.php");
 header('Content-type:text/json');
 global $Sys_config;
 try {
@@ -179,6 +180,30 @@ switch ($_GET["action"]) {
             'status' => 'success',
             'message' => 'API正常'
         );
+        break;
+    }
+    case "random_sharepage_password":
+    {
+        if (!isset($_GET['id'])) {
+            $data = array(
+                'status' => 'fail',
+                'message' => '页面ID不能为空'
+            );
+        }
+        $sharepage = new sharepage($_GET['id']);
+        if ($sharepage->id == -1) {
+            $data = array(
+                'status' => 'fail',
+                'message' => '页面不存在'
+            );
+        } else {
+            $sharepage->randomPassword();
+            $data = array(
+                'status' => 'success',
+                'password' => $sharepage->password,
+                'message' => '更新成功'
+            );
+        }
         break;
     }
     default:
