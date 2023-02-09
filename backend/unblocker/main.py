@@ -117,12 +117,14 @@ class ID:
         for item in self.answer:
             if question.find(item) != -1:
                 return self.answer.get(item)
-        return ""
+        logger.error("未找到问题答案，请检查问题是否正确，程序已退出")
+        driver.quit()
+        exit()
 
     def refresh(self):
         try:
             driver.get("https://iforgot.apple.com/password/verify/appleid?language=en_US")
-            WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.CLASS_NAME, "app-title")))
+            WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.CLASS_NAME, "iforgot-apple-id")))
         except BaseException:
             logger.error("刷新页面失败")
             logger.error("若启用了代理，请检查代理是否可用")
@@ -359,7 +361,7 @@ class ID:
         WebDriverWait(driver, 10).until(EC.presence_of_element_located(
             (By.XPATH, "//*[@id=\"root\"]/div[3]/main/div/div[2]/div[3]/div/div/header/h1")))
         time.sleep(config.step_sleep)
-        devices = driver.find_elements(By.CLASS_NAME, "medium-12")
+        devices = driver.find_elements(By.CLASS_NAME, "button-expand")
         logger.info(f"共有{len(devices)}个设备")
         for i in range(len(devices)):
             devices[i].click()
@@ -517,6 +519,9 @@ def job():
         else:
             logger.info("更新密码成功")
         if config.enable_delete_devices or config.enable_check_password_correct:
+            if not unlock:
+                # 未重置密码，先获取最新密码再执行登录
+                id.password = api.get_password(id.username)
             login_result = id.login_appleid()
             if not login_result and config.enable_check_password_correct:
                 logger.info("密码错误，开始修改密码")
@@ -528,12 +533,10 @@ def job():
                 else:
                     logger.info("更新密码成功")
             if config.enable_delete_devices:
-                if id.login_appleid():
+                if login_result:
                     id.delete_devices()
                 else:
                     logger.error("登录Apple ID失败，无法删除设备")
-
-
     else:
         logger.error("任务执行失败，等待下次检测")
     try:
