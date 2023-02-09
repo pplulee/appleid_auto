@@ -30,8 +30,8 @@ CREATE TABLE `account` (
   `share_link` varchar(16) COLLATE utf8_unicode_ci NOT NULL,
   `last_check` datetime NOT NULL DEFAULT '2000-01-01 00:00:00',
   `check_interval` int(10) unsigned NOT NULL DEFAULT '10',
-  `frontend_remark` text CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL,
-  `message` text CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL,
+  `frontend_remark` text COLLATE utf8_unicode_ci NOT NULL,
+  `message` text COLLATE utf8_unicode_ci NOT NULL,
   `enable_check_password_correct` tinyint(1) NOT NULL,
   `enable_delete_devices` tinyint(1) NOT NULL,
   PRIMARY KEY (`id`),
@@ -44,11 +44,12 @@ CREATE TABLE `account` (
 /*Table structure for table `share` */
 
 CREATE TABLE `share` (
-  `share_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `share_link` varchar(16) COLLATE utf8_unicode_ci NOT NULL,
   `account_list` varchar(512) COLLATE utf8_unicode_ci NOT NULL,
   `owner` int(10) unsigned NOT NULL,
-  PRIMARY KEY (`share_id`),
+  `password` varchar(64) COLLATE utf8_unicode_ci DEFAULT NULL,
+  PRIMARY KEY (`id`),
   KEY `owner` (`owner`),
   CONSTRAINT `share_ibfk_1` FOREIGN KEY (`owner`) REFERENCES `user` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
