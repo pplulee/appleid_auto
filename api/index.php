@@ -8,6 +8,8 @@ global $Sys_config;
 try {
     $conn = new PDO("mysql:host={$Sys_config["db_host"]};dbname={$Sys_config["db_database"]};", $Sys_config["db_user"], $Sys_config["db_password"]);
     $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+    $conn->setAttribute(PDO::ATTR_EMULATE_PREPARES, false); // 禁用prepared statements的模拟效果
+    $conn->exec("set names utf8"); //设置编码
 } catch (PDOException $e) {
     die("数据库连接失败，错误信息：" . $e->getMessage());
 }
@@ -102,7 +104,7 @@ switch ($_GET["action"]) {
         if (!isset($_GET['username'])) {
             $data = array(
                 'status' => 'fail',
-                'message' => 'ID不能为空'
+                'message' => 'username不能为空'
             );
         } else {
             $account = new account(get_account_id($_GET['username']));

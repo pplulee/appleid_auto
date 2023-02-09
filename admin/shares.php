@@ -11,7 +11,7 @@ include("header.php");
                     <th>页面ID</th>
                     <th>账号数量</th>
                     <th>所属用户ID</th>
-                    <th>连接后缀</th>
+                    <th>链接后缀</th>
                     <th>操作</th>
                 </tr>
                 <script>

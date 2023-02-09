@@ -41,7 +41,13 @@ class API:
 
     def get_config(self, id):
         try:
-            result = loads(get(f"{self.url}/api/?key={self.key}&action=get_task_info&id={id}", verify=False).text)
+            result = loads(get(f"{self.url}/api/",
+                               verify=False,
+                               params={
+                                   "key": self.key,
+                                   "action": "get_task_info",
+                                   "id": id
+                               }).text)
         except BaseException:
             return {"status": "fail"}
         else:
@@ -53,8 +59,14 @@ class API:
     def update(self, username, password):
         try:
             result = loads(
-                get(f"{self.url}/api/?key={self.key}&username={username}&password={password}&action=update_password",
-                    verify=False).text)
+                get(f"{self.url}/api/",
+                    verify=False,
+                    params={
+                        "key": self.key,
+                        "username": username,
+                        "password": password,
+                        "action": "update_password"
+                    }).text)
         except BaseException:
             return {"status": "fail"}
         else:
@@ -66,8 +78,13 @@ class API:
     def get_password(self, username):
         try:
             result = loads(
-                get(f"{self.url}/api/?key={self.key}&username={username}&action=get_password",
-                    verify=False).text)
+                get(f"{self.url}/api/",
+                    verify=False,
+                    params={
+                        "key": self.key,
+                        "username": username,
+                        "action": "get_password"
+                    }).text)
         except BaseException:
             return ""
         else:
@@ -75,11 +92,16 @@ class API:
                 return result["password"]
             else:
                 return ""
-    def update_message(self, message):
+
+    def update_message(self, username, message):
         try:
             result = loads(
-                get(f"{self.url}/api/?key={self.key}&message={message}&action=update_message",
-                    verify=False).text)
+                get(f"{self.url}/api/",
+                    verify=False,
+                    params={"key": self.key,
+                            "username": username,
+                            "message": message,
+                            "action": "update_message"}).text)
         except BaseException:
             return False
         else:
@@ -180,7 +202,7 @@ class ID:
             logger.error("无法获取页面内容，即将退出程序")
             if config.proxy != "":
                 logger.error("已启用代理，请检查代理是否可用")
-            api.update_message("无法获取页面内容，后端已退出")
+            api.update_message(self.username, "无法获取页面内容，后端已退出")
             driver.quit()
             exit()
         while True:
@@ -207,9 +229,9 @@ class ID:
             logger.info("登录成功")
             return True
         else:
-            logger.error(f"无法处理请求，可能是账号失效或服务器IP被拉黑\n错误信息：{msg}")
+            logger.error(f"无法处理请求，可能是账号失效或服务器IP被拉黑\n错误信息：{msg.strip()}")
             notification(f"Apple ID解锁登录失败，可能是账号失效或服务器IP被拉黑")
-            api.update_message("解锁登录失败，可能是账号失效或服务器IP被拉黑，具体请查看后端日志")
+            api.update_message(self.username, "解锁登录失败，可能是账号失效或服务器IP被拉黑，具体请查看后端日志")
             return False
 
     def check(self):
@@ -241,7 +263,7 @@ class ID:
                                     "/html/body/div[1]/iforgot-v2/app-container/div/iforgot-body/hsa-two-v2/recovery-web-app/idms-flow/div/div/trusted-phone-number/div/div/div[1]/idms-step/div/div/div/div[2]/div/div/div/button").click()
             except BaseException:
                 logger.error("无法找到关闭验证按钮，可能是账号不允许关闭2FA，退出程序")
-                api.update_message("关闭二步验证失败，可能是账号不允许关闭2FA，后端已退出")
+                api.update_message(self.username, "关闭二步验证失败，可能是账号不允许关闭2FA，后端已退出")
                 driver.quit()
                 exit()
             WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.XPATH,
@@ -260,7 +282,7 @@ class ID:
                                     "/html/body/div[1]/iforgot-v2/app-container/div/iforgot-body/sa/idms-flow/div/section/div/authentication-method/div[2]/div[2]/label/span").click()
             except BaseException:
                 logger.error("选择选项失败，无法使用安全问题解锁，程序已退出")
-                api.update_message("选择选项失败，无法使用安全问题解锁，后端已退出")
+                api.update_message(self.username, "选择选项失败，无法使用安全问题解锁，后端已退出")
                 driver.quit()
                 exit()
             time.sleep(config.step_sleep)
@@ -283,14 +305,14 @@ class ID:
                     "innerHTML")
             except BaseException:
                 logger.error("安全问题获取失败，可能是生日错误，程序已退出")
-                api.update_message("安全问题获取失败，可能是生日错误，后端已退出")
+                api.update_message(self.username, "安全问题获取失败，可能是生日错误，后端已退出")
                 driver.quit()
                 exit()
             answer1 = self.get_answer(question1)
             answer2 = self.get_answer(question2)
             if answer1 == "" or answer2 == "":
                 logger.error("无法找到答案，可能是安全问题错误，程序已退出")
-                api.update_message("无法找到答案，可能是安全问题错误，后端已退出")
+                api.update_message(self.username, "无法找到答案，可能是安全问题错误，后端已退出")
                 driver.quit()
                 exit()
             driver.find_element(By.XPATH,
@@ -306,7 +328,7 @@ class ID:
                                     "/html/body/div[1]/iforgot-v2/app-container/div/iforgot-body/sa/idms-flow/div/section/div/web-reset-options/div[2]/div[1]/button").click()
             except BaseException:
                 logger.error("无法重置密码，可能是上一步问题回答错误，程序已退出")
-                api.update_message("无法重置密码，可能是上一步问题回答错误，后端已退出")
+                api.update_message(self.username, "无法重置密码，可能是上一步问题回答错误，后端已退出")
                 driver.quit()
                 exit()
             time.sleep(config.step_sleep)
@@ -343,7 +365,7 @@ class ID:
         except BaseException:
             pass
         else:
-            logger.error(f"登录失败，错误信息：\n{msg}")
+            logger.error(f"登录失败，错误信息：\n{msg.strip()}")
             return False
         question_element = driver.find_elements(By.CLASS_NAME, "question")
         answer_inputs = driver.find_elements(By.CLASS_NAME, "generic-input-field")
@@ -357,7 +379,7 @@ class ID:
             pass
         else:
             logger.error("安全问题错误，程序已退出")
-            api.update_message("安全问题错误，后端已退出")
+            api.update_message(self.username, "安全问题错误，后端已退出")
             driver.quit()
             exit()
         # 跳过双重验证
@@ -392,6 +414,7 @@ class ID:
                 (By.XPATH, "/html/body/aside[2]/div/div[2]/fieldset/div/div/button[2]"))).click()
             WebDriverWait(driver, 10).until_not(EC.presence_of_element_located((By.CLASS_NAME, "button-bar-working")))
             if i != len(devices) - 1:
+                time.sleep(2)
                 devices[i + 1].click()
         logger.info("设备删除完毕")
         return True
@@ -400,8 +423,8 @@ class ID:
         try:
             WebDriverWait(driver, 5).until(EC.presence_of_element_located((By.CLASS_NAME, "date-input"))).send_keys(
                 self.dob)
-            time.sleep(1)
-            driver.find_element(By.CLASS_NAME, "button-primary").click()
+            time.sleep(3)
+            driver.find_element(By.CLASS_NAME, "date-input").send_keys(Keys.ENTER)
         except BaseException:
             return False
         else:
@@ -413,30 +436,31 @@ class ID:
                 EC.presence_of_all_elements_located((By.CLASS_NAME, "question")))
         except BaseException:
             logger.error("安全问题获取失败，可能是生日错误，程序已退出")
-            api.update_message("请检查生日是否正确，后端已退出")
+            api.update_message(self.username, "请检查生日是否正确，后端已退出")
             driver.quit()
             exit()
-        answer0= self.get_answer(question_element[0].get_attribute("innerHTML"))
-        answer1= self.get_answer(question_element[1].get_attribute("innerHTML"))
-        if answer0=="" or answer1=="":
+        answer0 = self.get_answer(question_element[0].get_attribute("innerHTML"))
+        answer1 = self.get_answer(question_element[1].get_attribute("innerHTML"))
+        if answer0 == "" or answer1 == "":
             logger.error("安全问题错误，程序已退出")
-            api.update_message("请检查安全问题设置是否正确，后端已退出")
+            api.update_message(self.username, "请检查安全问题设置是否正确，后端已退出")
             driver.quit()
             exit()
         answer_inputs = driver.find_elements(By.CLASS_NAME, "generic-input-field")
-        answer_inputs[0].send_keys(self.get_answer(answer0))
+
+        answer_inputs[0].send_keys(answer0)
         time.sleep(1)
-        answer_inputs[1].send_keys(self.get_answer(answer1))
-        time.sleep(1)
-        driver.find_element(By.CLASS_NAME, "button-primary").click()
-        time.sleep(5)
+        answer_inputs[1].send_keys(answer1)
+        time.sleep(2)
+        answer_inputs[1].send_keys(Keys.ENTER)
+        time.sleep(3)
         try:
             msg = driver.find_element(By.CLASS_NAME, "form-message").get_attribute("innerHTML").strip()
         except BaseException:
             return True
         else:
             logger.error(f"安全问题答案错误，程序已退出\n错误信息：{msg}")
-            api.update_message("请检查安全问题答案是否正确，后端已退出")
+            api.update_message(self.username, "请检查安全问题答案是否正确，后端已退出")
             driver.quit()
             exit()
 
@@ -446,9 +470,9 @@ class ID:
         for item in pwd_input_box:
             item.send_keys(self.password)
         time.sleep(1)
-        driver.find_element(By.CLASS_NAME, "button-primary").click()
+        pwd_input_box[-1].send_keys(Keys.ENTER)
         logger.info(f"新密码：{self.password}")
-        time.sleep(2)
+        time.sleep(3)
         try:
             driver.find_element(By.XPATH,
                                 "/html/body/div[5]/div/div/div[1]/idms-step/div/div/div/div[3]/idms-toolbar/div/div/div/button[1]").click()
@@ -554,6 +578,7 @@ def job():
                 # 未重置密码，先获取最新密码再执行登录
                 id.password = api.get_password(id.username)
             login_result = id.login_appleid()
+            reset_password = False
             if not login_result and config.enable_check_password_correct:
                 logger.info("密码错误，开始修改密码")
                 id.change_password()
@@ -563,7 +588,10 @@ def job():
                     logger.error("更新密码失败")
                 else:
                     logger.info("更新密码成功")
+                reset_password = True
             if config.enable_delete_devices:
+                if reset_password:
+                    login_result = id.login_appleid()
                 if login_result:
                     id.delete_devices()
                 else:
