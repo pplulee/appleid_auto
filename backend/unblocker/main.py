@@ -8,12 +8,15 @@ from json import loads
 
 import ddddocr
 import schedule
+import urllib3
 from requests import get, post
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.wait import WebDriverWait
+
+urllib3.disable_warnings()
 
 parser = argparse.ArgumentParser(description="")
 parser.add_argument("-api_url", help="API URL")
@@ -72,6 +75,18 @@ class API:
                 return result["password"]
             else:
                 return ""
+    def update_message(self, message):
+        try:
+            result = loads(
+                get(f"{self.url}/api/?key={self.key}&message={message}&action=update_message",
+                    verify=False).text)
+        except BaseException:
+            return False
+        else:
+            if result["status"] == "success":
+                return True
+            else:
+                return False
 
 
 class Config:
@@ -117,9 +132,7 @@ class ID:
         for item in self.answer:
             if question.find(item) != -1:
                 return self.answer.get(item)
-        logger.error("未找到问题答案，请检查问题是否正确，程序已退出")
-        driver.quit()
-        exit()
+        return ""
 
     def refresh(self):
         try:
@@ -165,7 +178,9 @@ class ID:
                 EC.presence_of_element_located((By.CLASS_NAME, "iforgot-apple-id"))).send_keys(self.username)
         except BaseException:
             logger.error("无法获取页面内容，即将退出程序")
-            logger.error("若启用了代理，请检查代理是否可用")
+            if config.proxy != "":
+                logger.error("已启用代理，请检查代理是否可用")
+            api.update_message("无法获取页面内容，后端已退出")
             driver.quit()
             exit()
         while True:
@@ -194,6 +209,7 @@ class ID:
         else:
             logger.error(f"无法处理请求，可能是账号失效或服务器IP被拉黑\n错误信息：{msg}")
             notification(f"Apple ID解锁登录失败，可能是账号失效或服务器IP被拉黑")
+            api.update_message("解锁登录失败，可能是账号失效或服务器IP被拉黑，具体请查看后端日志")
             return False
 
     def check(self):
@@ -225,6 +241,7 @@ class ID:
                                     "/html/body/div[1]/iforgot-v2/app-container/div/iforgot-body/hsa-two-v2/recovery-web-app/idms-flow/div/div/trusted-phone-number/div/div/div[1]/idms-step/div/div/div/div[2]/div/div/div/button").click()
             except BaseException:
                 logger.error("无法找到关闭验证按钮，可能是账号不允许关闭2FA，退出程序")
+                api.update_message("关闭二步验证失败，可能是账号不允许关闭2FA，后端已退出")
                 driver.quit()
                 exit()
             WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.XPATH,
@@ -243,6 +260,7 @@ class ID:
                                     "/html/body/div[1]/iforgot-v2/app-container/div/iforgot-body/sa/idms-flow/div/section/div/authentication-method/div[2]/div[2]/label/span").click()
             except BaseException:
                 logger.error("选择选项失败，无法使用安全问题解锁，程序已退出")
+                api.update_message("选择选项失败，无法使用安全问题解锁，后端已退出")
                 driver.quit()
                 exit()
             time.sleep(config.step_sleep)
@@ -265,12 +283,14 @@ class ID:
                     "innerHTML")
             except BaseException:
                 logger.error("安全问题获取失败，可能是生日错误，程序已退出")
+                api.update_message("安全问题获取失败，可能是生日错误，后端已退出")
                 driver.quit()
                 exit()
             answer1 = self.get_answer(question1)
             answer2 = self.get_answer(question2)
             if answer1 == "" or answer2 == "":
                 logger.error("无法找到答案，可能是安全问题错误，程序已退出")
+                api.update_message("无法找到答案，可能是安全问题错误，后端已退出")
                 driver.quit()
                 exit()
             driver.find_element(By.XPATH,
@@ -286,6 +306,7 @@ class ID:
                                     "/html/body/div[1]/iforgot-v2/app-container/div/iforgot-body/sa/idms-flow/div/section/div/web-reset-options/div[2]/div[1]/button").click()
             except BaseException:
                 logger.error("无法重置密码，可能是上一步问题回答错误，程序已退出")
+                api.update_message("无法重置密码，可能是上一步问题回答错误，后端已退出")
                 driver.quit()
                 exit()
             time.sleep(config.step_sleep)
@@ -336,6 +357,7 @@ class ID:
             pass
         else:
             logger.error("安全问题错误，程序已退出")
+            api.update_message("安全问题错误，后端已退出")
             driver.quit()
             exit()
         # 跳过双重验证
@@ -391,12 +413,20 @@ class ID:
                 EC.presence_of_all_elements_located((By.CLASS_NAME, "question")))
         except BaseException:
             logger.error("安全问题获取失败，可能是生日错误，程序已退出")
+            api.update_message("请检查生日是否正确，后端已退出")
+            driver.quit()
+            exit()
+        answer0= self.get_answer(question_element[0].get_attribute("innerHTML"))
+        answer1= self.get_answer(question_element[1].get_attribute("innerHTML"))
+        if answer0=="" or answer1=="":
+            logger.error("安全问题错误，程序已退出")
+            api.update_message("请检查安全问题设置是否正确，后端已退出")
             driver.quit()
             exit()
         answer_inputs = driver.find_elements(By.CLASS_NAME, "generic-input-field")
-        answer_inputs[0].send_keys(self.get_answer(question_element[0].get_attribute("innerHTML")))
+        answer_inputs[0].send_keys(self.get_answer(answer0))
         time.sleep(1)
-        answer_inputs[1].send_keys(self.get_answer(question_element[1].get_attribute("innerHTML")))
+        answer_inputs[1].send_keys(self.get_answer(answer1))
         time.sleep(1)
         driver.find_element(By.CLASS_NAME, "button-primary").click()
         time.sleep(5)
@@ -405,7 +435,8 @@ class ID:
         except BaseException:
             return True
         else:
-            logger.error(f"安全问题错误，程序已退出\n错误信息：{msg}")
+            logger.error(f"安全问题答案错误，程序已退出\n错误信息：{msg}")
+            api.update_message("请检查安全问题答案是否正确，后端已退出")
             driver.quit()
             exit()
 
