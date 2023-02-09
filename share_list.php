@@ -29,9 +29,10 @@ include("header.php");
                 </thead>
                 <?php
                 global $conn;
-                $result = $conn->query("SELECT share_id, share_link, account_list FROM share WHERE owner = '{$_SESSION['user_id']}';");
-                if ($result->num_rows > 0) {
-                    while ($row = $result->fetch_assoc()) {
+                $result = $conn->prepare("SELECT share_id, share_link, account_list FROM share WHERE owner = :owner;");
+                $result->execute(['owner' => $_SESSION['user_id']]);
+                if ($result->rowCount() > 0) {
+                    while ($row = $result->fetch()) {
                         $account_list = explode(',', $row['account_list']);
                         $account_count = count($account_list);
                         $share_link = "{$Sys_config['apiurl']}/share_accounts.php?link={$row['share_link']}";

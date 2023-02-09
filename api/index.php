@@ -3,11 +3,13 @@ include($_SERVER['DOCUMENT_ROOT'] . "/config.php");
 include($_SERVER['DOCUMENT_ROOT'] . "/include/function.php");
 include($_SERVER['DOCUMENT_ROOT'] . "/include/user.php");
 include($_SERVER['DOCUMENT_ROOT'] . "/include/account.php");
-
+header('Content-type:text/json');
 global $Sys_config;
-$conn = @mysqli_connect($Sys_config["db_host"], $Sys_config["db_user"], $Sys_config["db_password"], $Sys_config["db_database"]);  //数据库连接
-if (!$conn) {
-    die("数据库连接失败：" . mysqli_connect_error());
+try {
+    $conn = new PDO("mysql:host={$Sys_config["db_host"]};dbname={$Sys_config["db_database"]};", $Sys_config["db_user"], $Sys_config["db_password"]);
+    $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+} catch (PDOException $e) {
+    die("数据库连接失败，错误信息：" . $e->getMessage());
 }
 global $conn;
 if (!isset($_GET['key'])) {
@@ -28,9 +30,10 @@ if (!isset($_GET['key'])) {
 switch ($_GET["action"]) {
     case "get_task_list":
     {
-        $result = $conn->query("SELECT id FROM account;");
+        $result = $conn->prepare("SELECT id FROM account;");
+        $result->execute();
         $task_list = [];
-        while ($row = $result->fetch_assoc()) {
+        while ($row = $result->fetch()) {
             $task_list[] = $row['id'];
         }
         $data = array(
@@ -126,14 +129,15 @@ switch ($_GET["action"]) {
                 'message' => 'username不能为空'
             );
         } else {
-            $result = $conn->query("SELECT password FROM account WHERE username = '" . $_GET['username'] . "';");
-            if ($result->num_rows == 0) {
+            $result = $conn->prepare("SELECT password FROM account WHERE username = :username;");
+            $result->execute(array(':username' => $_GET['username']));
+            if ($result->rowCount() == 0) {
                 $data = array(
                     'status' => 'fail',
                     'message' => '账号不存在'
                 );
             } else {
-                $row = $result->fetch_assoc();
+                $row = $result->fetch();
                 $data = array(
                     'status' => 'success',
                     'message' => '获取成功',

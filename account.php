@@ -36,9 +36,10 @@ $currentuser = new user($_SESSION['user_id']);
                 </thead>
                 <?php
                 global $conn;
-                $result = $conn->query("SELECT * FROM account WHERE owner = '$currentuser->user_id';");
-                if ($result->num_rows > 0) {
-                    while ($row = $result->fetch_assoc()) {
+                $stmt = $conn->prepare("SELECT * FROM account WHERE owner = :userid;");
+                $stmt->execute(['userid' => $currentuser->user_id]);
+                if ($stmt->rowCount() > 0) {
+                    while ($row = $stmt->fetch()) {
                         $share_link = "{$Sys_config['apiurl']}/share.php?link={$row['share_link']}";
                         echo "<tr><td>{$row['id']}</td><td>{$row['username']}</td><td>{$row['password']}</td><td>{$row['remark']}</td><td>{$row['frontend_remark']}</td><td>{$row['message']}</td><td>{$row['last_check']}</td><td>{$row['check_interval']}</td><td> <button id='share_link' class='btn btn-success ' data-clipboard-text='$share_link' onclick='alert_success()'>复制链接</button> <a href='account_edit.php?action=edit&id={$row['id']}' class='btn btn-secondary'>编辑</a> <a href='account_edit.php?action=delete&id={$row['id']}' class='btn btn-danger'>删除</a></td></tr>";
                     }

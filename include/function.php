@@ -19,45 +19,60 @@ function random_string($length): string
 function isadmin($id): bool
 {
     global $conn;
-    return $conn->query("SELECT is_admin FROM user WHERE id='$id';")->fetch_assoc()["is_admin"] == 1;
+    $stmt = $conn->prepare("SELECT is_admin FROM user WHERE id=:id;");
+    $stmt->execute(['id' => $id]);
+    if ($stmt->rowCount() == 0) {
+        return false;
+    } else {
+        return $stmt->fetch()["is_admin"] == 1;
+    }
 }
 
 function get_account_username($id): string
 {
     global $conn;
-    return $conn->query("SELECT username FROM account WHERE id='$id';")->fetch_assoc()["username"];
+    $stmt = $conn->prepare("SELECT username FROM account WHERE id=:id;");
+    $stmt->execute(['id' => $id]);
+    if ($stmt->rowCount() == 0) {
+        return "";
+    } else {
+        return $stmt->fetch()["username"];
+    }
 }
 
 function get_id_by_username($username): int
 {
     global $conn;
-    $result = $conn->query("SELECT id FROM user WHERE username='$username';");
-    if ($result->num_rows == 0) {
+    $stmt = $conn->prepare("SELECT id FROM user WHERE username=:username;");
+    $stmt->execute(['username' => $username]);
+    if ($stmt->rowCount() == 0) {
         return -1;
     } else {
-        return $result->fetch_assoc()["id"];
+        return $stmt->fetch()["id"];
     }
 }
 
 function get_account_id($username): int
 {
     global $conn;
-    $result = $conn->query("SELECT id FROM account WHERE username='$username';");
-    if ($result->num_rows == 0) {
+    $stmt = $conn->prepare("SELECT id FROM account WHERE username=:username;");
+    $stmt->execute(['username' => $username]);
+    if ($stmt->rowCount() == 0) {
         return -1;
     } else {
-        return $result->fetch_assoc()["id"];
+        return $stmt->fetch()["id"];
     }
 }
 
 function get_username_by_id($id): string
 {
     global $conn;
-    $result = $conn->query("SELECT username FROM user WHERE id='$id';");
-    if ($result->num_rows == 0) {
+    $stmt = $conn->prepare("SELECT username FROM user WHERE id=:id;");
+    $stmt->execute(['id' => $id]);
+    if ($stmt->rowCount() == 0) {
         return "";
     } else {
-        return $result->fetch_assoc()["username"];
+        return $stmt->fetch()["username"];
     }
 }
 
@@ -68,7 +83,8 @@ function register($username, $password): array
         return array(false, "用户已存在");
     } else {
         $password = password_hash($password, PASSWORD_DEFAULT);
-        $conn->query("INSERT INTO user (username, password) VALUES ('$username', '$password');");
+        $stmt = $conn->prepare("INSERT INTO user (username, password) VALUES (:username, :password);");
+        $stmt->execute(['username' => $username, 'password' => $password]);
         return array(true, "注册成功");
     }
 }
@@ -77,7 +93,10 @@ function login($username, $password): array
 {
     global $conn;
     if (get_id_by_username($username) != -1) {
-        if (password_verify($password, $conn->query("SELECT password FROM user WHERE username='{$username}';")->fetch_assoc()["password"])) {
+        $stmt = $conn->prepare("SELECT password FROM user WHERE username=:username;");
+        $stmt->execute(['username' => $username]);
+        $password_result = $stmt->fetch()["password"];
+        if (password_verify($password, $password_result)) {
             return array(true, "登陆成功");
         } else {
             return array(false, "密码错误");
@@ -90,11 +109,11 @@ function login($username, $password): array
 function get_share_account_id($share_link): int
 {
     global $conn;
-    $result = $conn->query("SELECT id FROM account WHERE share_link='$share_link';");
-    if ($result->num_rows == 0) {
+    $stmt = $conn->prepare("SELECT id FROM account WHERE share_link=:share_link;");
+    if ($stmt->rowCount() == 0) {
         return -1;
     } else {
-        return $result->fetch_assoc()["id"];
+        return $stmt->fetch()["id"];
     }
 }
 
@@ -164,6 +183,6 @@ function alert($type, $message, $delay, $dest)
             $title = "";
             break;
     }
-    echo ", $delay)</script>";
+    echo "<script>Swal.fire({icon: '$type',title: '$title',text: '$message',timer:$delay,showConfirmButton: false,timerProgressBar: true});setTimeout(\"javascript:location.href='$dest'\", $delay);</script>";
 }
 

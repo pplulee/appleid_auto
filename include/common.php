@@ -10,11 +10,11 @@ if ($Sys_config["debug"]) {
     error_reporting(E_ALL);
 }
 
-if (!isset($conn)) {
-    $conn = @mysqli_connect($Sys_config["db_host"], $Sys_config["db_user"], $Sys_config["db_password"], $Sys_config["db_database"]);  //数据库连接
-    if (!$conn) {
-        die("数据库连接失败：" . mysqli_connect_error());
-    }
+try{
+    $conn = new PDO("mysql:host={$Sys_config["db_host"]};dbname={$Sys_config["db_database"]};", $Sys_config["db_user"], $Sys_config["db_password"]);
+    $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+} catch (PDOException $e) {
+    die("数据库连接失败，错误信息：" . $e->getMessage());
 }
 
 //检查php_self()是否可用

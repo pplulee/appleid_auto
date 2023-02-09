@@ -20,11 +20,12 @@ class account
     function __construct($id)
     {
         global $conn;
-        $result = $conn->query("SELECT * FROM account WHERE id='$id';");
-        if ($result->num_rows == 0) {
+        $stmt = $conn->prepare("SELECT * FROM account WHERE id=:id;");
+        $stmt->execute(['id' => $id]);
+        $result = $stmt->fetch();
+        if ($stmt->rowCount() == 0) {
             $this->id = -1;
         } else {
-            $result = $result->fetch_assoc();
             $this->id = $id;
             $this->remark = $result["remark"];
             $this->username = $result['username'];
@@ -64,7 +65,27 @@ class account
         $this->frontend_remark = $frontend_remark;
         $this->enable_check_password_correct = $enable_check_password_correct;
         $this->enable_delete_devices = $enable_delete_devices;
-        $conn->query("UPDATE account SET username='$username',password='$password',remark='$remark',dob='$dob',question1='$question1',answer1='$answer1',question2='$question2',answer2='$answer2',question3='$question3',answer3='$answer3',owner='$owner',share_link='$share_link', check_interval='$check_interval', frontend_remark='$frontend_remark', enable_check_password_correct='$enable_check_password_correct', enable_delete_devices='$enable_delete_devices' WHERE id='$this->id';");
+        $sql = "UPDATE `account` SET `username`=:username, `password`=:password, `remark`=:remark, `dob`=:dob, `question1`=:question1, `answer1`=:answer1, `question2`=:question2, `answer2`=:answer2, `question3`=:question3, `answer3`=:answer3, `owner`=:owner, `share_link`=:share_link, `check_interval`=:check_interval, `frontend_remark`=:frontend_remark, `enable_check_password_correct`=:enable_check_password_correct, `enable_delete_devices`=:enable_delete_devices WHERE `id`=:id;";
+        $stmt = $conn->prepare($sql);
+        $stmt->execute([
+            'username' => $username,
+            'password' => $password,
+            'remark' => $remark,
+            'dob' => $dob,
+            'question1' => $question1,
+            'answer1' => $answer1,
+            'question2' => $question2,
+            'answer2' => $answer2,
+            'question3' => $question3,
+            'answer3' => $answer3,
+            'owner' => $owner,
+            'share_link' => $share_link,
+            'check_interval' => $check_interval,
+            'frontend_remark' => $frontend_remark,
+            'enable_check_password_correct' => $enable_check_password_correct,
+            'enable_delete_devices' => $enable_delete_devices,
+            'id' => $this->id
+        ]);
     }
 
     function update_password($password)
@@ -72,7 +93,8 @@ class account
         global $conn;
         if ($password != "") {
             $this->password = $password;
-            $conn->query("UPDATE account SET password='$password' WHERE id='$this->id';");
+            $stmt = $conn->prepare("UPDATE account SET password=:password WHERE id=:id;");
+            $stmt->execute(['password' => $password, 'id' => $this->id]);
         }
         $this->update_last_check();
         $this->update_message("正常");
@@ -82,30 +104,35 @@ class account
     {
         global $conn;
         $this->last_check = get_time();
-        $conn->query("UPDATE account SET last_check='$this->last_check' WHERE id='$this->id';");
+        $stmt = $conn->prepare("UPDATE account SET last_check=:last_check WHERE id=:id;");
+        $stmt->execute(['last_check' => $this->last_check, 'id' => $this->id]);
     }
 
     function update_message($message)
     {
         global $conn;
         $this->message = $message;
-        $conn->query("UPDATE account SET message='$message' WHERE id='$this->id';");
+        $stmt = $conn->prepare("UPDATE account SET message=:message WHERE id=:id;");
+        $stmt->execute(['message' => $message, 'id' => $this->id]);
     }
 
     function delete()
     {
         global $conn;
         // 修改相关分享页面
-        $result = $conn->query("SELECT share_id,account_list FROM share WHERE locate('$this->id',account_list);");
-        if ($result->num_rows != 0) {
-            while ($row = $result->fetch_assoc()) {
+        $stmt = $conn->prepare("SELECT share_id,account_list FROM share WHERE locate(:id,account_list);");
+        $stmt->execute(['id' => $this->id]);
+        if ($stmt->rowCount() != 0) {
+            while ($row = $stmt->fetch()) {
                 $account_list = explode(",", $row["account_list"]);
                 if (sizeof($account_list) == 1 && $account_list[0] == $this->id) {
-                    $conn->query("DELETE FROM share WHERE share_id='{$row["share_id"]}';");
+                    $stmt2 = $conn->prepare("DELETE FROM share WHERE share_id=:share_id;");
+                    $stmt2->execute(['share_id' => $row["share_id"]]);
                 } else {
                     $account_list = array_diff($account_list, array($this->id));
                     $account_list = implode(",", $account_list);
-                    $conn->query("UPDATE share SET account_list='$account_list' WHERE share_id='{$row["share_id"]}';");
+                    $stmt2 = $conn->prepare("UPDATE share SET account_list=:account_list WHERE share_id=:share_id;");
+                    $stmt2->execute(['account_list' => $account_list, 'share_id' => $row["share_id"]]);
                 }
             }
         }

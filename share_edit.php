@@ -6,8 +6,9 @@ if (isset($_POST['submit'])) {
         case "add":
         {
             $share_link = $_POST['share_link'];
-            $duplicate_result = $conn->query("SELECT share_id FROM share WHERE share_link = '$share_link';");
-            if ($duplicate_result->num_rows != 0) {
+            $stmt = $conn->prepare("SELECT share_id FROM share WHERE share_link = :link;");
+            $stmt->execute(['link' => $share_link]);
+            if ($stmt->rowCount() != 0) {
                 alert("error", "分享链接已存在，无法重复添加", 2000, "share_list.php");
                 exit;
             }
@@ -16,7 +17,8 @@ if (isset($_POST['submit'])) {
                 exit;
             }
             $accounts = implode(",", $_POST['account_list']);
-            $conn->query("INSERT INTO share (share_link,account_list,owner) VALUES ('$share_link','$accounts','{$_SESSION['user_id']}');");
+            $stmt = $conn->prepare("INSERT INTO share (share_link,account_list,owner) VALUES (:link,:accounts,:owner);");
+            $stmt->execute(['link' => $share_link, 'accounts' => $accounts, 'owner' => $_SESSION['user_id']]);
             alert("success", "添加成功", 2000, "share_list.php");
             exit;
         }
@@ -33,31 +35,34 @@ if (isset($_POST['submit'])) {
             $share_link = $_POST['share_link'];
             $share_id = $_GET['id'];
             // 检查权限
-            $share_id_check = $conn->query("SELECT share_link, owner FROM share WHERE share_id = '$share_id';");
-            if ($share_id_check->num_rows == 0) {
+            $stmt = $conn->prepare("SELECT share_id FROM share WHERE share_link = :link;");
+            $stmt->execute(['link' => $share_link]);
+            if ($stmt->rowCount() == 0) {
                 alert("error", "分享页面ID不存在", 2000, "share_list.php");
                 exit;
             } else {
-                $share_id_check = $share_id_check->fetch_assoc();
+                $share_id_check=$stmt->fetch();
                 if ($share_id_check['owner'] != $_SESSION['user_id']) {
                     alert("error", "无权修改", 2000, "share_list.php");
                     exit;
                 }
             }
             $origin_share_link = $share_id_check['share_link'];
-            $share_link_result = $conn->query("SELECT owner FROM share WHERE share_link = '$share_link';");
-            if ($origin_share_link != $share_link && $share_link_result->num_rows != 0) {
+            $share_link_result = $conn->prepare("SELECT owner FROM share WHERE share_link = :link;");
+            $share_link_result->execute(['link' => $share_link]);
+            if ($origin_share_link != $share_link && $share_link_result->rowCount() != 0) {
                 alert("error", "分享链接已存在，无法重复添加", 2000, "share_list.php");
                 exit;
             } else {
-                $share_link_result = $share_link_result->fetch_assoc();
+                $share_link_result = $share_link_result->fetch();
                 if ($share_link_result['owner'] != $_SESSION['user_id']) {
                     alert("error", "无权修改", 2000, "share_list.php");
                     exit;
                 }
             }
             $accounts = implode(",", $_POST['account_list']);
-            $conn->query("UPDATE share SET account_list = '$accounts', share_link='{$_POST['share_link']}' WHERE share_id = '$share_id';");
+            $stmt = $conn->prepare("UPDATE share SET account_list = :accounts, share_link=:link WHERE share_id = :id;");
+            $stmt->execute(['accounts' => $accounts, 'link' => $share_link, 'id' => $share_id]);
             alert("success", "修改成功", 2000, "share_list.php");
             exit;
         }
@@ -73,33 +78,35 @@ if (isset($_GET['action'])) {
     switch ($_GET['action']) {
         case "delete":
         {
-            $owner_result = $conn->query("SELECT owner FROM share WHERE share_id='{$_GET['id']}';");
-            if ($owner_result->num_rows == 0) {
+            $owner_result = $conn->prepare("SELECT owner FROM share WHERE share_id = :id;");
+            $owner_result->execute(['id' => $_GET['id']]);
+            if ($owner_result->rowCount() == 0) {
                 alert("error", "页面ID不存在", 2000, "share_list.php");
                 exit;
             } else {
-                $owner = $owner_result->fetch_assoc()['owner'];
+                $owner = $owner_result->fetch()['owner'];
                 if ($owner == $_SESSION['user_id']) {
-                    $conn->query("DELETE FROM share WHERE share_id='{$_GET['id']}';");
+                    $stmt = $conn->prepare("DELETE FROM share WHERE share_id = :id;");
+                    $stmt->execute(['id' => $_GET['id']]);
                     alert("success", "删除成功", 2000, "share_list.php");
-                    exit;
                 } else {
                     alert("warning", "没有权限", 2000, "share_list.php");
-                    exit;
                 }
+                exit;
             }
         }
         case "add":
         {
             $share_link = random_string(12);
             $width = isMobile() ? "auto" : "60%";
-            $account_list_result = $conn->query("SELECT id,username FROM account WHERE owner='{$_SESSION['user_id']}';");
-            if ($account_list_result->num_rows == 0) {
+            $account_list_result = $conn->prepare("SELECT id,username FROM account WHERE owner=:owner;");
+            $account_list_result->execute(['owner' => $_SESSION['user_id']]);
+            if ($account_list_result->rowCount() == 0) {
                 alert("warning", "请先添加账号", 2000, "account.php");
                 exit;
             } else {
                 $account_list = array();
-                while ($row = $account_list_result->fetch_assoc()) {
+                while ($row = $account_list_result->fetch()) {
                     $account_list[$row['id']] = $row['username'];
                 }
             }
@@ -130,21 +137,23 @@ if (isset($_GET['action'])) {
                 exit;
             }
             $width = isMobile() ? "auto" : "60%";
-            $page_result = $conn->query("SELECT * FROM share WHERE share_id='{$_GET['id']}' AND owner='{$_SESSION['user_id']}';");
-            if ($page_result->num_rows == 0) {
+            $page_result = $conn->prepare("SELECT * FROM share WHERE share_id=:id AND owner=:owner;");
+            $page_result->execute(['id' => $_GET['id'], 'owner' => $_SESSION['user_id']]);
+            if ($page_result->rowCount() == 0) {
                 alert("error", "页面ID不存在", 2000, "share_list.php");
                 exit;
             }
-            $account_list_result = $conn->query("SELECT id,username FROM account WHERE owner='{$_SESSION['user_id']}';");
-            if ($account_list_result->num_rows == 0) {
+            $account_list_result = $conn->prepare("SELECT id,username FROM account WHERE owner=:owner;");
+            $account_list_result->execute(['owner' => $_SESSION['user_id']]);
+            if ($account_list_result->rowCount() == 0) {
                 alert("warning", "请先添加账号", 2000, "account.php");
                 exit;
             } else {
                 $account_list = array();
-                while ($row = $account_list_result->fetch_assoc()) {
+                while ($row = $account_list_result->fetch()) {
                     $account_list[$row['id']] = $row['username'];
                 }
-                $share_result_detail = $page_result->fetch_assoc();
+                $share_result_detail = $page_result->fetch();
                 $share_account_list = explode(",", $share_result_detail['account_list']);
                 $share_link = $share_result_detail['share_link'];
             }

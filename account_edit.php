@@ -9,9 +9,27 @@ if (isset($_POST['submit'])) {
                 alert("warning", "账号已存在", 2000, "account.php");
                 exit;
             }
-            $enable_check_password_correct = isset($_POST['enable_check_password_correct']) ? 1 : 0;
-            $enable_delete_devices = isset($_POST['enable_delete_devices']) ? 1 : 0;
-            $conn->query("INSERT INTO account (username, password, remark, dob, question1, answer1,question2,answer2,question3,answer3,owner,share_link,check_interval,frontend_remark,message,enable_check_password_correct, enable_delete_devices) VALUES ('{$_POST['username']}','{$_POST['password']}','{$_POST['remark']}','{$_POST['dob']}','{$_POST['question1']}','{$_POST['answer1']}','{$_POST['question2']}','{$_POST['answer2']}','{$_POST['question3']}','{$_POST['answer3']}','{$_SESSION['user_id']}','{$_POST['share_link']}','{$_POST['check_interval']}','{$_POST['frontend_remark']}','未执行任务',$enable_check_password_correct,$enable_delete_devices);");
+            $stmt = $conn->prepare("INSERT INTO account (username, password, remark, dob, question1, answer1,question2,answer2,question3,answer3,owner,share_link,check_interval,frontend_remark,message,enable_check_password_correct, enable_delete_devices) 
+                                    VALUES (:username,:password,:remark,:dob,:question1,:answer1,:question2,:answer2,:question3,:answer3,:owner,:share_link,:check_interval,:frontend_remark,:message,:enable_check_password_correct,:enable_delete_devices);");
+            $stmt->execute([
+                'username' => $_POST['username'],
+                'password' => $_POST['password'],
+                'remark' => $_POST['remark'],
+                'dob' => $_POST['dob'],
+                'question1' => $_POST['question1'],
+                'answer1' => $_POST['answer1'],
+                'question2' => $_POST['question2'],
+                'answer2' => $_POST['answer2'],
+                'question3' => $_POST['question3'],
+                'answer3' => $_POST['answer3'],
+                'owner' => $_SESSION['user_id'],
+                'share_link' => $_POST['share_link'],
+                'check_interval' => $_POST['check_interval'],
+                'frontend_remark' => $_POST['frontend_remark'],
+                'message' => "未执行任务",
+                'enable_check_password_correct' => isset($_POST['enable_check_password_correct']) ? 1 : 0,
+                'enable_delete_devices' => isset($_POST['enable_delete_devices']) ? 1 : 0
+            ]);
             alert("success", "添加成功", 2000, "account.php");
             exit;
         }
@@ -19,9 +37,23 @@ if (isset($_POST['submit'])) {
         {
             $account = new account($_GET['id']);
             if ($account->owner == $_SESSION['user_id'] || $account->id) {
-                $enable_check_password_correct = isset($_POST['enable_check_password_correct']) ? 1 : 0;
-                $enable_delete_devices = isset($_POST['enable_delete_devices']) ? 1 : 0;
-                $account->update($_POST['username'], $_POST['password'], $_POST['remark'], $_POST['dob'], $_POST['question1'], $_POST['answer1'], $_POST['question2'], $_POST['answer2'], $_POST['question3'], $_POST['answer3'], $_SESSION['user_id'], $_POST['share_link'], $_POST['check_interval'], $_POST['frontend_remark'], $enable_check_password_correct, $enable_delete_devices);
+                $account->update(
+                    $_POST['username'],
+                    $_POST['password'],
+                    $_POST['remark'],
+                    $_POST['dob'],
+                    $_POST['question1'],
+                    $_POST['answer1'],
+                    $_POST['question2'],
+                    $_POST['answer2'],
+                    $_POST['question3'],
+                    $_POST['answer3'],
+                    $_SESSION['user_id'],
+                    $_POST['share_link'],
+                    $_POST['check_interval'],
+                    $_POST['frontend_remark'],
+                    isset($_POST['enable_check_password_correct']) ? 1 : 0,
+                    isset($_POST['enable_delete_devices']) ? 1 : 0);
                 alert("success", "修改成功", 2000, "account.php");
             } else {
                 alert("error", "修改失败", 2000, "account.php");
