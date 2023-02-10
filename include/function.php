@@ -111,6 +111,7 @@ function get_share_account_id($share_link): int
 {
     global $conn;
     $stmt = $conn->prepare("SELECT id FROM account WHERE share_link=:share_link;");
+    $stmt->execute(['share_link' => $share_link]);
     if ($stmt->rowCount() == 0) {
         return -1;
     } else {
