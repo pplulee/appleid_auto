@@ -61,13 +61,13 @@ foreach ($sharepage->account_list as $account_id) {
     if ($account->frontend_remark != "") {
         $remark = "<p class='card-subtitle mb-2 text-muted'>备注：$account->frontend_remark</p>";
     }
-    echo "<div class='card' style='width: 20rem;'>
+    echo "<div class='card border border-3 border-info shadow-lg' style='width: 20rem;'>
             <div class='card-body'>
                 <h5 class='card-title'>账号信息</h5>
                 <h6 class='card-text'>$account->username</h6>
                 " . $remark . "
                 <p class='card-subtitle mb-2 text-muted'>上次检测时间：$account->last_check</p>
-                <p class='card-subtitle mb-2 text-muted'>状态：" . (($account->message == "正常" && ((time() - strtotime($account->last_check)) < ($account->check_interval + 2) * 60)) ? "<font color='#549A31'>正常</font>" : "<font color='#B40404'>异常</font>") . "</p>
+                <p class='card-subtitle mb-2 text-muted'>状态：" . (($account->message == "正常" && ((time() - strtotime($account->last_check)) < (($account->check_interval + 2) * 60))) ? "<img src='resources/img/icons8-checkmark.svg' width='30' height='30'><span style='color: #549A31'>正常</span>" : "<img src='resources/img/icons8-cancel.svg' width='30' height='30'><span style='color: #B40404'>异常</span>") . "</p>
                 <button id='username_$account->id' class='btn btn-primary' data-clipboard-text='$account->username' onclick='alert_success()'>复制账号</button>
                 <button id='password_$account->id' class='btn btn-success' data-clipboard-text='$account->password' onclick='alert_success()'>复制密码</button>
             </div>

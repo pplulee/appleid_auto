@@ -31,7 +31,7 @@ if ($account->id == -1) {
 </script>
 <div class="container"
      style="align-self: center; position: absolute;width: <?php echo((isMobile()) ? "auto" : "20%"); ?>; margin-top:1rem">
-    <div class="card" style="width: 20rem;">
+    <div class="card border border-3 border-info shadow-lg" style="width: 20rem;">
         <div class="card-body">
             <h5 class="card-title">账号信息</h5>
             <h6 class="card-text"><?php echo $account->username ?></h6>
@@ -42,8 +42,7 @@ if ($account->id == -1) {
             ?>
             <p class="card-subtitle mb-2 text-muted">上次检测时间：<?php echo $account->last_check ?></p>
             <p class="card-subtitle mb-2 text-muted">
-                状态：<?php echo ($account->message == "正常" && ((time() - strtotime($account->last_check)) < ($account->check_interval + 2) * 60)) ? "<font color='#549A31'>正常</font>" : "<font color='#B40404'>异常</font>" ?></p>
-
+                状态：<?php echo ($account->message == "正常" && ((time() - strtotime($account->last_check)) < (($account->check_interval + 2) * 60))) ? "<img src='resources/img/icons8-checkmark.svg' width='30' height='30'><span style='color: #549A31'>正常</span>" : "<img src='resources/img/icons8-cancel.svg' width='30' height='30'><span style='color: #B40404'>异常</span>" ?></p>
             <button id="username" class="btn btn-primary" data-clipboard-text="<?php echo $account->username ?>"
                     onclick='alert_success()'>复制账号
             </button>
