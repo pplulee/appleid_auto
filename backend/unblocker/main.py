@@ -370,18 +370,23 @@ class ID:
         driver.get("https://appleid.apple.com/account/manage/section/devices")
         WebDriverWait(driver, 10).until(EC.presence_of_element_located(
             (By.XPATH, "//*[@id=\"root\"]/div[3]/main/div/div[2]/div[3]/div/div/header/h1")))
-        devices = WebDriverWait(driver, 10).until(EC.presence_of_all_elements_located((By.CLASS_NAME, "button-expand")))
-        logger.info(f"共有{len(devices)}个设备")
-        for i in range(len(devices)):
-            devices[i].click()
-            WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.CLASS_NAME, "button-secondary"))).click()
-            WebDriverWait(driver, 10).until(EC.presence_of_element_located(
-                (By.XPATH, "/html/body/aside[2]/div/div[2]/fieldset/div/div/button[2]"))).click()
-            WebDriverWait(driver, 10).until_not(EC.presence_of_element_located((By.CLASS_NAME, "button-bar-working")))
-            if i != len(devices) - 1:
-                time.sleep(2)
-                devices[i + 1].click()
-        logger.info("设备删除完毕")
+        try:
+            devices = WebDriverWait(driver, 3).until(
+                EC.presence_of_all_elements_located((By.CLASS_NAME, "button-expand")))
+        except BaseException:
+            logger.info("没有设备需要删除")
+        else:
+            logger.info(f"共有{len(devices)}个设备")
+            for i in range(len(devices)):
+                devices[i].click()
+                WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.CLASS_NAME, "button-secondary"))).click()
+                WebDriverWait(driver, 10).until(EC.presence_of_element_located(
+                    (By.XPATH, "/html/body/aside[2]/div/div[2]/fieldset/div/div/button[2]"))).click()
+                WebDriverWait(driver, 10).until_not(EC.presence_of_element_located((By.CLASS_NAME, "button-bar-working")))
+                if i != len(devices) - 1:
+                    time.sleep(2)
+                    devices[i + 1].click()
+            logger.info("设备删除完毕")
         return True
 
     def process_dob(self):
@@ -511,18 +516,23 @@ def setup_driver():
         else:
             driver = webdriver.Chrome(options=options)
     except BaseException as e:
-        logger.error("Webdriver调用失败")
+        logger.error("Webdriver调用失败，程序已退出")
         logger.error(e)
-        exit()
+        return False
     else:
         driver.set_page_load_timeout(30)
+        return True
 
 
 def job():
     global api
     schedule.clear()
     unlock = False
-    setup_driver()
+    driver_result = setup_driver()
+    if not driver_result:
+        api.update_message(id.username, "Webdriver调用失败")
+        notification("Webdriver调用失败")
+        exit()
     if id.login():
         if id.check_2fa():
             logger.info("检测到账号开启双重认证，开始解锁")
@@ -577,8 +587,11 @@ def job():
     logger.info("已设置下次检测任务")
     return unlock
 
-logger.info("启动AppleID_Auto\n项目地址 https://github.com/pplulee/appleid_auto\nTelegram交流群 @appleunblocker")
-logger.info("当前版本：v1.3-20230209")
+logger.info(f"{'=' * 80}\n"
+            f"启动AppleID_Auto\n"
+            f"项目地址 https://github.com/pplulee/appleid_auto\n"
+            f"Telegram交流群 @appleunblocker")
+logger.info("当前版本：v1.3-20230210")
 id = ID(config.username, config.password, config.dob, config.answer)
 job()
 while True:
