@@ -22,8 +22,7 @@ $currentuser = new user($_SESSION['user_id']);
                 </thead>
                 <?php
                 global $conn;
-                $stmt = $conn->prepare("SELECT * FROM account WHERE owner = :userid;");
-                $stmt->execute(['userid' => $currentuser->user_id]);
+                $stmt = $conn->query("SELECT * FROM account;");
                 if ($stmt->rowCount() > 0) {
                     while ($row = $stmt->fetch()) {
                         $user_name = get_username_by_id($row['owner']);

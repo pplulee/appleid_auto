@@ -30,9 +30,7 @@ include("header.php");
                 </thead>
                 <?php
                 global $conn;
-                $result = $conn->query("SELECT * FROM share;");
-                $stmt = $conn->prepare("SELECT * FROM share;");
-                $stmt->execute();
+                $stmt = $conn->query("SELECT * FROM share;");
                 if ($stmt->rowCount() > 0) {
                     while ($row = $stmt->fetch()){
                         $account_list = explode(',', $row['account_list']);
