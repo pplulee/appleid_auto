@@ -2,11 +2,13 @@ import argparse
 import json
 import logging
 import os
-import platform
 import time
 
 import schedule
+import urllib3
 from requests import get
+
+urllib3.disable_warnings()
 
 prefix = "apple-auto_"
 parser = argparse.ArgumentParser(description="")
@@ -15,7 +17,6 @@ parser.add_argument("-api_key", help="API key", required=True)
 args = parser.parse_args()
 api_url = args.api_url
 api_key = args.api_key
-
 
 logger = logging.getLogger()
 logger.setLevel('INFO')
@@ -34,13 +35,16 @@ class API:
 
     def get_task_list(self):
         try:
-            result = json.loads(get(f"{self.url}/api/?key={self.key}&action=get_task_list", verify=False).text)
+            result = json.loads(
+                get(f"{self.url}/api/", verify=False, params={"key": self.key, "action": "get_task_list"}).text)
         except Exception as e:
             logger.error("获取任务列表失败")
+            logger.error(e)
             return False
         else:
             if result['status'] == "fail":
                 logger.error("获取任务列表失败")
+                logger.error(result['message'])
                 return False
             elif result['data'] == "":
                 return []
@@ -129,10 +133,12 @@ def job():
     logger.info("开始定时任务")
     Local.sync()
 
+
 def update():
     global Local
     logger.info("开始更新任务")
     Local.update()
+
 
 logger.info("AppleAuto后端管理服务启动")
 api = API()

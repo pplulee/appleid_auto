@@ -439,7 +439,9 @@ class ID:
             pwd_input_box = WebDriverWait(driver, 5).until(
                 EC.presence_of_all_elements_located((By.CLASS_NAME, "override")))
         except BaseException:
-            logger.error("密码框获取失败，程序已退出")
+            logger.error("密码框获取失败")
+            api.update_message(self.username, "密码框获取失败")
+            return False
         self.password = self.generate_password()
         for item in pwd_input_box:
             item.send_keys(self.password)
