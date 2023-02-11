@@ -79,7 +79,6 @@ $Sys_config["db_database"] = "appleid_auto";
 
 $Sys_config["apiurl"] = "http://192.168.50.1:80"; # 站点地址，无需斜杠结尾
 $Sys_config["apikey"] = "password"; # API密钥
-$Sys_config["backend_step_sleep"] = 3; # 后端脚本步骤执行间隔，单位秒
 $Sys_config["webdriver_url"] = "http://selenium:4444";
 ```
 

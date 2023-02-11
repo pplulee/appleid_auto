@@ -360,7 +360,8 @@ class ID:
         except BaseException:
             pass
         driver.switch_to.default_content()
-        WebDriverWait(driver,5).until(EC.presence_of_element_located((By.CLASS_NAME, "button-primary")))  # 找到登出按钮
+        time.sleep(3)
+        # WebDriverWait(driver,5).until(EC.presence_of_element_located((By.CLASS_NAME, "button-primary")))  # 找到登出按钮
         logger.info("登录成功")
         return True
 

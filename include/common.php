@@ -41,7 +41,7 @@ echo '<!DOCTYPE html>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link href="../resources/css/bootstrap.min.css" rel="stylesheet">
-    <script src="../resources/js/bootstrap.min.js" integrity="sha384-kenU1KFdBIe4zVF0s0G1M5b4hcpxyD9F7jL+jjXkk+Q2h455rYXK/7HAuoJl+0I4" crossorigin="anonymous"></script>
+    <script src="../resources/js/bootstrap.min.js"></script>
     <script src="../resources/js/sweetalert2.all.min.js"></script>
     <link href="../resources/css/sweetalert2.min.css" rel="stylesheet">
     <script src="../resources/js/clipboard.min.js"></script>

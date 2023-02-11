@@ -84,7 +84,6 @@ switch ($_GET["action"]) {
                     'tgbot_chatid' => $Sys_config["telegram_bot_chatid"],
                     'API_key' => $Sys_config['apikey'],
                     'API_url' => $Sys_config['apiurl'],
-                    'step_sleep' => $Sys_config['backend_step_sleep'],
                     'webdriver' => $Sys_config['webdriver_url'],
                     'proxy' => $Sys_config['webdriver_proxy']
 
@@ -133,7 +132,7 @@ switch ($_GET["action"]) {
             );
         } else {
             $result = $conn->prepare("SELECT password FROM account WHERE username = :username;");
-            $result->execute(array(':username' => $_GET['username']));
+            $result->execute([':username' => $_GET['username']]);
             if ($result->rowCount() == 0) {
                 $data = array(
                     'status' => 'fail',
