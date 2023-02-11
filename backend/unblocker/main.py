@@ -350,7 +350,8 @@ class ID:
             driver.quit()
             exit()
         # 跳过双重验证
-        driver.switch_to.frame(WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.TAG_NAME, "iframe"))))
+        driver.switch_to.frame(
+            WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.TAG_NAME, "iframe"))))
         try:
             WebDriverWait(driver, 5).until(EC.presence_of_element_located((By.XPATH,
                                                                            "/html/body/div[1]/appleid-repair/idms-widget/div/div/div/hsa2-enrollment-flow/div/div/idms-step/div/div/div/div[3]/idms-toolbar/div/div[1]/div/button[2]"))).click()
@@ -358,8 +359,8 @@ class ID:
             WebDriverWait(driver, 5).until_not(EC.presence_of_element_located((By.CLASS_NAME, "nav-cancel")))
         except BaseException:
             pass
-        WebDriverWait(driver, 10).until(EC.presence_of_element_located(
-            (By.XPATH, "//*[@id=\"ac-localnav\"]/div/div[2]/div[2]/div[2]/div[2]/a")))  # 找到登出按钮
+        driver.switch_to.default_content()
+        WebDriverWait(driver,5).until(EC.presence_of_element_located((By.CLASS_NAME, "button-primary")))  # 找到登出按钮
         logger.info("登录成功")
         return True
 
@@ -593,7 +594,7 @@ logger.info(f"{'=' * 80}\n"
             f"启动AppleID_Auto\n"
             f"项目地址 https://github.com/pplulee/appleid_auto\n"
             f"Telegram交流群 @appleunblocker")
-logger.info("当前版本：v1.3-20230210")
+logger.info("当前版本：v1.4-20230211")
 id = ID(config.username, config.password, config.dob, config.answer)
 job()
 while True:
