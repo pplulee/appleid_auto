@@ -333,7 +333,8 @@ class ID:
             api.update_message(self.username, "请检查安全问题设置是否正确，后端已退出")
             driver.quit()
             exit()
-        answer_inputs = WebDriverWait(driver, 10).until(EC.presence_of_all_elements_located((By.CLASS_NAME, "generic-input-field")))
+        answer_inputs = WebDriverWait(driver, 10).until(
+            EC.presence_of_all_elements_located((By.CLASS_NAME, "generic-input-field")))
         answer_inputs[0].send_keys(answer0)
         time.sleep(1)
         answer_inputs[1].send_keys(answer1)
@@ -360,8 +361,7 @@ class ID:
         except BaseException:
             pass
         driver.switch_to.default_content()
-        time.sleep(3)
-        # WebDriverWait(driver,5).until(EC.presence_of_element_located((By.CLASS_NAME, "button-primary")))  # 找到登出按钮
+        time.sleep(5)
         logger.info("登录成功")
         return True
 
@@ -370,21 +370,22 @@ class ID:
         logger.info("开始删除设备")
         # 删除设备
         driver.get("https://appleid.apple.com/account/manage/section/devices")
-        # WebDriverWait(driver, 10).until(EC.presence_of_element_located(
-        #     (By.XPATH, "//*[@id=\"root\"]/div[3]/main/div/div[2]/div[3]/div/div/header/h1")))
+        WebDriverWait(driver, 10).until_not(EC.presence_of_element_located((By.ID, "loading")))
+        time.sleep(2)
         try:
-            devices = WebDriverWait(driver, 3).until(
-                EC.presence_of_all_elements_located((By.CLASS_NAME, "button-expand")))
+            devices = driver.find_elements(By.CLASS_NAME, "button-expand")
         except BaseException:
             logger.info("没有设备需要删除")
         else:
             logger.info(f"共有{len(devices)}个设备")
             for i in range(len(devices)):
                 devices[i].click()
-                WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.CLASS_NAME, "button-secondary"))).click()
+                WebDriverWait(driver, 10).until(
+                    EC.presence_of_element_located((By.CLASS_NAME, "button-secondary"))).click()
                 WebDriverWait(driver, 10).until(EC.presence_of_element_located(
                     (By.XPATH, "/html/body/aside[2]/div/div[2]/fieldset/div/div/button[2]"))).click()
-                WebDriverWait(driver, 10).until_not(EC.presence_of_element_located((By.CLASS_NAME, "button-bar-working")))
+                WebDriverWait(driver, 10).until_not(
+                    EC.presence_of_element_located((By.CLASS_NAME, "button-bar-working")))
                 if i != len(devices) - 1:
                     time.sleep(2)
                     devices[i + 1].click()
@@ -425,7 +426,7 @@ class ID:
         time.sleep(1)
         answer_inputs[1].send_keys(Keys.ENTER)
         time.sleep(1)
-        WebDriverWait(driver,5).until_not(EC.presence_of_element_located((By.CLASS_NAME, "generic-input-field")))
+        WebDriverWait(driver, 5).until_not(EC.presence_of_element_located((By.CLASS_NAME, "generic-input-field")))
         try:
             msg = driver.find_element(By.CLASS_NAME, "form-message").get_attribute("innerHTML").strip()
         except BaseException:
@@ -515,11 +516,10 @@ def setup_driver():
     options.add_argument(
         "user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/108.0.0.0 Safari/537.36")
     try:
-        # if config.webdriver != "local":
-        #     driver = webdriver.Remote(command_executor=config.webdriver, options=options)
-        # else:
-        #     driver = webdriver.Chrome(options=options)
-        driver = webdriver.Chrome(options=options)
+        if config.webdriver != "local":
+            driver = webdriver.Remote(command_executor=config.webdriver, options=options)
+        else:
+            driver = webdriver.Chrome(options=options)
     except BaseException as e:
         logger.error("Webdriver调用失败，程序已退出")
         logger.error(e)
@@ -592,11 +592,12 @@ def job():
     logger.info("已设置下次检测任务")
     return unlock
 
+
 logger.info(f"{'=' * 80}\n"
             f"启动AppleID_Auto\n"
             f"项目地址 https://github.com/pplulee/appleid_auto\n"
             f"Telegram交流群 @appleunblocker")
-logger.info("当前版本：v1.4-20230211")
+logger.info("当前版本：v1.4-20230212")
 id = ID(config.username, config.password, config.dob, config.answer)
 job()
 while True:
