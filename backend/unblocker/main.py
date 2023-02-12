@@ -548,7 +548,7 @@ def job():
             unlock = True
         logger.info("账号检测完毕")
         if unlock:
-            notification(f"Apple ID解锁成功\n新密码：{id.password}")
+            notification(f"Apple ID更新成功\n账号：{id.username}\n新密码：{id.password}")
             update_result = api.update(id.username, id.password)
         else:
             update_result = api.update(id.username, "")
