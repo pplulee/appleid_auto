@@ -370,8 +370,8 @@ class ID:
         logger.info("开始删除设备")
         # 删除设备
         driver.get("https://appleid.apple.com/account/manage/section/devices")
-        WebDriverWait(driver, 10).until(EC.presence_of_element_located(
-            (By.XPATH, "//*[@id=\"root\"]/div[3]/main/div/div[2]/div[3]/div/div/header/h1")))
+        # WebDriverWait(driver, 10).until(EC.presence_of_element_located(
+        #     (By.XPATH, "//*[@id=\"root\"]/div[3]/main/div/div[2]/div[3]/div/div/header/h1")))
         try:
             devices = WebDriverWait(driver, 3).until(
                 EC.presence_of_all_elements_located((By.CLASS_NAME, "button-expand")))
@@ -515,10 +515,11 @@ def setup_driver():
     options.add_argument(
         "user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/108.0.0.0 Safari/537.36")
     try:
-        if config.webdriver != "local":
-            driver = webdriver.Remote(command_executor=config.webdriver, options=options)
-        else:
-            driver = webdriver.Chrome(options=options)
+        # if config.webdriver != "local":
+        #     driver = webdriver.Remote(command_executor=config.webdriver, options=options)
+        # else:
+        #     driver = webdriver.Chrome(options=options)
+        driver = webdriver.Chrome(options=options)
     except BaseException as e:
         logger.error("Webdriver调用失败，程序已退出")
         logger.error(e)
