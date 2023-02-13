@@ -425,10 +425,9 @@ class ID:
         answer_inputs[1].send_keys(answer1)
         time.sleep(1)
         answer_inputs[1].send_keys(Keys.ENTER)
-        time.sleep(1)
-        WebDriverWait(driver, 5).until_not(EC.presence_of_element_located((By.CLASS_NAME, "generic-input-field")))
         try:
-            msg = driver.find_element(By.CLASS_NAME, "form-message").get_attribute("innerHTML").strip()
+            msg = WebDriverWait(driver, 5).until(
+                EC.presence_of_element_located((By.CLASS_NAME, "form-message"))).get_attribute("innerHTML").strip()
         except BaseException:
             return True
         else:
