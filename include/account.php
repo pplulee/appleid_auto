@@ -120,19 +120,19 @@ class account
     {
         global $conn;
         // 修改相关分享页面
-        $stmt = $conn->prepare("SELECT share_id,account_list FROM share WHERE locate(:id,account_list);");
+        $stmt = $conn->prepare("SELECT id,account_list FROM share WHERE locate(:id,account_list);");
         $stmt->execute(['id' => $this->id]);
         if ($stmt->rowCount() != 0) {
             while ($row = $stmt->fetch()) {
                 $account_list = explode(",", $row["account_list"]);
                 if (sizeof($account_list) == 1 && $account_list[0] == $this->id) {
-                    $stmt2 = $conn->prepare("DELETE FROM share WHERE share_id=:share_id;");
-                    $stmt2->execute(['share_id' => $row["share_id"]]);
+                    $stmt2 = $conn->prepare("DELETE FROM share WHERE id=:share_id;");
+                    $stmt2->execute(['share_id' => $row["id"]]);
                 } else {
                     $account_list = array_diff($account_list, array($this->id));
                     $account_list = implode(",", $account_list);
-                    $stmt2 = $conn->prepare("UPDATE share SET account_list=:account_list WHERE share_id=:share_id;");
-                    $stmt2->execute(['account_list' => $account_list, 'share_id' => $row["share_id"]]);
+                    $stmt2 = $conn->prepare("UPDATE share SET account_list=:account_list WHERE id=:share_id;");
+                    $stmt2->execute(['account_list' => $account_list, 'share_id' => $row["id"]]);
                 }
             }
         }
