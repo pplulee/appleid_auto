@@ -47,7 +47,7 @@ if (isset($_POST['submit'])) {
                 alert("error", "分享链接已存在，无法重复添加", 2000, "share_list.php");
                 exit;
             }
-            $sharepage->update($_POST['share_link'],$_POST['password'],$_POST['account_list'], $_SESSION['user_id']);
+            $sharepage->update($_POST['share_link'],$_POST['password'],$_POST['account_list'], $_SESSION['user_id'],$_POST['html']);
             alert("success", "修改成功", 2000, "share_list.php");
             exit;
         }
@@ -161,6 +161,11 @@ if (isset($_GET['action'])) {
                             <div class='input-group mb-3'>
                                 <span class='input-group-text' id='password'>页面密码</span>
                                 <input type='text' class='form-control' name='password' value='$sharepage->password' placeholder='留空则不启用密码' autocomplete='off'>
+                            </div>
+                            <div class='input-group mb-3'>
+                                <span class='input-group-text' id='html'>HTML内容</span>
+                                <textarea name='html' cols='80' rows=4>$sharepage->html</textarea>
+
                             </div>
                             <input type='submit' name='submit' class='btn btn-primary btn-block' value='保存'>
                         </form>

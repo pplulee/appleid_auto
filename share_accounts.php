@@ -74,6 +74,7 @@ foreach ($sharepage->account_list as $account_id) {
           </div>
           <br>";
 }
+echo $sharepage->html;
 ?>
 </div>
 </body>

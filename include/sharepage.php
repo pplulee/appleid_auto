@@ -7,6 +7,7 @@ class sharepage
     var string $password;
     var array $account_list;
     var int $owner;
+    var string $html;
 
     function __construct($id){
         global $conn;
@@ -21,14 +22,20 @@ class sharepage
             $this->account_list = explode(",", $result['account_list']);
             $this->password = $result['password']==null?"":$result['password'];
             $this->owner = $result['owner'];
+            $this->html = htmlspecialchars_decode($result['html']);
         }
     }
 
-    function update($share_link,$password,array $account_list, $owner){
+    function update($share_link,$password,array $account_list, $owner, $html){
         global $conn;
         $account_list_str = implode(",", $account_list);
-        $stmt = $conn->prepare("UPDATE share SET share_link=:share_link, account_list=:account_list, owner=:owner, password=:password WHERE id=:id;");
-        $stmt->execute(['share_link' => $share_link, 'account_list' => $account_list_str, 'owner' => $owner, 'id' => $this->id, 'password' => $password]);
+        $stmt = $conn->prepare("UPDATE share SET share_link=:share_link, account_list=:account_list, owner=:owner, password=:password, html=:html WHERE id=:id;");
+        $this->share_link = $share_link;
+        $this->password = $password;
+        $this->account_list = $account_list;
+        $this->owner = $owner;
+        $this->html = htmlspecialchars($html);
+        $stmt->execute(['share_link' => $this->share_link, 'account_list' => $account_list_str, 'owner' => $this->owner, 'id' => $this->id, 'password' => $this->password, 'html' => $this->html]);
     }
 
     function delete(){
