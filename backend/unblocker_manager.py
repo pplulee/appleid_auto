@@ -63,8 +63,6 @@ class local_docker:
         -e api_url={self.api.url} \
         -e api_key={self.api.key} \
         -e taskid={id} \
-        --log-opt max-size=1m \
-        --log-opt max-file=1 \
         --restart=on-failure \
         sahuidhsu/appleid_auto")
 
