@@ -41,7 +41,15 @@ class user
     function delete_account()
     {
         global $conn;
+        // 删除相关分享页面
+        $stmt = $conn->prepare("DELETE FROM share WHERE `owner`=:owner;");
+        $stmt->execute(['owner' => $this->user_id]);
+        // 删除相关账号
         $stmt = $conn->prepare("DELETE FROM account WHERE `owner`=:owner;");
         $stmt->execute(['owner' => $this->user_id]);
+        // 删除用户
+        $stmt = $conn->prepare("DELETE FROM user WHERE `id`=:id;");
+        $stmt->execute(['id' => $this->user_id]);
+        $this->user_id = -1;
     }
 }
