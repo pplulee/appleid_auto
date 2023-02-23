@@ -296,7 +296,6 @@ class ID:
             self.process_dob()
             # 判断问题
             self.process_security_question()
-            WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.CLASS_NAME, "pwdChange"))).click()
             # 重置密码
             self.process_password()
 
