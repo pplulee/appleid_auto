@@ -513,17 +513,16 @@ def setup_driver():
     options.add_argument("--disable-extensions")
     options.add_argument("start-maximized")
     options.add_argument("window-size=1920,1080")
-    # if config.proxy != "":
-    #     logger.info("已启用代理")
-    #     options.add_argument(f"--proxy-server={config.proxy}")
+    if config.proxy != "":
+        logger.info("已启用代理")
+        options.add_argument(f"--proxy-server={config.proxy}")
     options.add_argument(
         "user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/108.0.0.0 Safari/537.36")
     try:
-        # if config.webdriver != "local":
-        #     driver = webdriver.Remote(command_executor=config.webdriver, options=options)
-        # else:
-        #     driver = webdriver.Chrome(options=options)
-        driver = webdriver.Chrome(options=options)
+        if config.webdriver != "local":
+            driver = webdriver.Remote(command_executor=config.webdriver, options=options)
+        else:
+            driver = webdriver.Chrome(options=options)
     except BaseException as e:
         logger.error("Webdriver调用失败，程序已退出")
         logger.error(e)
@@ -601,7 +600,7 @@ logger.info(f"{'=' * 80}\n"
             f"启动AppleID_Auto\n"
             f"项目地址 https://github.com/pplulee/appleid_auto\n"
             f"Telegram交流群 @appleunblocker")
-logger.info("当前版本：v1.41-20230223")
+logger.info("当前版本：v1.41-20230224")
 id = ID(config.username, config.password, config.dob, config.answer)
 job()
 while True:
