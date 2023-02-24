@@ -21,7 +21,7 @@ class user
         }
     }
 
-    function update($username, $isadmin)
+    function update($username, $isadmin): void
     {
         global $conn;
         $this->username = $username;
@@ -30,7 +30,7 @@ class user
         $stmt->execute(['username' => $username, 'is_admin' => $isadmin, 'id' => $this->user_id]);
     }
 
-    function change_password($password)
+    function change_password($password): void
     {
         global $conn;
         $password = password_hash($password, PASSWORD_DEFAULT);
@@ -38,7 +38,7 @@ class user
         $stmt->execute(['password' => $password, 'id' => $this->user_id]);
     }
 
-    function delete_account()
+    function delete_account(): void
     {
         global $conn;
         // 删除相关分享页面

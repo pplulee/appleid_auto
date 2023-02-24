@@ -1,12 +1,12 @@
 <?php
 include("header.php");
 //如果已登录则跳转到用户界面
-if (isset($_SESSION["isLogin"]) and $_SESSION["isLogin"]) {
+if (isset($_SESSION["isLogin"]) && $_SESSION["isLogin"]) {
     alert("error","你已登录！",1000,"userindex.php");
     exit;
 }
 if (isset($_POST['register']) && $Sys_config['enable_register']) {
-    if ($_POST["username"] == null or $_POST["password"] == null) {
+    if ($_POST["username"] == null || $_POST["password"] == null) {
         alert("error","用户名或密码不能为空！",2000,"index.php#register");
         exit;
     } else {

@@ -51,7 +51,7 @@ include "include/common.php";
         <article id="login">
             <?php
             if (isset($_SESSION['isLogin']) and $_SESSION['isLogin']) {
-                alert("warning","您已登录，自动跳转到用户界面！",1000, "userindex.php");
+                alert("warning", "您已登录，自动跳转到用户界面！", 1000, "userindex.php");
                 exit;
             }
             ?>
@@ -73,7 +73,7 @@ include "include/common.php";
         <article id="register">
             <?php
             if (isset($_SESSION['isLogin']) and $_SESSION['isLogin']) {
-                alert("warning","您已登录，自动跳转到用户界面！",1000, "userindex.php");
+                alert("warning", "您已登录，自动跳转到用户界面！", 1000, "userindex.php");
                 exit;
             }
             ?>

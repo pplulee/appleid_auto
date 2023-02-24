@@ -47,7 +47,7 @@ class account
         }
     }
 
-    function update($username, $password, $remark, $dob, $question1, $answer1, $question2, $answer2, $question3, $answer3, $owner, $share_link, $check_interval, $frontend_remark, $enable_check_password_correct, $enable_delete_devices)
+    function update($username, $password, $remark, $dob, $question1, $answer1, $question2, $answer2, $question3, $answer3, $owner, $share_link, $check_interval, $frontend_remark, $enable_check_password_correct, $enable_delete_devices) : void
     {
         global $conn;
         $this->username = $username;
@@ -88,7 +88,7 @@ class account
         ]);
     }
 
-    function update_password($password)
+    function update_password($password) : void
     {
         global $conn;
         if ($password != "") {
@@ -100,7 +100,7 @@ class account
         $this->update_message("正常");
     }
 
-    function update_last_check()
+    function update_last_check(): void
     {
         global $conn;
         $this->last_check = get_time();
@@ -108,7 +108,7 @@ class account
         $stmt->execute(['last_check' => $this->last_check, 'id' => $this->id]);
     }
 
-    function update_message($message)
+    function update_message($message): void
     {
         global $conn;
         $this->message = $message;
@@ -116,7 +116,7 @@ class account
         $stmt->execute(['message' => $message, 'id' => $this->id]);
     }
 
-    function delete()
+    function delete(): void
     {
         global $conn;
         // 修改相关分享页面

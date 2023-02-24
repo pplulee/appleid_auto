@@ -85,7 +85,7 @@ $Sys_config["webdriver_url"] = "http://selenium:4444";
 ### 一键部署unblocker_manager（后端+webdriver）：
 
 ```bash
-wget https://raw.githubusercontent.com/pplulee/appleid_auto/main/backend/install_unblocker.sh -O install_unblocker.sh && bash install_unblocker.sh
+bash <(curl -Ls https://raw.githubusercontent.com/pplulee/appleid_auto/main/backend/install_unblocker.sh)
 ```
 
 ### 关于密保问题的说明：
@@ -113,8 +113,7 @@ wget https://raw.githubusercontent.com/pplulee/appleid_auto/main/backend/install
 方法： `GET` \
 所有action均需要传入`key`参数，值为`config.php`中的`apikey` \
 返回类型： `JSON` \
-通用返回参数 
-
+通用返回参数
 
 | 参数        | 值/类型             | 说明      |
 |-----------|------------------|---------|
@@ -136,9 +135,42 @@ Action: `random_sharepage_password` \
 |------------|----------|-----|
 | `password` | `String` | 新密码 |
 
-
-
 ……其余等待添加
+
+---
+
+# JSON API接口
+
+支持通过分享页面链接，以JSON方式获取账号信息，用于对接其他APP \
+分享页面链接指页面的代码，并非整个URL
+
+API地址：`/api/share.php` \
+请求方法：`GET` \
+输入参数：
+
+| 参数           | 值/类型     | 说明                |
+|--------------|----------|-------------------|
+| `share_link` | `String` | 分享页代码             |
+| `password`   | `String` | 分享页密码（若未设置密码则不需要） |
+
+返回参数：
+
+| 参数         | 值/类型             | 说明            |
+|------------|------------------|---------------|
+| `status`   | `success`/`fail` | 操作成功/失败       |
+| `message`  | `String`         | 提示信息          |
+| `accounts` | `Array`          | 账号信息列表（内容见下表） |
+
+账号信息：
+
+| 参数           | 值/类型     | 说明     |
+|--------------|----------|--------|
+| `id`         | `Int`    | 账号ID   |
+| `username`   | `String` | 账号     |
+| `password`   | `String` | 密码     |
+| `status`     | `Bool`   | 账号状态   |
+| `last_check` | `String` | 上次检查时间 |
+| `remark`     | `String` | 账号前端备注 |
 
 # TODO List
 
@@ -152,3 +184,4 @@ Action: `random_sharepage_password` \
 - [x] 修改密码
 - [x] 上报密码
 - [x] Telegram Bot通知
+- [x] JSON API接口获取账号信息
