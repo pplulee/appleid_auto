@@ -136,6 +136,45 @@ Action: `random_sharepage_password` \
 |------------|----------|-----|
 | `password` | `String` | 新密码 |
 
+Action: `get_all_available_account` \
+说明： 获取json格式的全部可用账户信息 \
+输入参数：
+| 参数       | 值/类型                        | 说明    |
+|----------|-----------------------------|-------|
+| `action` | `get_all_available_account` | 操作    |
+
+返回参数：
+
+| 参数         | 值/类型     | 说明  |
+|------------|----------|-----|
+| `data` | `ArrayList` | 一个包含可用账户信息的数组 
+示例：
+```
+{
+    "username": "test@outlook.com",
+    "password": "test12344",
+    "last_check": "2023-02-24 20:56:04"
+} 
+```
+
+Action: `get_random_available_account` \
+说明： 从可用账户中随机获取一个账户  \
+输入参数：
+
+| 参数       | 值/类型                        | 说明    |
+|----------|-----------------------------|-------|
+| `action` | `get_random_available_account` | 操作    |
+
+返回参数：
+
+| 参数         | 值/类型     | 说明  |
+|------------|----------|-----|
+| `apple_id` | `String` | 账户用户名
+| `apple_pwd` | `String` | 账户密码 
+| `last_check` | `Date` | 最后一次更新的时间
+
+
+
 
 
 ……其余等待添加

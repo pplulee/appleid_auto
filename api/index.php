@@ -205,6 +205,40 @@ switch ($_GET["action"]) {
         }
         break;
     }
+    // 随机获取一个有效账户
+    case "get_random_available_account":
+    {
+        $result = $conn->prepare("SELECT username,password,last_check FROM account WHERE message='正常';");
+        $result->execute();
+        $available_account = $result->fetchall();
+        $rand_account_index = array_rand($available_account);
+        $appid_id = $available_account[$rand_account_index]['username'];
+        $appid_pwd = $available_account[$rand_account_index]['password']; 
+        $last_check = $available_account[$rand_account_index]['last_check'];
+        $data = array(
+            'status' => 'success',
+            'message' => '获取成功',
+            'apple_id' => $appid_id,
+            'apple_pwd' => $appid_pwd,
+            'last_check' => $last_check
+        );
+        break;   
+    }
+    //获取全部可用账户 
+    case "get_all_available_account":
+    {
+        $result = $conn->prepare("SELECT username,password,last_check FROM account WHERE message='正常';");
+        $result->execute();
+        $available_account = $result->fetchall(PDO::FETCH_CLASS);
+    
+        $data = array(
+            'status' => 'success',
+            'message' => '获取成功',
+            'data' => $available_account,
+        );
+        break;   
+    }
+    
     default:
     {
         $data = array(
