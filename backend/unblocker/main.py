@@ -328,22 +328,22 @@ class ID:
         else:
             logger.error(f"登录失败，错误信息：\n{msg.strip()}")
             return False
-        question_element = WebDriverWait(driver, 15).until(
-            EC.presence_of_all_elements_located((By.CLASS_NAME, "question")))
-        answer0 = self.get_answer(question_element[0].get_attribute("innerHTML"))
-        answer1 = self.get_answer(question_element[1].get_attribute("innerHTML"))
+        question_element = WebDriverWait(driver, 5).until(
+            EC.presence_of_all_elements_located((By.XPATH, "//*[contains(@class, 'question')]")))
+        answer0 = self.get_answer(question_element[1].get_attribute("innerHTML"))
+        answer1 = self.get_answer(question_element[2].get_attribute("innerHTML"))
         if answer0 == "" or answer1 == "":
             logger.error("安全问题错误，程序已退出")
             api.update_message(self.username, "请检查安全问题设置是否正确，后端已退出")
             driver.quit()
             exit()
         answer_inputs = WebDriverWait(driver, 10).until(
-            EC.presence_of_all_elements_located((By.CLASS_NAME, "generic-input-field")))
+            EC.presence_of_all_elements_located((By.XPATH, "//*[contains(@class, 'input')]")))
         answer_inputs[0].send_keys(answer0)
         time.sleep(1)
         answer_inputs[1].send_keys(answer1)
         time.sleep(1)
-        driver.find_element(By.XPATH, "/html/body/div[4]/div/div/div[1]/div[3]/div/button[2]").click()
+        driver.find_element(By.CSS_SELECTOR, 'button[type="submit"]').click()
         time.sleep(5)
         try:
             driver.find_element(By.CLASS_NAME, "has-errors")
