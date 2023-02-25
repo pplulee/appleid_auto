@@ -172,6 +172,14 @@ API地址：`/api/share.php` \
 | `last_check` | `String` | 上次检查时间 |
 | `remark`     | `String` | 账号前端备注 |
 
+---
+# 赞助开发者
+[![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/baiyimiao) \
+USDT-TRC20: TV1su1RnQny27YEF9WG4DbC8AAz3udt6d4 \
+ETH-ERC20：0xea8fbe1559b1eb4b526c3bb69285203969b774c5 \
+广告：如果您有使用邮局的需求，欢迎咨询开发者
+
+---
 # TODO List
 
 - [x] 自动识别验证码
