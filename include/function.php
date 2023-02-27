@@ -208,3 +208,11 @@ function alert($type, $message, $delay, $dest)
     echo "<script>Swal.fire({icon: '$type',title: '$title',text: '$message',timer:$delay,showConfirmButton: false,timerProgressBar: true});setTimeout(\"javascript:location.href='$dest'\", $delay);</script>";
 }
 
+function get_random_proxy($owner): proxy
+{
+    global $conn;
+    $stmt = $conn->prepare("SELECT id FROM proxy WHERE owner=:owner ORDER BY RAND() LIMIT 1;");
+    $stmt->execute(['owner' => $owner]);
+    return new proxy($stmt->rowCount() == 0?-1:$stmt->fetch()["id"]);
+}
+

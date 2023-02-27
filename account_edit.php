@@ -52,8 +52,8 @@ if (isset($_POST['submit'])) {
                     $_POST['share_link'],
                     $_POST['check_interval'],
                     $_POST['frontend_remark'],
-                    isset($_POST['enable_check_password_correct']) ? 1 : 0,
-                    isset($_POST['enable_delete_devices']) ? 1 : 0);
+                    isset($_POST['enable_check_password_correct']),
+                    isset($_POST['enable_delete_devices']));
                 alert("success", "修改成功", 2000, "account.php");
             } else {
                 alert("error", "修改失败", 2000, "account.php");
@@ -110,7 +110,7 @@ if (isset($_GET['action'])) {
                             </div>
                             <div class='input-group mb-3'>
                                 <span class='input-group-text' id='dob'>生日</span>
-                                <input type='text' class='form-control' name='dob' placeholder='格式：mmddyyyy' required autocomplete='off'>
+                                <input type='text' class='form-control' name='dob' placeholder='格式：mmddyyyy' required autocomplete='off' maxlength='8' minlength='8'>
                             </div>
                             <div class='input-group mb-3'>
                                 <span class='input-group-text' id='question1'>问题1</span>
@@ -205,7 +205,7 @@ if (isset($_GET['action'])) {
                             </div>
                             <div class='input-group mb-3'>
                                 <span class='input-group-text' id='dob'>生日</span>
-                                <input type='text' class='form-control' name='dob' placeholder='格式：mmddyyyy' required autocomplete='off' value='$account->dob'>
+                                <input type='text' class='form-control' name='dob' placeholder='格式：mmddyyyy' required autocomplete='off' value='$account->dob' maxlength='8' minlength='8'>
                             </div>
                             <div class='input-group mb-3'>
                                 <span class='input-group-text' id='question1'>问题1</span>

@@ -33,6 +33,7 @@ if (!isset($_SESSION["isLogin"])) {
 include($_SERVER['DOCUMENT_ROOT'] . "/include/user.php");
 include($_SERVER['DOCUMENT_ROOT'] . "/include/account.php");
 include($_SERVER['DOCUMENT_ROOT'] . "/include/sharepage.php");
+include($_SERVER['DOCUMENT_ROOT'] . "/include/proxy.php");
 
 //Initialize CSS
 echo '<!DOCTYPE html>

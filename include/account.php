@@ -47,7 +47,7 @@ class account
         }
     }
 
-    function update($username, $password, $remark, $dob, $question1, $answer1, $question2, $answer2, $question3, $answer3, $owner, $share_link, $check_interval, $frontend_remark, $enable_check_password_correct, $enable_delete_devices) : void
+    function update($username, $password, $remark, $dob, $question1, $answer1, $question2, $answer2, $question3, $answer3, $owner, $share_link, $check_interval, $frontend_remark, $enable_check_password_correct, $enable_delete_devices): void
     {
         global $conn;
         $this->username = $username;
@@ -65,30 +65,47 @@ class account
         $this->frontend_remark = $frontend_remark;
         $this->enable_check_password_correct = $enable_check_password_correct;
         $this->enable_delete_devices = $enable_delete_devices;
-        $sql = "UPDATE `account` SET `username`=:username, `password`=:password, `remark`=:remark, `dob`=:dob, `question1`=:question1, `answer1`=:answer1, `question2`=:question2, `answer2`=:answer2, `question3`=:question3, `answer3`=:answer3, `owner`=:owner, `share_link`=:share_link, `check_interval`=:check_interval, `frontend_remark`=:frontend_remark, `enable_check_password_correct`=:enable_check_password_correct, `enable_delete_devices`=:enable_delete_devices WHERE `id`=:id;";
+        $sql = "UPDATE `account` SET 
+                     `username`=:username, 
+                     `password`=:password, 
+                     `remark`=:remark, 
+                     `dob`=:dob, 
+                     `question1`=:question1, 
+                     `answer1`=:answer1, 
+                     `question2`=:question2, 
+                     `answer2`=:answer2, 
+                     `question3`=:question3, 
+                     `answer3`=:answer3, 
+                     `owner`=:owner, 
+                     `share_link`=:share_link, 
+                     `check_interval`=:check_interval, 
+                     `frontend_remark`=:frontend_remark, 
+                     `enable_check_password_correct`=:enable_check_password_correct, 
+                     `enable_delete_devices`=:enable_delete_devices 
+                 WHERE `id`=:id;";
         $stmt = $conn->prepare($sql);
         $stmt->execute([
-            'username' => $username,
-            'password' => $password,
-            'remark' => $remark,
-            'dob' => $dob,
+            'username' => $this->username,
+            'password' => $this->password,
+            'remark' => $this->remark,
+            'dob' => $this->dob,
             'question1' => $question1,
             'answer1' => $answer1,
             'question2' => $question2,
             'answer2' => $answer2,
             'question3' => $question3,
             'answer3' => $answer3,
-            'owner' => $owner,
-            'share_link' => $share_link,
-            'check_interval' => $check_interval,
-            'frontend_remark' => $frontend_remark,
-            'enable_check_password_correct' => $enable_check_password_correct,
-            'enable_delete_devices' => $enable_delete_devices,
+            'owner' => $this->owner,
+            'share_link' => $this->share_link,
+            'check_interval' => $this->check_interval,
+            'frontend_remark' => $this->frontend_remark,
+            'enable_check_password_correct' => $this->enable_check_password_correct ? 1 : 0,
+            'enable_delete_devices' => $this->enable_delete_devices ? 1 : 0,
             'id' => $this->id
         ]);
     }
 
-    function update_password($password) : void
+    function update_password($password): void
     {
         global $conn;
         if ($password != "") {
