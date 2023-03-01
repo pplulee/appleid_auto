@@ -4,6 +4,7 @@ include($_SERVER['DOCUMENT_ROOT'] . "/include/function.php");
 include($_SERVER['DOCUMENT_ROOT'] . "/include/user.php");
 include($_SERVER['DOCUMENT_ROOT'] . "/include/account.php");
 include($_SERVER['DOCUMENT_ROOT'] . "/include/sharepage.php");
+include($_SERVER['DOCUMENT_ROOT'] . "/include/proxy.php");
 header('Content-type:text/json');
 global $Sys_config;
 try {
@@ -85,8 +86,7 @@ switch ($_GET["action"]) {
                     'API_key' => $Sys_config['apikey'],
                     'API_url' => $Sys_config['apiurl'],
                     'webdriver' => $Sys_config['webdriver_url'],
-                    'proxy' => $Sys_config['webdriver_proxy']
-
+                    'enable_proxy' => $Sys_config['enable_proxy_pool']
                 );
                 if ($account->enable_check_password_correct) {
                     $data['check_password_correct'] = true;
@@ -202,6 +202,58 @@ switch ($_GET["action"]) {
                 'password' => $sharepage->password,
                 'message' => '更新成功'
             );
+        }
+        break;
+    }
+    case "get_proxy":
+    {
+        if (!isset($_GET['id'])) {
+            $data = array(
+                'status' => 'fail',
+                'message' => 'ID不能为空'
+            );
+        } else {
+            $account = new account($_GET['id']);
+            if ($account->id == -1) {
+                $data = array(
+                    'status' => 'fail',
+                    'message' => '账户ID不存在'
+                );
+            } else {
+                $proxy = get_random_proxy($account->owner);
+                $proxy->update_use();
+                $data = array(
+                    'status' => 'success',
+                    'message' => '获取成功',
+                    'proxy_id' => $proxy->id,
+                    'proxy_content' => $proxy->protocol . '://' . $proxy->content
+                );
+            }
+        }
+        break;
+    }
+    case "report_proxy_error":
+    {
+        if (!isset($_GET['id'])) {
+            $data = array(
+                'status' => 'fail',
+                'message' => 'ID不能为空'
+            );
+        } else {
+            $proxy = new proxy($_GET['id']);
+            if ($proxy->id == -1) {
+                $data = array(
+                    'status' => 'fail',
+                    'message' => '代理ID不存在'
+                );
+            } else {
+                $proxy->update_use();
+                $proxy->set_disable();
+                $data = array(
+                    'status' => 'success',
+                    'message' => '报告成功'
+                );
+            }
         }
         break;
     }
