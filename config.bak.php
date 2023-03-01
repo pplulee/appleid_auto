@@ -10,6 +10,7 @@ $Sys_config["apiurl"] = "http://xxx.xxx"; // 站点地址，无需斜杠结尾
 $Sys_config["apikey"] = "114514"; // API密钥
 $Sys_config["webdriver_url"] = "http://"; // webdriver地址，需要带端口
 $Sys_config["enable_proxy_pool"] = false; // 是否启用代理池
+$Sys_config["proxy_auto_disable"] = false; // 当后端报告代理不可用时，是否自动禁用该代理
 
 // 是否启用Telegram Bot. 用于通知账号解锁情况. 留空则不启用
 $Sys_config["telegram_bot_token"] = "";

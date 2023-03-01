@@ -17,6 +17,8 @@ class proxy
         $result = $stmt->fetch();
         if ($stmt->rowCount() == 0) {
             $this->id = -1;
+            $this->protocol = "";
+            $this->content = "";
         } else {
             $this->id = $id;
             $this->protocol = $result['protocol'];

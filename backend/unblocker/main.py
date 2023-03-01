@@ -48,7 +48,9 @@ class API:
                                    "action": "get_task_info",
                                    "id": id
                                }).text)
-        except BaseException:
+        except BaseException as e:
+            logger.error("获取配置失败")
+            logger.error(e)
             return {"status": "fail"}
         else:
             if result["status"] == "success":
@@ -67,7 +69,9 @@ class API:
                         "password": password,
                         "action": "update_password"
                     }).text)
-        except BaseException:
+        except BaseException as e:
+            logger.error("更新密码失败")
+            logger.error(e)
             return {"status": "fail"}
         else:
             if result["status"] == "success":
@@ -85,7 +89,9 @@ class API:
                         "username": username,
                         "action": "get_password"
                     }).text)
-        except BaseException:
+        except BaseException as e:
+            logger.error("获取密码失败")
+            logger.error(e)
             return ""
         else:
             if result["status"] == "success":
@@ -102,7 +108,27 @@ class API:
                             "username": username,
                             "message": message,
                             "action": "update_message"}).text)
-        except BaseException:
+        except BaseException as e:
+            logger.error("更新消息失败")
+            logger.error(e)
+            return False
+        else:
+            if result["status"] == "success":
+                return True
+            else:
+                return False
+
+    def report_proxy_error(self, proxy_id):
+        try:
+            result = loads(
+                get(f"{self.url}/api/",
+                    verify=False,
+                    params={"key": self.key,
+                            "id": proxy_id,
+                            "action": "report_proxy_error"}).text)
+        except BaseException as e:
+            logger.error("上报代理错误失败")
+            logger.error(e)
             return False
         else:
             if result["status"] == "success":
@@ -124,6 +150,7 @@ class Config:
         self.check_interval = config_result["check_interval"]
         self.webdriver = config_result["webdriver"]
         self.proxy = config_result["proxy"] if "proxy" in config_result.keys() else ""
+        self.proxy_id = config_result["proxy_id"] if "proxy_id" in config_result.keys() else -1
         self.tgbot_chatid = config_result["tgbot_chatid"] if "tgbot_chatid" in config_result.keys() else ""
         self.tgbot_token = config_result["tgbot_token"] if "tgbot_token" in config_result.keys() else ""
         self.tgbot_enable = self.tgbot_chatid != "" and self.tgbot_token != ""
@@ -133,6 +160,8 @@ class Config:
             logger.info("已启用 删除设备")
         if self.enable_check_password_correct:
             logger.info("已启用 检查密码正确")
+        if self.proxy != "":
+            logger.info(f"使用代理ID：{self.proxy_id}")
 
 
 class ID:
@@ -158,12 +187,13 @@ class ID:
     def refresh(self):
         try:
             driver.get("https://iforgot.apple.com/password/verify/appleid?language=en_US")
-            WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.CLASS_NAME, "iforgot-apple-id")))
+            WebDriverWait(driver, 15).until(EC.presence_of_element_located((By.CLASS_NAME, "iforgot-apple-id")))
         except BaseException:
             logger.error("刷新页面失败")
             if config.proxy != "":
                 logger.error("已启用代理，请检查代理是否可用")
                 api.update_message(self.username, "页面加载失败，可能是代理不可用")
+                api.report_proxy_error(config.proxy_id)
                 notification("页面加载失败，可能是代理不可用")
             else:
                 api.update_message(self.username, "页面加载失败")
@@ -181,6 +211,8 @@ class ID:
             logger.error("页面加载失败，疑似服务器IP被拒绝访问")
             logger.error(text)
             api.update_message(self.username, "页面加载失败，具体原因请查看日志")
+            if config.proxy != "":
+                api.report_proxy_error(config.proxy_id)
             notification("页面加载失败，具体原因请查看日志")
             return False
 
@@ -208,6 +240,7 @@ class ID:
             if config.proxy != "":
                 logger.error("已启用代理，请检查代理是否可用")
                 api.update_message(self.username, "无法获取页面内容，可能是代理不可用")
+                api.report_proxy_error(config.proxy_id)
                 notification("无法获取页面内容，可能是代理不可用")
             else:
                 api.update_message(self.username, "无法获取页面内容")
@@ -289,6 +322,7 @@ class ID:
             else:
                 logger.error(f"操作被苹果拒绝，疑似被风控，错误信息：{msg.strip()}")
                 api.update_message(self.username, "操作被苹果拒绝，疑似被风控")
+                api.report_proxy_error(config.proxy_id)
                 notification("操作被苹果拒绝，疑似被风控")
                 return False
         return True
@@ -501,18 +535,8 @@ class ID:
         return True
 
 
-api = API(args.api_url, args.api_key)
-config_result = api.get_config(args.taskid)
-if config_result["status"] == "fail":
-    logger.error("从API获取配置失败")
-    exit()
-
-config = Config(config_result)
-
-
 def notification(content):
     if config.tgbot_enable:
-        content = f"【{config.username}】{content}"
         post(f"https://api.telegram.org/bot{config.tgbot_token}/sendMessage",
              data={"chat_id": config.tgbot_chatid, "text": content})
 
@@ -532,7 +556,6 @@ def setup_driver():
     options.add_argument("start-maximized")
     options.add_argument("window-size=1920,1080")
     if config.proxy != "":
-        logger.info("已启用代理")
         options.add_argument(f"--proxy-server={config.proxy}")
     options.add_argument(
         "user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/108.0.0.0 Safari/537.36")
@@ -551,8 +574,16 @@ def setup_driver():
 
 
 def job():
-    global api
+    global api, config, id
     schedule.clear()
+    api = API(args.api_url, args.api_key)
+    config_result = api.get_config(args.taskid)
+    if config_result["status"] == "fail":
+        logger.error("从API获取配置失败")
+        exit()
+    config = Config(config_result)
+    id = ID(config.username, config.password, config.dob, config.answer)
+
     unlock = False
     unblock_result = True
     driver_result = setup_driver()
@@ -621,8 +652,7 @@ logger.info(f"{'=' * 80}\n"
             f"启动AppleID_Auto\n"
             f"项目地址 https://github.com/pplulee/appleid_auto\n"
             f"Telegram交流群 @appleunblocker")
-logger.info("当前版本：v1.42-20230301")
-id = ID(config.username, config.password, config.dob, config.answer)
+logger.info("当前版本：v1.43-20230301")
 job()
 while True:
     schedule.run_pending()

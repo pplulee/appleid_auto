@@ -86,13 +86,18 @@ switch ($_GET["action"]) {
                     'API_key' => $Sys_config['apikey'],
                     'API_url' => $Sys_config['apiurl'],
                     'webdriver' => $Sys_config['webdriver_url'],
-                    'enable_proxy' => $Sys_config['enable_proxy_pool']
                 );
                 if ($account->enable_check_password_correct) {
                     $data['check_password_correct'] = true;
                 }
                 if ($account->enable_delete_devices) {
                     $data['delete_devices'] = true;
+                }
+                if ($Sys_config['enable_proxy_pool']){
+                    $proxy = get_random_proxy($account->owner);
+                    $proxy->update_use();
+                    $data['proxy_id'] = $proxy->id;
+                    $data['proxy'] = $proxy->protocol . "://" . $proxy->content;
                 }
                 break;
             }
@@ -207,17 +212,17 @@ switch ($_GET["action"]) {
     }
     case "get_proxy":
     {
-        if (!isset($_GET['id'])) {
+        if (!isset($_GET['username'])) {
             $data = array(
                 'status' => 'fail',
-                'message' => 'ID不能为空'
+                'message' => '用户名不能为空'
             );
         } else {
-            $account = new account($_GET['id']);
+            $account = new account(get_account_id($_GET['username']));
             if ($account->id == -1) {
                 $data = array(
                     'status' => 'fail',
-                    'message' => '账户ID不存在'
+                    'message' => '账户不存在'
                 );
             } else {
                 $proxy = get_random_proxy($account->owner);
@@ -234,6 +239,13 @@ switch ($_GET["action"]) {
     }
     case "report_proxy_error":
     {
+        if (!$Sys_config['proxy_auto_disable']||!$Sys_config['enable_proxy_pool']){
+            $data = array(
+                'status' => 'fail',
+                'message' => '代理池未启用或代理自动禁用'
+            );
+            break;
+        }
         if (!isset($_GET['id'])) {
             $data = array(
                 'status' => 'fail',
