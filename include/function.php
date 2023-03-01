@@ -211,7 +211,7 @@ function alert($type, $message, $delay, $dest)
 function get_random_proxy($owner): proxy
 {
     global $conn;
-    $stmt = $conn->prepare("SELECT id FROM proxy WHERE owner=:owner ORDER BY RAND() LIMIT 1;");
+    $stmt = $conn->prepare("SELECT id FROM proxy WHERE owner=:owner AND status=1 ORDER BY RAND() LIMIT 1;");
     $stmt->execute(['owner' => $owner]);
     return new proxy($stmt->rowCount() == 0?-1:$stmt->fetch()["id"]);
 }

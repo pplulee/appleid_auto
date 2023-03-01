@@ -95,9 +95,14 @@ switch ($_GET["action"]) {
                 }
                 if ($Sys_config['enable_proxy_pool']){
                     $proxy = get_random_proxy($account->owner);
-                    $proxy->update_use();
-                    $data['proxy_id'] = $proxy->id;
-                    $data['proxy'] = $proxy->protocol . "://" . $proxy->content;
+                    if ($proxy->id == -1){
+                        $data['proxy_id'] = -1;
+                        $data['proxy'] = "";
+                    }else{
+                        $proxy->update_use();
+                        $data['proxy_id'] = $proxy->id;
+                        $data['proxy'] = $proxy->protocol . "://" . $proxy->content;
+                    }
                 }
                 break;
             }
@@ -207,33 +212,6 @@ switch ($_GET["action"]) {
                 'password' => $sharepage->password,
                 'message' => '更新成功'
             );
-        }
-        break;
-    }
-    case "get_proxy":
-    {
-        if (!isset($_GET['username'])) {
-            $data = array(
-                'status' => 'fail',
-                'message' => '用户名不能为空'
-            );
-        } else {
-            $account = new account(get_account_id($_GET['username']));
-            if ($account->id == -1) {
-                $data = array(
-                    'status' => 'fail',
-                    'message' => '账户不存在'
-                );
-            } else {
-                $proxy = get_random_proxy($account->owner);
-                $proxy->update_use();
-                $data = array(
-                    'status' => 'success',
-                    'message' => '获取成功',
-                    'proxy_id' => $proxy->id,
-                    'proxy_content' => $proxy->protocol . '://' . $proxy->content
-                );
-            }
         }
         break;
     }
