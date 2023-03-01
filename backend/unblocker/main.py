@@ -164,8 +164,10 @@ class ID:
             if config.proxy != "":
                 logger.error("已启用代理，请检查代理是否可用")
                 api.update_message(self.username, "页面加载失败，可能是代理不可用")
+                notification("页面加载失败，可能是代理不可用")
             else:
                 api.update_message(self.username, "页面加载失败")
+                notification("页面加载失败")
             return False
         try:
             driver.switch_to.alert.accept()
@@ -179,6 +181,7 @@ class ID:
             logger.error("页面加载失败，疑似服务器IP被拒绝访问")
             logger.error(text)
             api.update_message(self.username, "页面加载失败，具体原因请查看日志")
+            notification("页面加载失败，具体原因请查看日志")
             return False
 
     def process_verify(self):
@@ -205,11 +208,11 @@ class ID:
             if config.proxy != "":
                 logger.error("已启用代理，请检查代理是否可用")
                 api.update_message(self.username, "无法获取页面内容，可能是代理不可用")
+                notification("无法获取页面内容，可能是代理不可用")
             else:
                 api.update_message(self.username, "无法获取页面内容")
-            api.update_message(self.username, "无法获取页面内容，后端已退出")
-            driver.quit()
-            exit()
+                notification("无法获取页面内容")
+            return False
         while True:
             if not self.process_verify():
                 return False
@@ -235,8 +238,8 @@ class ID:
             return True
         else:
             logger.error(f"无法处理请求，可能是账号失效或服务器IP被拉黑\n错误信息：{msg.strip()}")
-            notification(f"Apple ID解锁登录失败，可能是账号失效或服务器IP被拉黑")
             api.update_message(self.username, "解锁登录失败，可能是账号失效或服务器IP被拉黑，具体请查看后端日志")
+            notification(f"Apple ID解锁登录失败，可能是账号失效或服务器IP被拉黑")
             return False
 
     def check(self):
@@ -269,15 +272,26 @@ class ID:
             except BaseException:
                 logger.error("无法找到关闭验证按钮，可能是账号不允许关闭2FA，退出程序")
                 api.update_message(self.username, "关闭二步验证失败，可能是账号不允许关闭2FA，后端已退出")
+                notification("关闭二步验证失败，可能是账号不允许关闭2FA")
                 driver.quit()
                 exit()
             WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.XPATH,
                                                                             "/html/body/div[5]/div/div/recovery-unenroll-start/div/idms-step/div/div/div/div[3]/idms-toolbar/div/div/div/button[1]"))).click()
             time.sleep(1)
-            self.process_dob()
-            self.process_security_question()
-            driver.find_element(By.CLASS_NAME, "button-primary").click()
-            self.process_password()
+            try:
+                msg = WebDriverWait(driver, 3).until(
+                    EC.presence_of_element_located((By.CLASS_NAME, "error-content"))).get_attribute("innerHTML")
+            except BaseException:
+                self.process_dob()
+                self.process_security_question()
+                driver.find_element(By.CLASS_NAME, "button-primary").click()
+                self.process_password()
+            else:
+                logger.error(f"操作被苹果拒绝，疑似被风控，错误信息：{msg.strip()}")
+                api.update_message(self.username, "操作被苹果拒绝，疑似被风控")
+                notification("操作被苹果拒绝，疑似被风控")
+                return False
+        return True
 
     def unlock(self):
         if not (self.check()):
@@ -303,6 +317,7 @@ class ID:
                 pass
             # 重置密码
             self.process_password()
+        return True
 
     def login_appleid(self):
         logger.info("开始登录AppleID")
@@ -447,6 +462,7 @@ class ID:
         except BaseException:
             logger.error("密码框获取失败")
             api.update_message(self.username, "密码框获取失败")
+            notification("密码框获取失败")
             return False
         self.password = self.generate_password()
         for item in pwd_input_box:
@@ -477,6 +493,7 @@ class ID:
             driver.find_element(By.ID, "action").click()
         except BaseException:
             logger.error("无法使用安全问题重设密码，修改失败")
+            notification("密码修改失败")
             return False
         self.process_dob()
         self.process_security_question()
@@ -495,6 +512,7 @@ config = Config(config_result)
 
 def notification(content):
     if config.tgbot_enable:
+        content = f"【{config.username}】{content}"
         post(f"https://api.telegram.org/bot{config.tgbot_token}/sendMessage",
              data={"chat_id": config.tgbot_chatid, "text": content})
 
@@ -536,7 +554,9 @@ def job():
     global api
     schedule.clear()
     unlock = False
+    unblock_result = True
     driver_result = setup_driver()
+    logger.info(f"当前账号：{id.username}")
     if not driver_result:
         api.update_message(id.username, "Webdriver调用失败")
         notification("Webdriver调用失败")
@@ -544,23 +564,26 @@ def job():
     if id.login():
         if id.check_2fa():
             logger.info("检测到账号开启双重认证，开始解锁")
-            id.unlock_2fa()
+            unblock_result = id.unlock_2fa()
             unlock = True
         elif not (id.check()):
             logger.info("检测到账号被锁定，开始解锁")
-            id.unlock()
+            unblock_result = id.unlock()
             unlock = True
         logger.info("账号检测完毕")
-        if unlock:
+        if unlock and unblock_result:
             notification(f"Apple ID更新成功\n账号：{id.username}\n新密码：{id.password}")
             update_result = api.update(id.username, id.password)
+        elif not unblock_result:
+            logger.error("解锁失败")
+            update_result = api.update(id.username, "")
         else:
             update_result = api.update(id.username, "")
         if update_result["status"] == "fail":
             logger.error("更新密码失败")
         else:
             logger.info("更新密码成功")
-        if config.enable_delete_devices or config.enable_check_password_correct:
+        if (config.enable_delete_devices or config.enable_check_password_correct) and unblock_result:
             if not unlock:
                 # 未重置密码，先获取最新密码再执行登录
                 id.password = api.get_password(id.username)
@@ -589,8 +612,6 @@ def job():
         driver.quit()
     except BaseException:
         logger.error("Webdriver关闭失败")
-    else:
-        logger.info("关闭Webdriver窗口")
     schedule.every(config.check_interval).minutes.do(job)
     logger.info("已设置下次检测任务")
     return unlock
@@ -600,7 +621,7 @@ logger.info(f"{'=' * 80}\n"
             f"启动AppleID_Auto\n"
             f"项目地址 https://github.com/pplulee/appleid_auto\n"
             f"Telegram交流群 @appleunblocker")
-logger.info("当前版本：v1.41-20230224")
+logger.info("当前版本：v1.42-20230301")
 id = ID(config.username, config.password, config.dob, config.answer)
 job()
 while True:
