@@ -34,6 +34,7 @@ CREATE TABLE `account` (
   `message` text COLLATE utf8_unicode_ci NOT NULL,
   `enable_check_password_correct` tinyint(1) NOT NULL,
   `enable_delete_devices` tinyint(1) NOT NULL,
+  `enable_auto_update_password` tinyint(1) NOT NULL,
   PRIMARY KEY (`id`),
   KEY `owner` (`owner`),
   CONSTRAINT `account_ibfk_1` FOREIGN KEY (`owner`) REFERENCES `user` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
@@ -64,10 +65,11 @@ CREATE TABLE `share` (
   `owner` int(10) unsigned NOT NULL,
   `password` varchar(64) COLLATE utf8_unicode_ci DEFAULT NULL,
   `html` text COLLATE utf8_unicode_ci,
+  `remark` varchar(128) COLLATE utf8_unicode_ci DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `owner` (`owner`),
   CONSTRAINT `share_ibfk_1` FOREIGN KEY (`owner`) REFERENCES `user` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 /*Data for the table `share` */
 
@@ -79,7 +81,7 @@ CREATE TABLE `user` (
   `password` varchar(64) COLLATE utf8_unicode_ci NOT NULL,
   `is_admin` tinyint(1) unsigned NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 /*Data for the table `user` */
 

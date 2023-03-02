@@ -15,6 +15,24 @@ $current_user = new user($_SESSION['user_id']);
             <li class="list-group-item">
                 <b>用户ID:</b> <?php echo $current_user->user_id ?>
             </li>
+            <li class="list-group-item">
+                <b>账号数量:</b>
+                <?php
+                global $conn;
+                $account_list_result = $conn->prepare("SELECT COUNT(id) FROM account WHERE owner=:owner;");
+                $account_list_result->execute(['owner' => $current_user->user_id]);
+                echo $account_list_result->fetch()[0];
+                ?>
+            </li>
+            <li class="list-group-item">
+                <b>分享页数量:</b>
+                <?php
+                global $conn;
+                $share_list_result = $conn->prepare("SELECT COUNT(id) FROM share WHERE owner=:owner;");
+                $share_list_result->execute(['owner' => $current_user->user_id]);
+                echo $share_list_result->fetch()[0];
+                ?>
+            </li>
         </ul>
     </div>
 </div>

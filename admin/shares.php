@@ -9,6 +9,7 @@ include("header.php");
                 <thead>
                 <tr>
                     <th>页面ID</th>
+                    <th>备注</th>
                     <th>账号数量</th>
                     <th>所属用户ID</th>
                     <th>链接后缀</th>
@@ -36,10 +37,10 @@ include("header.php");
                         $account_list = explode(',', $row['account_list']);
                         $account_count = count($account_list);
                         $share_link = "{$Sys_config['apiurl']}/share_accounts.php?link={$row['share_link']}";
-                        echo "<tr><td>{$row['id']}</td><td>$account_count</td><td>{$row['owner']}</td><td>{$row['share_link']}</td><td> <button id='share_link' class='btn btn-success ' data-clipboard-text='$share_link' onclick='alert_success()'>复制链接</button> <a href='share_edit.php?action=edit&id={$row['id']}' class='btn btn-secondary'>编辑</a> <a href='share_edit.php?action=delete&id={$row['id']}' class='btn btn-danger'>删除</a></td></tr>";
+                        echo "<tr><td>{$row['id']}</td><td>{$row['remark']}</td><td>$account_count</td><td>{$row['owner']}</td><td>{$row['share_link']}</td><td> <button id='share_link' class='btn btn-success ' data-clipboard-text='$share_link' onclick='alert_success()'>复制链接</button> <a href='share_edit.php?action=edit&id={$row['id']}' class='btn btn-secondary'>编辑</a> <a href='share_edit.php?action=delete&id={$row['id']}' class='btn btn-danger'>删除</a></td></tr>";
                     }
                 } else {
-                    echo "<tr><td colspan='4'>没有分享页</td></tr>";
+                    echo "<tr><td colspan='6'>没有分享页</td></tr>";
                 }
                 ?>
             </table>

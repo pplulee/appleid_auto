@@ -5,9 +5,30 @@ if (isset($_POST['submit'])) {
     switch ($_GET['action']) {
         case "edit":
             $account = new account($_GET['id']);
-            $enable_check_password_correct = isset($_POST['enable_check_password_correct']) ? 1 : 0;
-            $enable_delete_devices = isset($_POST['enable_delete_devices']) ? 1 : 0;
-            $account->update($_POST['username'], $_POST['password'], $_POST['remark'], $_POST['dob'], $_POST['question1'], $_POST['answer1'], $_POST['question2'], $_POST['answer2'], $_POST['question3'], $_POST['answer3'], $_POST['owner'], $_POST['share_link'], $_POST['check_interval'], $_POST['frontend_remark'], $enable_check_password_correct, $enable_delete_devices);
+            if ($account->id == -1) {
+                alert("error", "账号ID不存在", 2000, "account.php");
+                exit;
+            }
+            $data = array(
+                    'username' => $_POST['username'],
+                    'password' => $_POST['password'],
+                    'remark' => $_POST['remark'],
+                    'dob' => $_POST['dob'],
+                    'question1' => $_POST['question1'],
+                    'answer1' => $_POST['answer1'],
+                    'question2' => $_POST['question2'],
+                    'answer2' => $_POST['answer2'],
+                    'question3' => $_POST['question3'],
+                    'answer3' => $_POST['answer3'],
+                    'owner' => $_POST['owner'],
+                    'share_link' => $_POST['share_link'],
+                    'check_interval' => $_POST['check_interval'],
+                    'frontend_remark' => $_POST['frontend_remark'],
+                    'enable_check_password_correct' => isset($_POST['enable_check_password_correct']),
+                    'enable_delete_devices' => isset($_POST['enable_delete_devices']),
+                    'enable_auto_update_password' => isset($_POST['enable_auto_update_password'])
+                );
+            $account->update($data);
             alert("success", "修改成功！", 2000, "account.php");
             exit;
         default:
@@ -20,13 +41,21 @@ if (isset($_GET['action'])) {
         case "delete":
         {
             $account = new account($_GET['id']);
-            $account->delete();
-            alert("success", "删除成功！", 2000, "account.php");
+            if ($account->id == -1) {
+                alert("error", "账号ID不存在", 2000, "account.php");
+            }else{
+                $account->delete();
+                alert("success", "删除成功！", 2000, "account.php");
+            }
             exit;
         }
         case "edit":
         {
             $account = new account($_GET['id']);
+            if ($account->id == -1) {
+                alert("error", "账号ID不存在", 2000, "account.php");
+                exit;
+            }
             $width = isMobile() ? "auto" : "60%";
             $question1 = array_keys($account->question)[0];
             $question2 = array_keys($account->question)[1];
@@ -37,6 +66,7 @@ if (isset($_GET['action'])) {
             $check_interval = $account->check_interval;
             $check_password_checked = $account->enable_check_password_correct ? "checked" : "";
             $delete_devices_checked = $account->enable_delete_devices ? "checked" : "";
+            $auto_update_password_checked = $account->enable_auto_update_password ? "checked" : "";
             echo "<div class='container' style='margin-top: 2%; width: $width;'>
                     <div class='card border-dark'>
                         <h4 class='card-header bg-primary text-white text-center'>编辑账号</h4>
@@ -113,6 +143,11 @@ if (isset($_GET['action'])) {
                             <div class='input-group mb-3'>
                                 <div class='form-check form-switch'>
                                   开启删除设备<input class='form-check-input' type='checkbox' name='enable_delete_devices' $delete_devices_checked>
+                                </div>
+                            </div>
+                            <div class='input-group mb-3'>
+                                <div class='form-check form-switch'>
+                                  开启自动修改密码<input class='form-check-input' type='checkbox' name='enable_auto_update_password' $auto_update_password_checked>
                                 </div>
                             </div>
                             <div class='input-group mb-3'>

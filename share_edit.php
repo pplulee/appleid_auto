@@ -17,8 +17,23 @@ if (isset($_POST['submit'])) {
                 exit;
             }
             $accounts = implode(",", $_POST['account_list']);
-            $stmt = $conn->prepare("INSERT INTO share (share_link,account_list,owner,html) VALUES (:link,:accounts,:owner,:html);");
-            $stmt->execute(['link' => $share_link, 'accounts' => $accounts, 'owner' => $_SESSION['user_id'],'html' => htmlspecialchars($_POST['html'])]);
+            $stmt = $conn->prepare("INSERT INTO share (
+                   share_link,
+                   account_list,
+                   owner,
+                   html,
+                   remark) 
+            VALUES (
+                    :link,
+                    :accounts,
+                    :owner,
+                    :html,
+                    :remark);");
+            $stmt->execute(['link' => $share_link,
+                'accounts' => $accounts,
+                'owner' => $_SESSION['user_id'],
+                'html' => htmlspecialchars($_POST['html']),
+                'remark' => $_POST['remark']]);
             alert("success", "添加成功", 2000, "share_list.php");
             exit;
         }
@@ -47,7 +62,15 @@ if (isset($_POST['submit'])) {
                 alert("error", "分享链接已存在，无法重复添加", 2000, "share_list.php");
                 exit;
             }
-            $sharepage->update($_POST['share_link'],$_POST['password'],$_POST['account_list'], $_SESSION['user_id'],$_POST['html']);
+            $data = array(
+                'share_link' => $_POST['share_link'],
+                'password' => $_POST['password'],
+                'account_list' => $_POST['account_list'],
+                'owner' => $_SESSION['user_id'],
+                'html' => $_POST['html'],
+                'remark' => $_POST['remark']
+            );
+            $sharepage->update($data);
             alert("success", "修改成功", 2000, "share_list.php");
             exit;
         }
@@ -110,6 +133,10 @@ if (isset($_GET['action'])) {
                                 <input type='text' class='form-control' name='password' placeholder='留空则不启用密码' autocomplete='off'>
                             </div>
                             <div class='input-group mb-3'>
+                                <span class='input-group-text' id='remark'>备注</span>
+                                <input type='text' class='form-control' name='remark' autocomplete='off'>
+                            </div>
+                            <div class='input-group mb-3'>
                                 <span class='input-group-text' id='html'>HTML内容</span>
                                 <textarea name='html' cols='80' rows=4></textarea>
                             </div>
@@ -164,6 +191,10 @@ if (isset($_GET['action'])) {
                             <div class='input-group mb-3'>
                                 <span class='input-group-text' id='password'>页面密码</span>
                                 <input type='text' class='form-control' name='password' value='$sharepage->password' placeholder='留空则不启用密码' autocomplete='off'>
+                            </div>
+                            <div class='input-group mb-3'>
+                                <span class='input-group-text' id='remark'>备注</span>
+                                <input type='text' class='form-control' name='remark' value='$sharepage->remark' autocomplete='off'>
                             </div>
                             <div class='input-group mb-3'>
                                 <span class='input-group-text' id='html'>HTML内容</span>

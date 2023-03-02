@@ -87,18 +87,13 @@ switch ($_GET["action"]) {
                     'API_url' => $Sys_config['apiurl'],
                     'webdriver' => $Sys_config['webdriver_url'],
                 );
-                if ($account->enable_check_password_correct) {
-                    $data['check_password_correct'] = true;
-                }
-                if ($account->enable_delete_devices) {
-                    $data['delete_devices'] = true;
-                }
+                if ($account->enable_check_password_correct) $data['check_password_correct'] = true;
+                if ($account->enable_delete_devices) $data['delete_devices'] = true;
+                if ($account->enable_auto_update_password) $data['auto_update_password'] = true;
+                if ($Sys_config["task_headless"]) $data['headless'] = true;
                 if ($Sys_config['enable_proxy_pool']){
                     $proxy = get_random_proxy($account->owner);
-                    if ($proxy->id == -1){
-                        $data['proxy_id'] = -1;
-                        $data['proxy'] = "";
-                    }else{
+                    if ($proxy->id != -1){
                         $proxy->update_use();
                         $data['proxy_id'] = $proxy->id;
                         $data['proxy'] = $proxy->protocol . "://" . $proxy->content;

@@ -8,6 +8,7 @@ class sharepage
     var array $account_list;
     var int $owner;
     var string $html;
+    var string $remark;
 
     function __construct($id)
     {
@@ -24,20 +25,35 @@ class sharepage
             $this->password = $result['password'] == null ? "" : $result['password'];
             $this->owner = $result['owner'];
             $this->html = htmlspecialchars_decode($result['html']);
+            $this->remark = $result['remark'];
         }
     }
 
-    function update($share_link, $password, array $account_list, $owner, $html): void
+    function update($data): void
     {
         global $conn;
-        $account_list_str = implode(",", $account_list);
-        $stmt = $conn->prepare("UPDATE share SET share_link=:share_link, account_list=:account_list, owner=:owner, password=:password, html=:html WHERE id=:id;");
-        $this->share_link = $share_link;
-        $this->password = $password;
-        $this->account_list = $account_list;
-        $this->owner = $owner;
-        $this->html = htmlspecialchars($html);
-        $stmt->execute(['share_link' => $this->share_link, 'account_list' => $account_list_str, 'owner' => $this->owner, 'id' => $this->id, 'password' => $this->password, 'html' => $this->html]);
+        $account_list_str = implode(",", $data['account_list']);
+        $this->share_link = $data['share_link'];
+        $this->password = $data['password'];
+        $this->account_list = $data['account_list'];
+        $this->owner = $data['owner'];
+        $this->html = htmlspecialchars($data['html']);
+        $this->remark = $data['remark'];
+        $stmt = $conn->prepare("UPDATE share SET 
+                 share_link=:share_link, 
+                 account_list=:account_list, 
+                 owner=:owner, 
+                 password=:password, 
+                 html=:html,
+                 remark=:remark
+             WHERE id=:id;");
+        $stmt->execute(['share_link' => $this->share_link,
+            'account_list' => $account_list_str,
+            'owner' => $this->owner,
+            'id' => $this->id,
+            'password' => $this->password,
+            'html' => $this->html,
+            'remark' => $this->remark]);
     }
 
     function delete(): void

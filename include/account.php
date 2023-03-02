@@ -16,6 +16,7 @@ class account
     var string $frontend_remark;
     var bool $enable_check_password_correct;
     var bool $enable_delete_devices;
+    var bool $enable_auto_update_password;
 
     function __construct($id)
     {
@@ -44,27 +45,29 @@ class account
             $this->frontend_remark = $result['frontend_remark'];
             $this->enable_check_password_correct = $result['enable_check_password_correct'];
             $this->enable_delete_devices = $result['enable_delete_devices'];
+            $this->enable_auto_update_password = $result['enable_auto_update_password'];
         }
     }
 
-    function update($username, $password, $remark, $dob, $question1, $answer1, $question2, $answer2, $question3, $answer3, $owner, $share_link, $check_interval, $frontend_remark, $enable_check_password_correct, $enable_delete_devices): void
+    function update($data): void
     {
         global $conn;
-        $this->username = $username;
-        $this->password = $password;
-        $this->remark = $remark;
-        $this->dob = $dob;
+        $this->username = $data['username'];
+        $this->password = $data['password'];
+        $this->remark = $data['remark'];
+        $this->dob = $data['dob'];
         $this->question = array(
-            $question1 => $answer1,
-            $question2 => $answer2,
-            $question3 => $answer3
+            $data["question1"] => $data["answer1"],
+            $data["question2"] => $data["answer2"],
+            $data["question3"] => $data["answer3"]
         );
-        $this->owner = $owner;
-        $this->share_link = $share_link;
-        $this->check_interval = $check_interval;
-        $this->frontend_remark = $frontend_remark;
-        $this->enable_check_password_correct = $enable_check_password_correct;
-        $this->enable_delete_devices = $enable_delete_devices;
+        $this->owner = $data['owner'];
+        $this->share_link = $data['share_link'];
+        $this->check_interval = $data['check_interval'];
+        $this->frontend_remark = $data['frontend_remark'];
+        $this->enable_check_password_correct = $data['enable_check_password_correct'];
+        $this->enable_delete_devices = $data['enable_delete_devices'];
+        $this->enable_auto_update_password = $data['enable_auto_update_password'];
         $sql = "UPDATE `account` SET 
                      `username`=:username, 
                      `password`=:password, 
@@ -81,7 +84,8 @@ class account
                      `check_interval`=:check_interval, 
                      `frontend_remark`=:frontend_remark, 
                      `enable_check_password_correct`=:enable_check_password_correct, 
-                     `enable_delete_devices`=:enable_delete_devices 
+                     `enable_delete_devices`=:enable_delete_devices,
+                     `enable_auto_update_password`=:enable_auto_update_password
                  WHERE `id`=:id;";
         $stmt = $conn->prepare($sql);
         $stmt->execute([
@@ -89,18 +93,19 @@ class account
             'password' => $this->password,
             'remark' => $this->remark,
             'dob' => $this->dob,
-            'question1' => $question1,
-            'answer1' => $answer1,
-            'question2' => $question2,
-            'answer2' => $answer2,
-            'question3' => $question3,
-            'answer3' => $answer3,
+            'question1' => $data["question1"],
+            'answer1' => $data["answer1"],
+            'question2' => $data["question2"],
+            'answer2' => $data["answer2"],
+            'question3' => $data["question3"],
+            'answer3' => $data["answer3"],
             'owner' => $this->owner,
             'share_link' => $this->share_link,
             'check_interval' => $this->check_interval,
             'frontend_remark' => $this->frontend_remark,
             'enable_check_password_correct' => $this->enable_check_password_correct ? 1 : 0,
             'enable_delete_devices' => $this->enable_delete_devices ? 1 : 0,
+            'enable_auto_update_password' => $this->enable_auto_update_password ? 1 : 0,
             'id' => $this->id
         ]);
     }
