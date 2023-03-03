@@ -65,7 +65,7 @@ CREATE TABLE `share` (
   `owner` int(10) unsigned NOT NULL,
   `password` varchar(64) COLLATE utf8_unicode_ci DEFAULT NULL,
   `html` text COLLATE utf8_unicode_ci,
-  `remark` varchar(128) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `remark` text COLLATE utf8_unicode_ci,
   PRIMARY KEY (`id`),
   KEY `owner` (`owner`),
   CONSTRAINT `share_ibfk_1` FOREIGN KEY (`owner`) REFERENCES `user` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
