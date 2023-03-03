@@ -35,9 +35,7 @@ CREATE TABLE `account` (
   `enable_check_password_correct` tinyint(1) NOT NULL,
   `enable_delete_devices` tinyint(1) NOT NULL,
   `enable_auto_update_password` tinyint(1) NOT NULL,
-  PRIMARY KEY (`id`),
-  KEY `owner` (`owner`),
-  CONSTRAINT `account_ibfk_1` FOREIGN KEY (`owner`) REFERENCES `user` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+  PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 /*Data for the table `account` */
@@ -66,9 +64,7 @@ CREATE TABLE `share` (
   `password` varchar(64) COLLATE utf8_unicode_ci DEFAULT NULL,
   `html` text COLLATE utf8_unicode_ci,
   `remark` text COLLATE utf8_unicode_ci,
-  PRIMARY KEY (`id`),
-  KEY `owner` (`owner`),
-  CONSTRAINT `share_ibfk_1` FOREIGN KEY (`owner`) REFERENCES `user` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+  PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 /*Data for the table `share` */
