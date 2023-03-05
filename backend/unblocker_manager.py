@@ -64,6 +64,7 @@ class local_docker:
         -e api_key={self.api.key} \
         -e taskid={id} \
         --restart=on-failure \
+        --log-opt max-size=1m --log-opt max-file=2 \
         sahuidhsu/appleid_auto")
 
     def remove_docker(self, id):

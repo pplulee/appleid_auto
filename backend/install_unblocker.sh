@@ -20,6 +20,7 @@ else
        echo "无法检测到当前系统，已退出"
        exit;
     fi
+    python_path=$(which python3)
 fi
 if pip3 >/dev/null 2>&1; then
     echo "pip3已安装"
@@ -67,6 +68,7 @@ if [ "$run_webdriver" = "y" ]; then
     docker run -d --name=webdriver --log-opt max-size=1m --log-opt max-file=1 --shm-size="1g" --restart=always -e SE_NODE_MAX_SESSIONS=$webdriver_max_session -e SE_NODE_OVERRIDE_MAX_SESSIONS=true -e SE_SESSION_RETRY_INTERVAL=1 -e SE_VNC_VIEW_ONLY=1 -p $webdriver_port:4444 -p 5900:5900 selenium/standalone-chrome
     echo "Webdriver Docker容器部署完成"
 fi
+rm -rf install_unblocker
 mkdir install_unblocker
 cd install_unblocker
 echo "开始下载文件……"
@@ -100,6 +102,10 @@ systemctl daemon-reload
 systemctl enable appleauto
 systemctl restart appleauto
 systemctl status appleauto
+echo "安装完成，服务已启动"
 echo "默认服务名：appleauto"
-echo "安装完成"
+echo "操作方法："
+echo "启动服务：systemctl start appleauto"
+echo "停止服务：systemctl stop appleauto"
+echo "重启服务：systemctl restart appleauto"
 exit 0

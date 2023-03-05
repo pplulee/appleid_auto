@@ -163,6 +163,8 @@ class Config:
             logger.info("已启用 删除设备")
         if self.enable_check_password_correct:
             logger.info("已启用 检查密码正确")
+        if self.enable_auto_update_password:
+            logger.info("已启用 定时更新密码")
         if self.proxy != "":
             logger.info(f"使用代理ID：{self.proxy_id}")
 
@@ -364,12 +366,12 @@ class ID:
         except BaseException:
             pass
         driver.switch_to.frame(WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.TAG_NAME, "iframe"))))
-        WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.ID, "account_name_text_field"))).send_keys(
+        WebDriverWait(driver, 10).until(EC.element_to_be_clickable((By.ID, "account_name_text_field"))).send_keys(
             self.username)
         time.sleep(1)
         driver.find_element(By.ID, "account_name_text_field").send_keys(Keys.ENTER)
-        time.sleep(1)
-        driver.find_element(By.ID, "password_text_field").send_keys(self.password)
+        WebDriverWait(driver, 5).until(EC.element_to_be_clickable((By.ID, "password_text_field"))).send_keys(
+            self.password)
         time.sleep(1)
         driver.find_element(By.ID, "password_text_field").send_keys(Keys.ENTER)
         time.sleep(5)
@@ -572,7 +574,7 @@ def setup_driver():
         else:
             driver = webdriver.Chrome(options=options)
     except BaseException as e:
-        logger.error("Webdriver调用失败，程序已退出")
+        logger.error("Webdriver调用失败")
         logger.error(e)
         return False
     else:
@@ -609,8 +611,7 @@ def job():
     if not driver_result:
         api.update_message(id.username, "Webdriver调用失败")
         notification("Webdriver调用失败")
-        exit()
-    if id.login():
+    if driver_result and id.login():
         # 检查账号
         if id.check_2fa():
             logger.info("检测到账号开启双重认证，开始解锁")
@@ -686,7 +687,7 @@ logger.info(f"{'=' * 80}\n"
             f"启动AppleID_Auto\n"
             f"项目地址 https://github.com/pplulee/appleid_auto\n"
             f"Telegram交流群 @appleunblocker")
-logger.info("当前版本：v1.43-20230302")
+logger.info("当前版本：v1.44-20230305")
 job()
 while True:
     schedule.run_pending()
