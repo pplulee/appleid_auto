@@ -409,8 +409,12 @@ class ID:
             notification("未找到安全问题对应答案，请检查配置")
             return False
         # 跳过双重验证
-        driver.switch_to.frame(
-            WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.TAG_NAME, "iframe"))))
+        try:
+            driver.switch_to.frame(
+                WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.TAG_NAME, "iframe"))))
+        except BaseException:
+            logger.error("跳过双重验证失败")
+            return False
         try:
             WebDriverWait(driver, 5).until(EC.presence_of_element_located((By.XPATH,
                                                                            "/html/body/div[1]/appleid-repair/idms-widget/div/div/div/hsa2-enrollment-flow/div/div/idms-step/div/div/div/div[3]/idms-toolbar/div/div[1]/div/button[2]"))).click()
