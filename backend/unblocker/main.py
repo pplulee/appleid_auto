@@ -220,6 +220,7 @@ class ID:
             if config.proxy != "":
                 api.report_proxy_error(config.proxy_id)
             notification("页面加载失败，具体原因请查看日志")
+            get_ip()
             return False
 
     def process_verify(self):
@@ -279,6 +280,7 @@ class ID:
             logger.error(f"无法处理请求，可能是账号失效或服务器IP被拉黑\n错误信息：{msg.strip()}")
             api.update_message(self.username, "解锁登录失败，可能是账号失效或服务器IP被拉黑，具体请查看后端日志")
             notification(f"Apple ID解锁登录失败，可能是账号失效或服务器IP被拉黑")
+            get_ip()
             return False
 
     def check(self):
@@ -329,6 +331,7 @@ class ID:
                 api.update_message(self.username, "操作被苹果拒绝，疑似被风控")
                 api.report_proxy_error(config.proxy_id)
                 notification("操作被苹果拒绝，疑似被风控")
+                get_ip()
                 return False
         return True
 
@@ -586,6 +589,16 @@ def setup_driver():
         return True
 
 
+def get_ip():
+    global driver
+    try:
+        driver.get("https://api.ip.sb/ip")
+        ip_address = WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.TAG_NAME, "pre"))).text
+        logger.info(f"当前IP：{ip_address}")
+    except BaseException:
+        logger.error("无法获取当前IP")
+
+
 def update_account(username, password):
     global api
     update_result = api.update(username, password)
@@ -683,7 +696,7 @@ def job():
     except BaseException:
         logger.error("Webdriver关闭失败")
     schedule.every(config.check_interval).minutes.do(job)
-    logger.info("已设置下次检测任务")
+    logger.info(f"下次任务将在{config.check_interval}分钟后执行")
     return unlock
 
 
