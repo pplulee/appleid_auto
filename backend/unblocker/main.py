@@ -363,7 +363,13 @@ class ID:
 
     def login_appleid(self):
         logger.info("开始登录AppleID")
-        driver.get("https://appleid.apple.com/sign-in")
+        try:
+            driver.get("https://appleid.apple.com/sign-in")
+        except BaseException:
+            logger.error("登录页面加载失败")
+            api.update_message(self.username, "登录页面加载失败")
+            notification("登录页面加载失败")
+            return False
         try:
             driver.switch_to.alert.accept()
         except BaseException:
@@ -663,6 +669,7 @@ def job():
 
             # 自动删除设备
             if config.enable_delete_devices or config.enable_check_password_correct:
+                need_login = False
                 if not unlock:
                     # 未重置密码，先获取最新密码再执行登录
                     id.password = api.get_password(id.username)
@@ -671,14 +678,14 @@ def job():
                     logger.info("密码错误，开始修改密码")
                     reset_pw_result = id.change_password()
                     if reset_pw_result:
-                        unlock = True
+                        need_login = True
                         notification(f"Apple ID密码修改成功\n新密码：{id.password}")
                         update_account(id.username, id.password)
                     else:
                         logger.error("修改密码失败")
                         notification("修改密码失败")
                 if config.enable_delete_devices:
-                    if unlock:
+                    if need_login:
                         login_result = id.login_appleid()
                     if login_result:
                         id.delete_devices()
@@ -688,7 +695,6 @@ def job():
             # 解锁失败
             logger.error("解锁失败")
             notification("解锁失败")
-
     else:
         logger.error("任务执行失败，等待下次检测")
     try:
@@ -704,7 +710,7 @@ logger.info(f"{'=' * 80}\n"
             f"启动AppleID_Auto\n"
             f"项目地址 https://github.com/pplulee/appleid_auto\n"
             f"Telegram交流群 @appleunblocker")
-logger.info("当前版本：v1.44-20230305")
+logger.info("当前版本：v1.44-20230307")
 job()
 while True:
     schedule.run_pending()
