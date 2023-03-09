@@ -151,12 +151,27 @@ class Config:
         self.webdriver = config_result["webdriver"]
         self.proxy = config_result["proxy"] if "proxy" in config_result.keys() else ""
         self.proxy_id = config_result["proxy_id"] if "proxy_id" in config_result.keys() else -1
+        self.proxy_type = config_result["proxy_type"] if "proxy_type" in config_result.keys() else ""
+        self.proxy_content = config_result["proxy_content"] if "proxy_content" in config_result.keys() else ""
         self.tgbot_chatid = config_result["tgbot_chatid"] if "tgbot_chatid" in config_result.keys() else ""
         self.tgbot_token = config_result["tgbot_token"] if "tgbot_token" in config_result.keys() else ""
         self.enable_check_password_correct = "check_password_correct" in config_result.keys()
         self.enable_delete_devices = "delete_devices" in config_result.keys()
         self.enable_auto_update_password = "auto_update_password" in config_result.keys()
         self.headless = "headless" in config_result.keys()
+        if self.proxy_content!="" and self.proxy_type!="":
+            # 新版本代理
+            if self.proxy_type=="url":
+                try:
+                    self.proxy = get(self.proxy_content).text
+                except BaseException as e:
+                    logger.error("从API获取代理失败")
+                    logger.error(e)
+                    self.proxy = ""
+                else:
+                    logger.info(f"从API获取到代理：{self.proxy}")
+            elif self.proxy_type=="socks5" or self.proxy_type=="http":
+                self.proxy = self.proxy_type+"://"+self.proxy_content
         if self.headless:
             logger.info("已启用 后台运行")
         if self.enable_delete_devices:
@@ -165,7 +180,7 @@ class Config:
             logger.info("已启用 检查密码正确")
         if self.enable_auto_update_password:
             logger.info("已启用 定时更新密码")
-        if self.proxy != "":
+        if self.proxy_id != -1:
             logger.info(f"使用代理ID：{self.proxy_id}")
 
 
@@ -208,6 +223,7 @@ class ID:
             else:
                 api.update_message(self.username, "页面加载失败")
                 notification("页面加载失败")
+            get_ip()
             return False
         try:
             text = driver.find_element(By.XPATH, "/html/body/center[1]/h1").text
@@ -704,7 +720,7 @@ logger.info(f"{'=' * 80}\n"
             f"启动AppleID_Auto\n"
             f"项目地址 https://github.com/pplulee/appleid_auto\n"
             f"Telegram交流群 @appleunblocker")
-logger.info("当前版本：v1.44-20230305")
+logger.info("当前版本：v1.44-20230309")
 job()
 while True:
     schedule.run_pending()
