@@ -573,8 +573,13 @@ class ID:
 def notification(content):
     content = f"【{config.username}】{content}"
     if config.tgbot_token != "" and config.tgbot_chatid != "":
-        post(f"https://api.telegram.org/bot{config.tgbot_token}/sendMessage",
-             data={"chat_id": config.tgbot_chatid, "text": content})
+        try:
+            post(f"https://api.telegram.org/bot{config.tgbot_token}/sendMessage",
+                 data={"chat_id": config.tgbot_chatid, "text": content})
+        except BaseException as e:
+            logger.error(f"Telegram发送消息失败\n错误信息：{e}")
+            logger.error("如果机器在大陆，请勿开启Telegram通知")
+
 
 
 ocr = ddddocr.DdddOcr()
@@ -665,8 +670,8 @@ def job():
         if unlock_success:
             # 更新账号信息
             if unlock:
-                notification(f"Apple ID更新成功\n新密码：{id.password}")
                 update_account(id.username, id.password)
+                notification(f"Apple ID更新成功\n新密码：{id.password}")
             else:
                 update_account(id.username, "")
 
@@ -677,8 +682,8 @@ def job():
                     reset_pw_result = id.change_password()
                     if reset_pw_result:
                         unlock = True
-                        notification(f"Apple ID密码修改成功\n新密码：{id.password}")
                         update_account(id.username, id.password)
+                        notification(f"Apple ID密码修改成功\n新密码：{id.password}")
                     else:
                         logger.error("修改密码失败")
                         notification("修改密码失败")
@@ -695,8 +700,8 @@ def job():
                     reset_pw_result = id.change_password()
                     if reset_pw_result:
                         need_login = True
-                        notification(f"Apple ID密码修改成功\n新密码：{id.password}")
                         update_account(id.username, id.password)
+                        notification(f"Apple ID密码修改成功\n新密码：{id.password}")
                     else:
                         logger.error("修改密码失败")
                         notification("修改密码失败")
