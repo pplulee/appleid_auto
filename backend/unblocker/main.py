@@ -619,11 +619,10 @@ def setup_driver():
     options.add_argument(
         "user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/108.0.0.0 Safari/537.36")
     try:
-        driver = webdriver.Chrome(options=options)
-        # if config.webdriver != "local":
-        #     driver = webdriver.Remote(command_executor=config.webdriver, options=options)
-        # else:
-        #     driver = webdriver.Chrome(options=options)
+        if config.webdriver != "local":
+            driver = webdriver.Remote(command_executor=config.webdriver, options=options)
+        else:
+            driver = webdriver.Chrome(options=options)
     except BaseException as e:
         logger.error("Webdriver调用失败")
         logger.error(e)
