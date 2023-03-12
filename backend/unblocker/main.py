@@ -531,30 +531,46 @@ class ID:
             api.update_message(self.username, "密码框获取失败")
             notification("密码框获取失败")
             return False
-        self.password = self.generate_password()
+        new_password = self.generate_password()
         for item in pwd_input_box:
-            item.send_keys(self.password)
+            item.send_keys(new_password)
         time.sleep(1)
         pwd_input_box[-1].send_keys(Keys.ENTER)
-        logger.info(f"新密码：{self.password}")
         time.sleep(3)
         try:
             driver.find_element(By.XPATH,
                                 "/html/body/div[5]/div/div/div[1]/idms-step/div/div/div/div[3]/idms-toolbar/div/div/div/button[1]").click()
         except BaseException:
             pass
-        else:
-            WebDriverWait(driver, 6).until_not(EC.presence_of_element_located((By.XPATH,
-                                                                               "/html/body/div[5]/div/div/div[1]/idms-step/div/div/div/div[3]/idms-toolbar/div/div/div/button[1]")))
+        try:
+            WebDriverWait(driver, 6).until_not(EC.presence_of_element_located((By.CLASS_NAME, "override")))
+        except BaseException:
+            logger.error("疑似密码修改失败？看到此报错请与作者反馈。已保存错误信息")
+            api.update_message(self.username, "疑似密码修改失败？看到此报错请与作者反馈")
+            notification("疑似密码修改失败？看到此报错请与作者反馈")
+            # 保存页面到文件
+            with open("error.html", "w", encoding="utf-8") as f:
+                f.write(driver.page_source)
+            # 保存页面截图到文件
+            driver.save_screenshot("error.png")
+            return False
+        self.password = new_password
+        logger.info(f"密码修改成功，新密码为{new_password}")
         return True
 
     def change_password(self):
         if not self.login():
             return False
         logger.info("开始修改密码")
-        driver.find_element(By.XPATH,
-                            "//*[@id=\"content\"]/iforgot-v2/app-container/div/iforgot-body/sa/idms-flow/div/section/div/recovery-options/div[2]/div/div[1]/label/span").click()
-        driver.find_element(By.ID, "action").click()
+        try:
+            driver.find_element(By.XPATH,
+                                "//*[@id=\"content\"]/iforgot-v2/app-container/div/iforgot-body/sa/idms-flow/div/section/div/recovery-options/div[2]/div/div[1]/label/span").click()
+            driver.find_element(By.ID, "action").click()
+        except BaseException:
+            logger.error("现在无法修改密码，可能是二步验证关闭失败")
+            api.update_message(self.username, "无法修改密码，可能是二步验证关闭失败")
+            notification("无法修改密码，可能是二步验证关闭失败")
+            return False
         try:
             WebDriverWait(driver, 5).until(EC.presence_of_element_located((By.XPATH,
                                                                            "//*[@id=\"content\"]/iforgot-v2/app-container/div/iforgot-body/sa/idms-flow/div/section/div/authentication-method/div[2]/div[2]/label/span"))).click()
@@ -603,10 +619,11 @@ def setup_driver():
     options.add_argument(
         "user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/108.0.0.0 Safari/537.36")
     try:
-        if config.webdriver != "local":
-            driver = webdriver.Remote(command_executor=config.webdriver, options=options)
-        else:
-            driver = webdriver.Chrome(options=options)
+        driver = webdriver.Chrome(options=options)
+        # if config.webdriver != "local":
+        #     driver = webdriver.Remote(command_executor=config.webdriver, options=options)
+        # else:
+        #     driver = webdriver.Chrome(options=options)
     except BaseException as e:
         logger.error("Webdriver调用失败")
         logger.error(e)
@@ -731,7 +748,7 @@ logger.info(f"{'=' * 80}\n"
             f"启动AppleID_Auto\n"
             f"项目地址 https://github.com/pplulee/appleid_auto\n"
             f"Telegram交流群 @appleunblocker")
-logger.info("当前版本：v1.44-20230309")
+logger.info("当前版本：v1.44-20230312")
 job()
 while True:
     schedule.run_pending()
