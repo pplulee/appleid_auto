@@ -44,7 +44,7 @@ elif args.lang == "en_us":
     lang_text = lang()
 else:
     logger.error("未知语言 | Language not supported")
-    exit()
+    exit(1)
 
 
 class API:
@@ -658,9 +658,9 @@ def record_error():
         # 保存页面截图到文件
         driver.save_screenshot("error.png")
     except BaseException:
-        logger.error("无法保存错误页面")
+        logger.error(lang_text.failOnSavingScreenshot)
     else:
-        logger.error("已保存错误页面到/app目录下error.html和error.png，请与开发者反馈")
+        logger.error(lang_text.screenshotSaved)
 
 
 def get_ip():
@@ -670,17 +670,17 @@ def get_ip():
         ip_address = WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.TAG_NAME, "pre"))).text
         logger.info(f"IP: {ip_address}")
     except BaseException:
-        logger.error("无法获取当前IP | Failed to get current IP")
+        logger.error(lang_text.getIPFail)
 
 
 def update_account(username, password):
     global api
     update_result = api.update(username, password)
     if update_result["status"] == "fail":
-        logger.error("更新账号失败 | Failed to update account")
+        logger.error(lang_text.updateFail)
         return False
     else:
-        logger.info("更新账号成功 | Account updated successfully")
+        logger.info(lang_text.updateSuccess)
         return True
 
 
@@ -690,7 +690,7 @@ def job():
     api = API(args.api_url, args.api_key)
     config_result = api.get_config(args.taskid)
     if config_result["status"] == "fail":
-        logger.error("从API获取配置失败 | Failed to get config from API")
+        logger.error(lang_text.getAPIFail)
         exit()
     config = Config(config_result)
     id = ID(config.username, config.password, config.dob, config.answer)
@@ -713,7 +713,7 @@ def job():
                 logger.info(lang_text.accountLocked)
                 unlock_success = id.unlock()
                 unlock = True
-            logger.info("账号检测完毕 | Account check completed")
+            logger.info(lang_text.checkComplete)
 
             if unlock_success:
                 # 更新账号信息

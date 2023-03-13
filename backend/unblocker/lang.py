@@ -69,6 +69,12 @@ class zh_cn:
         self.FailToChangePassword = "修改密码失败"
         self.CurrentAccount = "当前账号："
         self.invalidProxyType = "无效的代理类型"
+        self.failOnSavingScreenshot = "无法保存错误页面截图"
+        self.screenshotSaved = "已保存错误页面到/app目录下error.html和error.png，请与开发者反馈"
+        self.getIPFail = "无法获取当前IP"
+        self.updateFail = "更新账号失败"
+        self.getAPIFail = "从API获取配置失败"
+        self.checkComplete = "账号检测完毕"
 
     def nextRun(self, time):
         return f"下次任务将在{time}分钟后执行"
@@ -149,6 +155,13 @@ class en_us:
         self.FailToChangePassword = "Failed to change password"
         self.CurrentAccount = "Current account:"
         self.invalidProxyType = "Invalid proxy type"
+        self.failOnSavingScreenshot = "Unable to save screenshot of error page"
+        self.screenshotSaved = "Screenshot of error page saved to /app/error.html and /app/error.png, " \
+                               "please contact the developer"
+        self.getIPFail = "Unable to get current IP"
+        self.updateFail = "Update account failed"
+        self.getAPIFail = "Failed to get config from API"
+        self.checkComplete = "Account check complete"
 
     def nextRun(self, time):
         return f"Next job will be executed in {time} minutes"
