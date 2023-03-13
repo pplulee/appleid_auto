@@ -14,9 +14,18 @@ prefix = "apple-auto_"
 parser = argparse.ArgumentParser(description="")
 parser.add_argument("-api_url", help="API URL", required=True)
 parser.add_argument("-api_key", help="API key", required=True)
+parser.add_argument('-lang', help='Language', required=True)
 args = parser.parse_args()
 api_url = args.api_url
 api_key = args.api_key
+language = 'zh_cn'
+if args.lang == '1':
+    language = 'zh_cn'
+elif args.lang == '2':
+    language = 'en_us'
+else:
+    print("Invalid language")
+    exit(1)
 
 logger = logging.getLogger()
 logger.setLevel('INFO')
@@ -63,6 +72,7 @@ class local_docker:
         -e api_url={self.api.url} \
         -e api_key={self.api.key} \
         -e taskid={id} \
+        -e lang={language} \
         --restart=on-failure \
         --log-opt max-size=1m --log-opt max-file=2 \
         sahuidhsu/appleid_auto")

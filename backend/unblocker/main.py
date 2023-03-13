@@ -22,6 +22,7 @@ parser = argparse.ArgumentParser(description="")
 parser.add_argument("-api_url", help="API URL")
 parser.add_argument("-api_key", help="API key")
 parser.add_argument("-taskid", help="Task ID")
+parser.add_argument("-lang", help="Output language")
 args = parser.parse_args()
 
 logger = logging.getLogger()
@@ -33,6 +34,12 @@ chlr = logging.StreamHandler()
 chlr.setFormatter(formatter)
 logger.addHandler(chlr)
 
+lang_choose = args.lang if args.lang else "zh_cn"
+from lang import zh_cn as lang
+lang_text = lang()
+if lang_choose == "en_us":
+    from lang import en_us as lang
+    lang_text = lang()
 
 class API:
     def __init__(self, url, key):
@@ -49,7 +56,7 @@ class API:
                                    "id": id
                                }).text)
         except BaseException as e:
-            logger.error("获取配置失败")
+            logger.error(lang_text.ErrorRetrievingConfig)
             logger.error(e)
             return {"status": "fail"}
         else:
@@ -70,7 +77,7 @@ class API:
                         "action": "update_password"
                     }).text)
         except BaseException as e:
-            logger.error("更新密码失败")
+            logger.error(lang_text.failOnPasswordUpdate)
             logger.error(e)
             return {"status": "fail"}
         else:
@@ -90,7 +97,7 @@ class API:
                         "action": "get_password"
                     }).text)
         except BaseException as e:
-            logger.error("获取密码失败")
+            logger.error(lang_text.failOnRetrievingPassword)
             logger.error(e)
             return ""
         else:
@@ -109,7 +116,7 @@ class API:
                             "message": message,
                             "action": "update_message"}).text)
         except BaseException as e:
-            logger.error("更新消息失败")
+            logger.error(lang_text.failOnMessageUpdate)
             logger.error(e)
             return False
         else:
@@ -127,7 +134,7 @@ class API:
                             "id": proxy_id,
                             "action": "report_proxy_error"}).text)
         except BaseException as e:
-            logger.error("上报代理错误失败")
+            logger.error(lang_text.failOnReportingProxyError)
             logger.error(e)
             return False
         else:
@@ -165,23 +172,23 @@ class Config:
                 try:
                     self.proxy = get(self.proxy_content).text
                 except BaseException as e:
-                    logger.error("从API获取代理失败")
+                    logger.error(lang_text.failOnRetrievingProxyFromAPI)
                     logger.error(e)
                     self.proxy = ""
                 else:
-                    logger.info(f"从API获取到代理：{self.proxy}")
+                    logger.info(f"{lang_text.retrievedProxyFromAPI}: {self.proxy}")
             elif self.proxy_type == "socks5" or self.proxy_type == "http":
-                self.proxy = self.proxy_type + "://" + self.proxy_content
+                self.proxy = self.proxy_type+"://"+self.proxy_content
         if self.headless:
-            logger.info("已启用 后台运行")
+            logger.info(lang_text.backgroundRunning)
         if self.enable_delete_devices:
-            logger.info("已启用 删除设备")
+            logger.info(lang_text.removeDevice)
         if self.enable_check_password_correct:
-            logger.info("已启用 检查密码正确")
+            logger.info(lang_text.checkPassword)
         if self.enable_auto_update_password:
-            logger.info("已启用 定时更新密码")
+            logger.info(lang_text.autoUpdatePassword)
         if self.proxy_id != -1:
-            logger.info(f"使用代理ID：{self.proxy_id}")
+            logger.info(f"{lang_text.usingProxyID}: {self.proxy_id}")
 
 
 class ID:
@@ -214,15 +221,15 @@ class ID:
             WebDriverWait(driver, 30 if config.proxy != "" else 10).until(
                 EC.presence_of_element_located((By.CLASS_NAME, "iforgot-apple-id")))
         except BaseException:
-            logger.error("刷新页面失败")
+            logger.error(lang_text.failOnRefreshingPage)
             if config.proxy != "":
-                logger.error("已启用代理，请检查代理是否可用")
-                api.update_message(self.username, "页面加载失败，可能是代理不可用")
+                logger.error(lang_text.proxyEnabledRefreshing)
+                api.update_message(self.username, lang_text.proxyEnabledRefreshingAPI)
                 api.report_proxy_error(config.proxy_id)
-                notification("页面加载失败，可能是代理不可用")
+                notification(lang_text.proxyEnabledRefreshingAPI)
             else:
-                api.update_message(self.username, "页面加载失败")
-                notification("页面加载失败")
+                api.update_message(self.username, lang_text.failOnLoadingPage)
+                notification(lang_text.failOnLoadingPage)
             get_ip()
             return False
         try:
@@ -230,12 +237,12 @@ class ID:
         except BaseException:
             return True
         else:
-            logger.error("页面加载失败，疑似服务器IP被拒绝访问")
+            logger.error(lang_text.IPBlocked)
             logger.error(text)
-            api.update_message(self.username, "页面加载失败，具体原因请查看日志")
+            api.update_message(self.username, lang_text.seeLog)
             if config.proxy != "":
                 api.report_proxy_error(config.proxy_id)
-            notification("页面加载失败，具体原因请查看日志")
+            notification(lang_text.seeLog)
             get_ip()
             return False
 
@@ -247,7 +254,7 @@ class ID:
             code = ocr.classification(img)
             driver.find_element(By.CLASS_NAME, "captcha-input").send_keys(code)
         except BaseException:
-            logger.error("无法获取验证码")
+            logger.error(lang_text.failOnGettingCaptcha)
             return False
         else:
             return True
@@ -259,15 +266,15 @@ class ID:
             WebDriverWait(driver, 7).until(
                 EC.presence_of_element_located((By.CLASS_NAME, "iforgot-apple-id"))).send_keys(self.username)
         except BaseException:
-            logger.error("无法获取页面内容，即将退出程序")
+            logger.error(lang_text.failOnRetrievingPage)
             if config.proxy != "":
-                logger.error("已启用代理，请检查代理是否可用")
-                api.update_message(self.username, "无法获取页面内容，可能是代理不可用")
+                logger.error(lang_text.proxyEnabledRefreshing)
+                api.update_message(self.username, lang_text.proxyEnabledGettingContent)
                 api.report_proxy_error(config.proxy_id)
-                notification("无法获取页面内容，可能是代理不可用")
+                notification(lang_text.proxyEnabledGettingContent)
             else:
-                api.update_message(self.username, "无法获取页面内容")
-                notification("无法获取页面内容")
+                api.update_message(self.username, lang_text.failOnGettingPage)
+                notification(lang_text.failOnGettingPage)
             return False
         while True:
             if not self.process_verify():
@@ -279,10 +286,10 @@ class ID:
                 WebDriverWait(driver, 3).until(EC.presence_of_element_located((By.XPATH,
                                                                                "/html/body/div[1]/iforgot-v2/app-container/div/iforgot-body/global-v2/div/idms-flow/div/forgot-password/div/div/div[1]/idms-step/div/div/div/div[2]/div/div[1]/div[2]/div/iforgot-captcha/div/div[2]/idms-textbox/idms-error-wrapper/div/idms-error/div/div/span")))
             except BaseException:
-                logger.info("验证码正确")
+                logger.info(lang_text.captchaCorrect)
                 break
             else:
-                logger.info("验证码错误，重新输入")
+                logger.info(lang_text.captchaFail)
                 continue
 
         try:
@@ -290,12 +297,12 @@ class ID:
                                                                                  "/html/body/div[1]/iforgot-v2/app-container/div/iforgot-body/global-v2/div/idms-flow/div/forgot-password/div/div/div[1]/idms-step/div/div/div/div[2]/div/div[1]/div[1]/div/idms-textbox/idms-error-wrapper/div/idms-error/div/div/span"))).get_attribute(
                 "innerHTML")
         except BaseException:
-            logger.info("登录成功")
+            logger.info(lang_text.login)
             return True
         else:
-            logger.error(f"无法处理请求，可能是账号失效或服务器IP被拉黑\n错误信息：{msg.strip()}")
-            api.update_message(self.username, "解锁登录失败，可能是账号失效或服务器IP被拉黑，具体请查看后端日志")
-            notification(f"Apple ID解锁登录失败，可能是账号失效或服务器IP被拉黑")
+            logger.error(f"{lang_text.blocked}\n{msg.strip()}")
+            api.update_message(self.username, lang_text.loginFailCheckLog)
+            notification(lang_text.loginFailCheckLog)
             get_ip()
             return False
 
@@ -304,10 +311,10 @@ class ID:
             driver.find_element(By.XPATH,
                                 "/html/body/div[1]/iforgot-v2/app-container/div/iforgot-body/sa/idms-flow/div/section/div/authentication-method/div[1]/p[1]")
         except BaseException:
-            logger.info("当前账号未被锁定")
+            logger.info(lang_text.notLocked)
             return True  # 未被锁定
         else:
-            logger.info("当前账号已被锁定")
+            logger.info(lang_text.locked)
             return False  # 被锁定
 
     def check_2fa(self):
@@ -315,10 +322,10 @@ class ID:
             driver.find_element(By.XPATH,
                                 "/html/body/div[1]/iforgot-v2/app-container/div/iforgot-body/hsa-two-v2/recovery-web-app/idms-flow/div/div/trusted-phone-number/div/h1")
         except BaseException:
-            logger.info("当前账号未开启2FA")
+            logger.info(lang_text.twoStepnotEnabled)
             return False  # 未开启2FA
         else:
-            logger.info("当前账号已开启2FA")
+            logger.info(lang_text.twoStepEnabled)
             return True  # 已开启2FA
 
     def unlock_2fa(self):
@@ -327,9 +334,9 @@ class ID:
                 driver.find_element(By.XPATH,
                                     "/html/body/div[1]/iforgot-v2/app-container/div/iforgot-body/hsa-two-v2/recovery-web-app/idms-flow/div/div/trusted-phone-number/div/div/div[1]/idms-step/div/div/div/div[2]/div/div/div/button").click()
             except BaseException:
-                logger.error("无法找到关闭验证按钮，可能是账号不允许关闭2FA")
-                api.update_message(self.username, "关闭二步验证失败，可能是账号不允许关闭2FA")
-                notification("关闭二步验证失败，可能是账号不允许关闭2FA")
+                logger.error(lang_text.cantFindDisable2FA)
+                api.update_message(self.username, lang_text.cantFindDisable2FA)
+                notification(lang_text.cantFindDisable2FA)
                 return False
             WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.XPATH,
                                                                             "/html/body/div[5]/div/div/recovery-unenroll-start/div/idms-step/div/div/div/div[3]/idms-toolbar/div/div/div/button[1]"))).click()
@@ -343,10 +350,10 @@ class ID:
                 driver.find_element(By.CLASS_NAME, "button-primary").click()
                 self.process_password()
             else:
-                logger.error(f"操作被苹果拒绝，疑似被风控，错误信息：{msg.strip()}")
-                api.update_message(self.username, "操作被苹果拒绝，疑似被风控")
+                logger.error(f"{lang_text.rejectedByApple}\n{msg.strip()}")
+                api.update_message(self.username, lang_text.rejectedByApple)
                 api.report_proxy_error(config.proxy_id)
-                notification("操作被苹果拒绝，疑似被风控")
+                notification(lang_text.rejectedByApple)
                 get_ip()
                 return False
         return True
@@ -358,9 +365,9 @@ class ID:
                 driver.find_element(By.XPATH,
                                     "/html/body/div[1]/iforgot-v2/app-container/div/iforgot-body/sa/idms-flow/div/section/div/authentication-method/div[2]/div[2]/label/span").click()
             except BaseException:
-                logger.error("选择选项失败，无法使用安全问题解锁")
-                api.update_message(self.username, "选择选项失败，无法使用安全问题解锁")
-                notification("选择选项失败，无法使用安全问题解锁")
+                logger.error(lang_text.chooseFail)
+                api.update_message(self.username, lang_text.chooseFail)
+                notification(lang_text.chooseFail)
                 return False
             WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.ID, "action"))).click()
             # 填写生日
@@ -378,13 +385,13 @@ class ID:
         return True
 
     def login_appleid(self):
-        logger.info("开始登录AppleID")
+        logger.info("开始登录AppleID | Start logging in AppleID")
         try:
             driver.get("https://appleid.apple.com/sign-in")
         except BaseException:
-            logger.error("登录页面加载失败")
-            api.update_message(self.username, "登录页面加载失败")
-            notification("登录页面加载失败")
+            logger.error(lang_text.loginLoadFail)
+            api.update_message(self.username, lang_text.loginLoadFail)
+            notification(lang_text.loginLoadFail)
             return False
         try:
             driver.switch_to.alert.accept()
@@ -405,15 +412,15 @@ class ID:
         except BaseException:
             pass
         else:
-            logger.error(f"登录失败，错误信息：\n{msg.strip()}")
+            logger.error(f"登录失败 | Login Failed\n{msg.strip()}")
             return False
         question_element = WebDriverWait(driver, 5).until(
             EC.presence_of_all_elements_located((By.XPATH, "//*[contains(@class, 'question')]")))
         answer0 = self.get_answer(question_element[1].get_attribute("innerHTML"))
         answer1 = self.get_answer(question_element[2].get_attribute("innerHTML"))
         if answer0 == "" or answer1 == "":
-            logger.error("安全问题错误，程序已退出")
-            api.update_message(self.username, "请检查安全问题设置是否正确，后端已退出")
+            logger.error(lang_text.answerIncorrect)
+            api.update_message(self.username, lang_text.answerIncorrect)
             driver.quit()
             exit()
         answer_inputs = WebDriverWait(driver, 10).until(
@@ -429,16 +436,16 @@ class ID:
         except BaseException:
             pass
         else:
-            logger.error("未找到安全问题对应答案，请检查配置")
-            api.update_message(self.username, "未找到安全问题对应答案，请检查配置")
-            notification("未找到安全问题对应答案，请检查配置")
+            logger.error(lang_text.answerNotMatch)
+            api.update_message(self.username, lang_text.answerNotMatch)
+            notification(lang_text.answerNotMatch)
             return False
         # 跳过双重验证
         try:
             driver.switch_to.frame(
                 WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.TAG_NAME, "iframe"))))
         except BaseException:
-            logger.error("跳过双重验证失败")
+            logger.error(lang_text.failOnBypass2FA)
             return False
         try:
             WebDriverWait(driver, 5).until(EC.presence_of_element_located((By.XPATH,
@@ -449,12 +456,12 @@ class ID:
             pass
         driver.switch_to.default_content()
         time.sleep(5)
-        logger.info("登录成功")
+        logger.info(lang_text.login)
         return True
 
     def delete_devices(self):
         # 需要先登录，不能直接执行
-        logger.info("开始删除设备")
+        logger.info(lang_text.startRemoving)
         # 删除设备
         driver.get("https://appleid.apple.com/account/manage/section/devices")
         WebDriverWait(driver, 10).until_not(EC.presence_of_element_located((By.ID, "loading")))
@@ -462,9 +469,9 @@ class ID:
         try:
             devices = driver.find_elements(By.CLASS_NAME, "button-expand")
         except BaseException:
-            logger.info("没有设备需要删除")
+            logger.info(lang_text.noRemoveRequired)
         else:
-            logger.info(f"共有{len(devices)}个设备")
+            logger.info(f"共有{len(devices)}个设备 | {len(devices)} devices in total")
             for i in range(len(devices)):
                 devices[i].click()
                 WebDriverWait(driver, 10).until(
@@ -476,7 +483,7 @@ class ID:
                 if i != len(devices) - 1:
                     time.sleep(2)
                     devices[i + 1].click()
-            logger.info("设备删除完毕")
+            logger.info(lang_text.finishRemoving)
         return True
 
     def process_dob(self):
@@ -495,17 +502,17 @@ class ID:
             question_element = WebDriverWait(driver, 5).until(
                 EC.presence_of_all_elements_located((By.CLASS_NAME, "question")))
         except BaseException:
-            logger.error("安全问题获取失败，可能是生日错误")
-            api.update_message(self.username, "安全问题获取失败，可能是生日错误")
-            notification("安全问题获取失败，可能是生日错误")
+            logger.error(lang_text.DOB_Error)
+            api.update_message(self.username, lang_text.DOB_Error)
+            notification(lang_text.DOB_Error)
             record_error()
             return False
         answer0 = self.get_answer(question_element[0].get_attribute("innerHTML"))
         answer1 = self.get_answer(question_element[1].get_attribute("innerHTML"))
         if answer0 == "" or answer1 == "":
-            logger.error("未找到安全问题对应答案，请检查配置")
-            api.update_message(self.username, "未找到安全问题对应答案，请检查配置")
-            notification("未找到安全问题对应答案，请检查配置")
+            logger.error(lang_text.answerNotMatch)
+            api.update_message(self.username, lang_text.answerNotMatch)
+            notification(lang_text.answerNotMatch)
             return False
         answer_inputs = driver.find_elements(By.CLASS_NAME, "generic-input-field")
         answer_inputs[0].send_keys(answer0)
@@ -519,8 +526,8 @@ class ID:
         except BaseException:
             return True
         else:
-            logger.error(f"安全问题答案错误\n错误信息：{msg}")
-            api.update_message(self.username, "安全问题答案错误，请检查配置")
+            logger.error(f"{lang_text.failOnAnswer}\n{msg}")
+            api.update_message(self.username, lang_text.failOnAnswer)
             return False
 
     def process_password(self):
@@ -528,9 +535,9 @@ class ID:
             pwd_input_box = WebDriverWait(driver, 5).until(
                 EC.presence_of_all_elements_located((By.CLASS_NAME, "override")))
         except BaseException:
-            logger.error("密码框获取失败")
-            api.update_message(self.username, "密码框获取失败")
-            notification("密码框获取失败")
+            logger.error(lang_text.passwordNotFound)
+            api.update_message(self.username, lang_text.passwordNotFound)
+            notification(lang_text.passwordNotFound)
             record_error()
             return False
         new_password = self.generate_password()
@@ -558,29 +565,29 @@ class ID:
             get_ip()
             return False
         self.password = new_password
-        logger.info(f"密码修改成功，新密码为{new_password}")
+        logger.info(f"{lang_text.passwordUpdated}: {new_password}")
         return True
 
     def change_password(self):
         if not self.login():
             return False
-        logger.info("开始修改密码")
+        logger.info(lang_text.startChangePassword)
         try:
             driver.find_element(By.XPATH,
                                 "//*[@id=\"content\"]/iforgot-v2/app-container/div/iforgot-body/sa/idms-flow/div/section/div/recovery-options/div[2]/div/div[1]/label/span").click()
             driver.find_element(By.ID, "action").click()
         except BaseException:
-            logger.error("现在无法修改密码，可能是二步验证关闭失败")
-            api.update_message(self.username, "无法修改密码，可能是二步验证关闭失败")
-            notification("无法修改密码，可能是二步验证关闭失败")
+            logger.error(lang_text.failOnChangePassword)
+            api.update_message(self.username, lang_text.failOnChangePassword)
+            notification(lang_text.failOnChangePassword)
             return False
         try:
             WebDriverWait(driver, 5).until(EC.presence_of_element_located((By.XPATH,
                                                                            "//*[@id=\"content\"]/iforgot-v2/app-container/div/iforgot-body/sa/idms-flow/div/section/div/authentication-method/div[2]/div[2]/label/span"))).click()
             driver.find_element(By.ID, "action").click()
         except BaseException:
-            logger.error("无法使用安全问题重设密码，修改失败")
-            notification("密码修改失败")
+            logger.error(lang_text.failToUseSecurityQuestion)
+            notification(lang_text.failToUseSecurityQuestion)
             return False
         if self.process_dob():
             if self.process_security_question():
@@ -596,8 +603,8 @@ def notification(content):
             post(f"https://api.telegram.org/bot{config.tgbot_token}/sendMessage",
                  data={"chat_id": config.tgbot_chatid, "text": content})
         except BaseException as e:
-            logger.error(f"Telegram发送消息失败\n错误信息：{e}")
-            logger.error("如果机器在大陆，请勿开启Telegram通知")
+            logger.error(f"{lang_text.TGFail}\nError: {e}")
+            logger.error(lang_text.cnTG)
 
 
 ocr = ddddocr.DdddOcr()
@@ -626,7 +633,7 @@ def setup_driver():
         else:
             driver = webdriver.Chrome(options=options)
     except BaseException as e:
-        logger.error("Webdriver调用失败")
+        logger.error(lang_text.failOnCallingWD)
         logger.error(e)
         return False
     else:
@@ -652,19 +659,19 @@ def get_ip():
     try:
         driver.get("https://api.ip.sb/ip")
         ip_address = WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.TAG_NAME, "pre"))).text
-        logger.info(f"当前IP：{ip_address}")
+        logger.info(f"IP: {ip_address}")
     except BaseException:
-        logger.error("无法获取当前IP")
+        logger.error("无法获取当前IP | Failed to get current IP")
 
 
 def update_account(username, password):
     global api
     update_result = api.update(username, password)
     if update_result["status"] == "fail":
-        logger.error("更新账号失败")
+        logger.error("更新账号失败 | Failed to update account")
         return False
     else:
-        logger.info("更新账号成功")
+        logger.info("更新账号成功 | Account updated successfully")
         return True
 
 
@@ -674,7 +681,7 @@ def job():
     api = API(args.api_url, args.api_key)
     config_result = api.get_config(args.taskid)
     if config_result["status"] == "fail":
-        logger.error("从API获取配置失败")
+        logger.error("从API获取配置失败 | Failed to get config from API")
         exit()
     config = Config(config_result)
     id = ID(config.username, config.password, config.dob, config.answer)
@@ -684,92 +691,85 @@ def job():
     driver_result = setup_driver()
     logger.info(f"当前账号：{id.username}")
     if not driver_result:
-        api.update_message(id.username, "Webdriver调用失败")
-        notification("Webdriver调用失败")
-    try:
-        if driver_result and id.login():
-            # 检查账号
-            if id.check_2fa():
-                logger.info("检测到账号开启双重认证，开始解锁")
-                unlock_success = id.unlock_2fa()
-                unlock = True
-            elif not (id.check()):
-                logger.info("检测到账号被锁定，开始解锁")
-                unlock_success = id.unlock()
-                unlock = True
-            logger.info("账号检测完毕")
+        api.update_message(id.username, lang_text.failOnCallingWD)
+        notification(lang_text.failOnCallingWD)
+    if driver_result and id.login():
+        # 检查账号
+        if id.check_2fa():
+            logger.info(lang_text.twoStepDetected)
+            unlock_success = id.unlock_2fa()
+            unlock = True
+        elif not (id.check()):
+            logger.info(lang_text.accountLocked)
+            unlock_success = id.unlock()
+            unlock = True
+        logger.info("账号检测完毕 | Account check completed")
 
-            if unlock_success:
-                # 更新账号信息
-                if unlock:
-                    update_account(id.username, id.password)
-                    notification(f"Apple ID更新成功\n新密码：{id.password}")
-                else:
-                    update_account(id.username, "")
-
-                # 自动重置密码
-                if config.enable_auto_update_password:
-                    if not unlock:
-                        logger.info("开始修改密码")
-                        reset_pw_result = id.change_password()
-                        if reset_pw_result:
-                            unlock = True
-                            update_account(id.username, id.password)
-                            notification(f"Apple ID密码修改成功\n新密码：{id.password}")
-                        else:
-                            logger.error("修改密码失败")
-                            notification("修改密码失败")
-
-                # 自动删除设备
-                if config.enable_delete_devices or config.enable_check_password_correct:
-                    need_login = False
-                    if not unlock:
-                        # 未重置密码，先获取最新密码再执行登录
-                        id.password = api.get_password(id.username)
-                    login_result = id.login_appleid()
-                    if not login_result and config.enable_check_password_correct:
-                        logger.info("密码错误，开始修改密码")
-                        reset_pw_result = id.change_password()
-                        if reset_pw_result:
-                            need_login = True
-                            update_account(id.username, id.password)
-                            notification(f"Apple ID密码修改成功\n新密码：{id.password}")
-                        else:
-                            logger.error("修改密码失败")
-                            notification("修改密码失败")
-                    if config.enable_delete_devices:
-                        if need_login:
-                            login_result = id.login_appleid()
-                        if login_result:
-                            id.delete_devices()
-                        else:
-                            logger.error("登录Apple ID失败，无法删除设备")
+        if unlock_success:
+            # 更新账号信息
+            if unlock:
+                update_account(id.username, id.password)
+                notification(f"{lang_text.updateSuccess}\n{lang_text.newPassword}{id.password}")
             else:
-                # 解锁失败
-                logger.error("解锁失败")
-                notification("解锁失败")
+                update_account(id.username, "")
+
+            # 自动重置密码
+            if config.enable_auto_update_password:
+                if not unlock:
+                    logger.info(lang_text.startChangePassword)
+                    reset_pw_result = id.change_password()
+                    if reset_pw_result:
+                        unlock = True
+                        update_account(id.username, id.password)
+                        notification(f"{lang_text.updateSuccess}\n{lang_text.newPassword}{id.password}")
+                    else:
+                        logger.error("修改密码失败 | Failed to change password")
+                        notification("修改密码失败 | Failed to change password")
+
+            # 自动删除设备
+            if config.enable_delete_devices or config.enable_check_password_correct:
+                need_login = False
+                if not unlock:
+                    # 未重置密码，先获取最新密码再执行登录
+                    id.password = api.get_password(id.username)
+                login_result = id.login_appleid()
+                if not login_result and config.enable_check_password_correct:
+                    logger.info(lang_text.passwordChanged)
+                    reset_pw_result = id.change_password()
+                    if reset_pw_result:
+                        need_login = True
+                        update_account(id.username, id.password)
+                        notification(f"{lang_text.updateSuccess}\n{lang_text.newPassword}{id.password}")
+                    else:
+                        logger.error("修改密码失败 | Failed to change password")
+                        notification("修改密码失败 | Failed to change password")
+                if config.enable_delete_devices:
+                    if need_login:
+                        login_result = id.login_appleid()
+                    if login_result:
+                        id.delete_devices()
+                    else:
+                        logger.error(lang_text.LoginFail)
         else:
-            logger.error("任务执行失败，等待下次检测")
-    except BaseException as e:
-        logger.error("执行任务时遇到未知问题")
-        logger.error(e)
-        record_error()
-        api.update_message(id.username, "执行任务时遇到未知问题")
-        notification("执行任务时遇到未知问题")
+            # 解锁失败
+            logger.error("解锁失败 | Failed to unlock")
+            notification("解锁失败 | Failed to unlock")
+    else:
+        logger.error(lang_text.missionFailed)
     try:
         driver.quit()
     except BaseException:
-        logger.error("Webdriver关闭失败")
+        logger.error(lang_text.WDCloseError)
     schedule.every(config.check_interval).minutes.do(job)
-    logger.info(f"下次任务将在{config.check_interval}分钟后执行")
+    logger.info(f"下次任务将在{config.check_interval}分钟后执行 | Next job will be executed in {config.check_interval} minutes")
     return unlock
 
 
 logger.info(f"{'=' * 80}\n"
-            f"启动AppleID_Auto\n"
-            f"项目地址 https://github.com/pplulee/appleid_auto\n"
-            f"Telegram交流群 @appleunblocker")
-logger.info("当前版本：v1.44-20230313")
+            f"{lang_text.launch}\n"
+            f"{lang_text.repoAddress}: https://github.com/pplulee/appleid_auto\n"
+            f"{lang_text.TG_Group}: @appleunblocker")
+logger.info(f"{lang_text.version}: v1.44-20230313")
 job()
 while True:
     schedule.run_pending()
