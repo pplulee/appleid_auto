@@ -159,9 +159,9 @@ class Config:
         self.enable_delete_devices = "delete_devices" in config_result.keys()
         self.enable_auto_update_password = "auto_update_password" in config_result.keys()
         self.headless = "headless" in config_result.keys()
-        if self.proxy_content!="" and self.proxy_type!="":
+        if self.proxy_content != "" and self.proxy_type != "":
             # 新版本代理
-            if self.proxy_type=="url":
+            if self.proxy_type == "url":
                 try:
                     self.proxy = get(self.proxy_content).text
                 except BaseException as e:
@@ -170,8 +170,8 @@ class Config:
                     self.proxy = ""
                 else:
                     logger.info(f"从API获取到代理：{self.proxy}")
-            elif self.proxy_type=="socks5" or self.proxy_type=="http":
-                self.proxy = self.proxy_type+"://"+self.proxy_content
+            elif self.proxy_type == "socks5" or self.proxy_type == "http":
+                self.proxy = self.proxy_type + "://" + self.proxy_content
         if self.headless:
             logger.info("已启用 后台运行")
         if self.enable_delete_devices:
@@ -498,6 +498,7 @@ class ID:
             logger.error("安全问题获取失败，可能是生日错误")
             api.update_message(self.username, "安全问题获取失败，可能是生日错误")
             notification("安全问题获取失败，可能是生日错误")
+            record_error()
             return False
         answer0 = self.get_answer(question_element[0].get_attribute("innerHTML"))
         answer1 = self.get_answer(question_element[1].get_attribute("innerHTML"))
@@ -530,6 +531,7 @@ class ID:
             logger.error("密码框获取失败")
             api.update_message(self.username, "密码框获取失败")
             notification("密码框获取失败")
+            record_error()
             return False
         new_password = self.generate_password()
         for item in pwd_input_box:
@@ -543,16 +545,17 @@ class ID:
         except BaseException:
             pass
         try:
-            WebDriverWait(driver, 6).until_not(EC.presence_of_element_located((By.CLASS_NAME, "override")))
+            msg = WebDriverWait(driver, 3).until(
+                EC.presence_of_element_located((By.CLASS_NAME, "error-content"))).get_attribute("innerHTML")
         except BaseException:
-            logger.error("疑似密码修改失败？看到此报错请与作者反馈。已保存错误信息")
-            api.update_message(self.username, "疑似密码修改失败？看到此报错请与作者反馈")
-            notification("疑似密码修改失败？看到此报错请与作者反馈")
-            # 保存页面到文件
-            with open("error.html", "w", encoding="utf-8") as f:
-                f.write(driver.page_source)
-            # 保存页面截图到文件
-            driver.save_screenshot("error.png")
+            pass
+        else:
+            logger.error(f"操作被苹果拒绝，疑似被风控，错误信息：{msg.strip()}")
+            api.update_message(self.username, "操作被苹果拒绝，疑似被风控")
+            api.report_proxy_error(config.proxy_id)
+            notification("操作被苹果拒绝，疑似被风控")
+            record_error()
+            get_ip()
             return False
         self.password = new_password
         logger.info(f"密码修改成功，新密码为{new_password}")
@@ -597,7 +600,6 @@ def notification(content):
             logger.error("如果机器在大陆，请勿开启Telegram通知")
 
 
-
 ocr = ddddocr.DdddOcr()
 
 
@@ -630,6 +632,19 @@ def setup_driver():
     else:
         driver.set_page_load_timeout(30)
         return True
+
+
+def record_error():
+    try:
+        # 保存页面到文件
+        with open("error.html", "w", encoding="utf-8") as f:
+            f.write(driver.page_source)
+        # 保存页面截图到文件
+        driver.save_screenshot("error.png")
+    except BaseException:
+        logger.error("无法保存错误页面")
+    else:
+        logger.error("已保存错误页面到/app目录下error.html和error.png，请与开发者反馈")
 
 
 def get_ip():
@@ -671,69 +686,76 @@ def job():
     if not driver_result:
         api.update_message(id.username, "Webdriver调用失败")
         notification("Webdriver调用失败")
-    if driver_result and id.login():
-        # 检查账号
-        if id.check_2fa():
-            logger.info("检测到账号开启双重认证，开始解锁")
-            unlock_success = id.unlock_2fa()
-            unlock = True
-        elif not (id.check()):
-            logger.info("检测到账号被锁定，开始解锁")
-            unlock_success = id.unlock()
-            unlock = True
-        logger.info("账号检测完毕")
+    try:
+        if driver_result and id.login():
+            # 检查账号
+            if id.check_2fa():
+                logger.info("检测到账号开启双重认证，开始解锁")
+                unlock_success = id.unlock_2fa()
+                unlock = True
+            elif not (id.check()):
+                logger.info("检测到账号被锁定，开始解锁")
+                unlock_success = id.unlock()
+                unlock = True
+            logger.info("账号检测完毕")
 
-        if unlock_success:
-            # 更新账号信息
-            if unlock:
-                update_account(id.username, id.password)
-                notification(f"Apple ID更新成功\n新密码：{id.password}")
+            if unlock_success:
+                # 更新账号信息
+                if unlock:
+                    update_account(id.username, id.password)
+                    notification(f"Apple ID更新成功\n新密码：{id.password}")
+                else:
+                    update_account(id.username, "")
+
+                # 自动重置密码
+                if config.enable_auto_update_password:
+                    if not unlock:
+                        logger.info("开始修改密码")
+                        reset_pw_result = id.change_password()
+                        if reset_pw_result:
+                            unlock = True
+                            update_account(id.username, id.password)
+                            notification(f"Apple ID密码修改成功\n新密码：{id.password}")
+                        else:
+                            logger.error("修改密码失败")
+                            notification("修改密码失败")
+
+                # 自动删除设备
+                if config.enable_delete_devices or config.enable_check_password_correct:
+                    need_login = False
+                    if not unlock:
+                        # 未重置密码，先获取最新密码再执行登录
+                        id.password = api.get_password(id.username)
+                    login_result = id.login_appleid()
+                    if not login_result and config.enable_check_password_correct:
+                        logger.info("密码错误，开始修改密码")
+                        reset_pw_result = id.change_password()
+                        if reset_pw_result:
+                            need_login = True
+                            update_account(id.username, id.password)
+                            notification(f"Apple ID密码修改成功\n新密码：{id.password}")
+                        else:
+                            logger.error("修改密码失败")
+                            notification("修改密码失败")
+                    if config.enable_delete_devices:
+                        if need_login:
+                            login_result = id.login_appleid()
+                        if login_result:
+                            id.delete_devices()
+                        else:
+                            logger.error("登录Apple ID失败，无法删除设备")
             else:
-                update_account(id.username, "")
-
-            # 自动重置密码
-            if config.enable_auto_update_password:
-                if not unlock:
-                    logger.info("开始修改密码")
-                    reset_pw_result = id.change_password()
-                    if reset_pw_result:
-                        unlock = True
-                        update_account(id.username, id.password)
-                        notification(f"Apple ID密码修改成功\n新密码：{id.password}")
-                    else:
-                        logger.error("修改密码失败")
-                        notification("修改密码失败")
-
-            # 自动删除设备
-            if config.enable_delete_devices or config.enable_check_password_correct:
-                need_login = False
-                if not unlock:
-                    # 未重置密码，先获取最新密码再执行登录
-                    id.password = api.get_password(id.username)
-                login_result = id.login_appleid()
-                if not login_result and config.enable_check_password_correct:
-                    logger.info("密码错误，开始修改密码")
-                    reset_pw_result = id.change_password()
-                    if reset_pw_result:
-                        need_login = True
-                        update_account(id.username, id.password)
-                        notification(f"Apple ID密码修改成功\n新密码：{id.password}")
-                    else:
-                        logger.error("修改密码失败")
-                        notification("修改密码失败")
-                if config.enable_delete_devices:
-                    if need_login:
-                        login_result = id.login_appleid()
-                    if login_result:
-                        id.delete_devices()
-                    else:
-                        logger.error("登录Apple ID失败，无法删除设备")
+                # 解锁失败
+                logger.error("解锁失败")
+                notification("解锁失败")
         else:
-            # 解锁失败
-            logger.error("解锁失败")
-            notification("解锁失败")
-    else:
-        logger.error("任务执行失败，等待下次检测")
+            logger.error("任务执行失败，等待下次检测")
+    except BaseException as e:
+        logger.error("执行任务时遇到未知问题")
+        logger.error(e)
+        record_error()
+        api.update_message(id.username, "执行任务时遇到未知问题")
+        notification("执行任务时遇到未知问题")
     try:
         driver.quit()
     except BaseException:
@@ -747,7 +769,7 @@ logger.info(f"{'=' * 80}\n"
             f"启动AppleID_Auto\n"
             f"项目地址 https://github.com/pplulee/appleid_auto\n"
             f"Telegram交流群 @appleunblocker")
-logger.info("当前版本：v1.44-20230312")
+logger.info("当前版本：v1.44-20230313")
 job()
 while True:
     schedule.run_pending()
