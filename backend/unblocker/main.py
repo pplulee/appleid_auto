@@ -22,7 +22,7 @@ parser = argparse.ArgumentParser(description="")
 parser.add_argument("-api_url", help="API URL")
 parser.add_argument("-api_key", help="API key")
 parser.add_argument("-taskid", help="Task ID")
-parser.add_argument("-lang.py", help="Output language")
+parser.add_argument("-lang", help="Output language")
 args = parser.parse_args()
 
 logger = logging.getLogger()
