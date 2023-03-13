@@ -63,10 +63,11 @@ if (isset($_GET['action'])) {
                         <form action='' method='post' style='margin: 20px;'>
                             <div class='input-group mb-3'>
                                 <span class='input-group-text' id='protocol'>协议</span>
-                                <select class='form-select' name='protocol'>
-                                  <option value='http'>http</option>
-                                  <option value='socks5'>socks5</option>
-                                </select>
+                                <select class='form-select' name='protocol'>";
+                foreach ($Sys_config["proxy_list"] as $protocol) {
+                    echo "<option value='$protocol'>$protocol</option>";
+                }
+                echo "               </select>
                             </div>
                             <div class='input-group mb-3'>
                                 <span class='input-group-text' id='content'>地址</span>
@@ -106,10 +107,12 @@ if (isset($_GET['action'])) {
                             <div class='input-group mb-3'>
                                 <div class='input-group mb-3'>
                                     <span class='input-group-text' id='protocol'>协议</span>
-                                    <select class='form-select' name='protocol'>
-                                      <option value='http' $http_checked>http</option>
-                                      <option value='socks5' $socks5_checked>socks5</option>
-                                    </select>
+                                    <select class='form-select' name='protocol'>";
+                foreach ($Sys_config["proxy_list"] as $protocol) {
+                    $checked = $proxy->protocol == $protocol ? "selected" : "";
+                    echo "<option value='$protocol' $checked>$protocol</option>";
+                }
+                echo "               </select>
                                 </div>
                             </div>
                             <div class='input-group mb-3'>

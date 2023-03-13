@@ -174,9 +174,9 @@ class Config:
         self.headless = "headless" in config_result.keys()
         if self.proxy_content != "" and self.proxy_type != "":
             # 新版本代理
-            if self.proxy_type == "url":
+            if "url" in self.proxy_type:
                 try:
-                    self.proxy = get(self.proxy_content).text
+                    self.proxy = self.proxy_type+"://"+get(self.proxy_content).text
                 except BaseException as e:
                     logger.error(lang_text.failOnRetrievingProxyFromAPI)
                     logger.error(e)
@@ -185,6 +185,9 @@ class Config:
                     logger.info(f"{lang_text.retrievedProxyFromAPI}: {self.proxy}")
             elif self.proxy_type == "socks5" or self.proxy_type == "http":
                 self.proxy = self.proxy_type + "://" + self.proxy_content
+            else:
+                logger.error(lang_text.invalidProxyType)
+                self.proxy = ""
         if self.headless:
             logger.info(lang_text.backgroundRunning)
         if self.enable_delete_devices:

@@ -68,6 +68,7 @@ class zh_cn:
         self.UnlockFail = "解锁失败"
         self.FailToChangePassword = "修改密码失败"
         self.CurrentAccount = "当前账号："
+        self.invalidProxyType = "无效的代理类型"
 
     def nextRun(self, time):
         return f"下次任务将在{time}分钟后执行"
@@ -147,6 +148,7 @@ class en_us:
         self.UnlockFail = "Failed to unlock"
         self.FailToChangePassword = "Failed to change password"
         self.CurrentAccount = "Current account:"
+        self.invalidProxyType = "Invalid proxy type"
 
     def nextRun(self, time):
         return f"Next job will be executed in {time} minutes"

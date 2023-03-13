@@ -96,7 +96,8 @@ switch ($_GET["action"]) {
                     if ($proxy->id != -1){
                         $proxy->update_use();
                         $data['proxy_id'] = $proxy->id;
-                        $data['proxy'] = $proxy->protocol . "://" . $proxy->content;
+                        $data['proxy_type'] = $proxy->protocol;
+                        $data['proxy_content'] = $proxy->content;
                     }
                 }
                 break;
