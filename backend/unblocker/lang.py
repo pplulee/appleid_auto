@@ -26,6 +26,7 @@ class zh_cn:
         self.captchaCorrect = "验证码正确"
         self.captchaFail = "验证码错误，重新输入"
         self.login = "登录成功"
+        self.loginFail = "登陆失败"
         self.blocked = "无法处理请求，可能是账号失效或服务器IP被拉黑"
         self.loginFailCheckLog = "解锁登录失败，可能是账号失效或服务器IP被拉黑，具体请查看后端日志"
         self.notLocked = "当前账号未被锁定"
@@ -45,7 +46,7 @@ class zh_cn:
         self.DOB_Error = "安全问题获取失败，可能是生日错误"
         self.failOnAnswer = "安全问题答案错误"
         self.passwordNotFound = "密码框获取失败"
-        self.unknownError = "疑似密码修改失败？看到此报错请与作者反馈。已保存错误信息至日志"
+        self.unknownError = "执行任务时遇到未知错误"
         self.passwordUpdated = "密码修改成功，新密码为"
         self.startChangePassword = "开始修改密码"
         self.failOnChangePassword = "现在无法修改密码，可能是二步验证关闭失败"
@@ -64,6 +65,16 @@ class zh_cn:
         self.repoAddress = "项目地址"
         self.TG_Group = "Telegram交流群"
         self.version = "当前版本"
+        self.UnlockFail = "解锁失败"
+        self.FailToChangePassword = "修改密码失败"
+        self.CurrentAccount = "当前账号："
+
+    def nextRun(self, time):
+        return f"下次任务将在{time}分钟后执行"
+
+    def totalDevices(self, total):
+        return f"共有{total}个设备"
+
 
 class en_us:
     def __init__(self):
@@ -93,6 +104,7 @@ class en_us:
         self.captchaCorrect = "Captcha correct"
         self.captchaFail = "Captcha incorrect, please try again"
         self.login = "Login successful"
+        self.loginFail = "Login failed"
         self.blocked = "Unable to process request, account may be invalid or server IP may be blocked"
         self.loginFailCheckLog = "Login failed, account may be invalid or server IP may be blocked, " \
                                  "please check the backend log for details"
@@ -113,8 +125,7 @@ class en_us:
         self.DOB_Error = "Failed to get security question, birthday may be incorrect"
         self.failOnAnswer = "Security question answer incorrect"
         self.passwordNotFound = "Password box not found"
-        self.unknownError = "Password may not be changed? If you see this error, please contact the author. " \
-                            "Error information has been saved to the log"
+        self.unknownError = "An unknown error was encountered while executing the task"
         self.passwordUpdated = "Password updated, new password is "
         self.startChangePassword = "Start changing password"
         self.failOnChangePassword = "Unable to change password now, 2FA may not be disabled"
@@ -133,3 +144,12 @@ class en_us:
         self.repoAddress = "Project repo address"
         self.TG_Group = "Telegram group"
         self.version = "Current version"
+        self.UnlockFail = "Failed to unlock"
+        self.FailToChangePassword = "Failed to change password"
+        self.CurrentAccount = "Current account:"
+
+    def nextRun(self, time):
+        return f"Next job will be executed in {time} minutes"
+
+    def totalDevices(self, total):
+        return f"{total} devices in total"

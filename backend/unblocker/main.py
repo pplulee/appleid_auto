@@ -22,7 +22,7 @@ parser = argparse.ArgumentParser(description="")
 parser.add_argument("-api_url", help="API URL")
 parser.add_argument("-api_key", help="API key")
 parser.add_argument("-taskid", help="Task ID")
-parser.add_argument("-lang", help="Output language")
+parser.add_argument("-lang", help="Output language", default="zh_cn")
 args = parser.parse_args()
 
 logger = logging.getLogger()
@@ -34,12 +34,18 @@ chlr = logging.StreamHandler()
 chlr.setFormatter(formatter)
 logger.addHandler(chlr)
 
-lang_choose = args.lang if args.lang else "zh_cn"
-from lang import zh_cn as lang
-lang_text = lang()
-if lang_choose == "en_us":
-    from lang import en_us as lang
+if args.lang == "zh_cn":
+    from lang import zh_cn as lang
+
     lang_text = lang()
+elif args.lang == "en_us":
+    from lang import en_us as lang
+
+    lang_text = lang()
+else:
+    logger.error("未知语言 | Language not supported")
+    exit()
+
 
 class API:
     def __init__(self, url, key):
@@ -178,7 +184,7 @@ class Config:
                 else:
                     logger.info(f"{lang_text.retrievedProxyFromAPI}: {self.proxy}")
             elif self.proxy_type == "socks5" or self.proxy_type == "http":
-                self.proxy = self.proxy_type+"://"+self.proxy_content
+                self.proxy = self.proxy_type + "://" + self.proxy_content
         if self.headless:
             logger.info(lang_text.backgroundRunning)
         if self.enable_delete_devices:
@@ -412,7 +418,7 @@ class ID:
         except BaseException:
             pass
         else:
-            logger.error(f"登录失败 | Login Failed\n{msg.strip()}")
+            logger.error(f"{lang_text.LoginFail}\n{msg.strip()}")
             return False
         question_element = WebDriverWait(driver, 5).until(
             EC.presence_of_all_elements_located((By.XPATH, "//*[contains(@class, 'question')]")))
@@ -471,7 +477,7 @@ class ID:
         except BaseException:
             logger.info(lang_text.noRemoveRequired)
         else:
-            logger.info(f"共有{len(devices)}个设备 | {len(devices)} devices in total")
+            logger.info(lang_text.totalDevices(len(devices)))
             for i in range(len(devices)):
                 devices[i].click()
                 WebDriverWait(driver, 10).until(
@@ -557,10 +563,10 @@ class ID:
         except BaseException:
             pass
         else:
-            logger.error(f"操作被苹果拒绝，疑似被风控，错误信息：{msg.strip()}")
-            api.update_message(self.username, "操作被苹果拒绝，疑似被风控")
+            logger.error(f"{lang_text.rejectedByApple}: {msg.strip()}")
+            api.update_message(self.username, lang_text.rejectedByApple)
             api.report_proxy_error(config.proxy_id)
-            notification("操作被苹果拒绝，疑似被风控")
+            notification(lang_text.rejectedByApple)
             record_error()
             get_ip()
             return False
@@ -689,79 +695,86 @@ def job():
     unlock = False
     unlock_success = True
     driver_result = setup_driver()
-    logger.info(f"当前账号：{id.username}")
+    logger.info(f"{lang_text.CurrentAccount}{id.username}")
     if not driver_result:
         api.update_message(id.username, lang_text.failOnCallingWD)
         notification(lang_text.failOnCallingWD)
-    if driver_result and id.login():
-        # 检查账号
-        if id.check_2fa():
-            logger.info(lang_text.twoStepDetected)
-            unlock_success = id.unlock_2fa()
-            unlock = True
-        elif not (id.check()):
-            logger.info(lang_text.accountLocked)
-            unlock_success = id.unlock()
-            unlock = True
-        logger.info("账号检测完毕 | Account check completed")
+    try:
+        if driver_result and id.login():
+            # 检查账号
+            if id.check_2fa():
+                logger.info(lang_text.twoStepDetected)
+                unlock_success = id.unlock_2fa()
+                unlock = True
+            elif not (id.check()):
+                logger.info(lang_text.accountLocked)
+                unlock_success = id.unlock()
+                unlock = True
+            logger.info("账号检测完毕 | Account check completed")
 
-        if unlock_success:
-            # 更新账号信息
-            if unlock:
-                update_account(id.username, id.password)
-                notification(f"{lang_text.updateSuccess}\n{lang_text.newPassword}{id.password}")
+            if unlock_success:
+                # 更新账号信息
+                if unlock:
+                    update_account(id.username, id.password)
+                    notification(f"{lang_text.updateSuccess}\n{lang_text.newPassword}{id.password}")
+                else:
+                    update_account(id.username, "")
+
+                # 自动重置密码
+                if config.enable_auto_update_password:
+                    if not unlock:
+                        logger.info(lang_text.startChangePassword)
+                        reset_pw_result = id.change_password()
+                        if reset_pw_result:
+                            unlock = True
+                            update_account(id.username, id.password)
+                            notification(f"{lang_text.updateSuccess}\n{lang_text.newPassword}{id.password}")
+                        else:
+                            logger.error(lang_text.FailToChangePassword)
+                            notification(lang_text.FailToChangePassword)
+
+                # 自动删除设备
+                if config.enable_delete_devices or config.enable_check_password_correct:
+                    need_login = False
+                    if not unlock:
+                        # 未重置密码，先获取最新密码再执行登录
+                        id.password = api.get_password(id.username)
+                    login_result = id.login_appleid()
+                    if not login_result and config.enable_check_password_correct:
+                        logger.info(lang_text.passwordChanged)
+                        reset_pw_result = id.change_password()
+                        if reset_pw_result:
+                            need_login = True
+                            update_account(id.username, id.password)
+                            notification(f"{lang_text.updateSuccess}\n{lang_text.newPassword}{id.password}")
+                        else:
+                            logger.error(lang_text.FailToChangePassword)
+                            notification(lang_text.FailToChangePassword)
+                    if config.enable_delete_devices:
+                        if need_login:
+                            login_result = id.login_appleid()
+                        if login_result:
+                            id.delete_devices()
+                        else:
+                            logger.error(lang_text.LoginFail)
             else:
-                update_account(id.username, "")
-
-            # 自动重置密码
-            if config.enable_auto_update_password:
-                if not unlock:
-                    logger.info(lang_text.startChangePassword)
-                    reset_pw_result = id.change_password()
-                    if reset_pw_result:
-                        unlock = True
-                        update_account(id.username, id.password)
-                        notification(f"{lang_text.updateSuccess}\n{lang_text.newPassword}{id.password}")
-                    else:
-                        logger.error("修改密码失败 | Failed to change password")
-                        notification("修改密码失败 | Failed to change password")
-
-            # 自动删除设备
-            if config.enable_delete_devices or config.enable_check_password_correct:
-                need_login = False
-                if not unlock:
-                    # 未重置密码，先获取最新密码再执行登录
-                    id.password = api.get_password(id.username)
-                login_result = id.login_appleid()
-                if not login_result and config.enable_check_password_correct:
-                    logger.info(lang_text.passwordChanged)
-                    reset_pw_result = id.change_password()
-                    if reset_pw_result:
-                        need_login = True
-                        update_account(id.username, id.password)
-                        notification(f"{lang_text.updateSuccess}\n{lang_text.newPassword}{id.password}")
-                    else:
-                        logger.error("修改密码失败 | Failed to change password")
-                        notification("修改密码失败 | Failed to change password")
-                if config.enable_delete_devices:
-                    if need_login:
-                        login_result = id.login_appleid()
-                    if login_result:
-                        id.delete_devices()
-                    else:
-                        logger.error(lang_text.LoginFail)
+                # 解锁失败
+                logger.error(lang_text.UnlockFail)
+                notification(lang_text.UnlockFail)
         else:
-            # 解锁失败
-            logger.error("解锁失败 | Failed to unlock")
-            notification("解锁失败 | Failed to unlock")
-    else:
-        logger.error(lang_text.missionFailed)
+            logger.error(lang_text.missionFailed)
+    except BaseException as e:
+        logger.error(lang_text.unknownError)
+        logger.error(e)
+        record_error()
+        api.update_message(id.username, lang_text.unknownError)
+        notification(lang_text.unknownError)
     try:
         driver.quit()
     except BaseException:
         logger.error(lang_text.WDCloseError)
     schedule.every(config.check_interval).minutes.do(job)
-    logger.info(f"下次任务将在{config.check_interval}分钟后执行 | Next job will be executed in {config.check_interval} minutes")
+    logger.info(lang_text.nextRun(config.check_interval))
     return unlock
 
 
