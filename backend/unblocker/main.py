@@ -22,6 +22,7 @@ parser = argparse.ArgumentParser(description="")
 parser.add_argument("-api_url", help="API URL")
 parser.add_argument("-api_key", help="API key")
 parser.add_argument("-taskid", help="Task ID")
+parser.add_argument("-lang.py", help="Output language")
 args = parser.parse_args()
 
 logger = logging.getLogger()
@@ -33,6 +34,12 @@ chlr = logging.StreamHandler()
 chlr.setFormatter(formatter)
 logger.addHandler(chlr)
 
+lang_choose = args.lang if args.lang else "zh-cn"
+from lang import zh_cn as lang
+lang_text = lang()
+if lang_choose == "en_us":
+    from lang import en_us as lang
+    lang_text = lang()
 
 class API:
     def __init__(self, url, key):
@@ -49,7 +56,7 @@ class API:
                                    "id": id
                                }).text)
         except BaseException as e:
-            logger.error("获取配置失败")
+            logger.error(lang_text.ErrorRetrievingConfig)
             logger.error(e)
             return {"status": "fail"}
         else:
@@ -70,7 +77,7 @@ class API:
                         "action": "update_password"
                     }).text)
         except BaseException as e:
-            logger.error("更新密码失败")
+            logger.error(lang_text.failOnPasswordUpdate)
             logger.error(e)
             return {"status": "fail"}
         else:
@@ -90,7 +97,7 @@ class API:
                         "action": "get_password"
                     }).text)
         except BaseException as e:
-            logger.error("获取密码失败")
+            logger.error(lang_text.failOnRetrievingPassword)
             logger.error(e)
             return ""
         else:
@@ -109,7 +116,7 @@ class API:
                             "message": message,
                             "action": "update_message"}).text)
         except BaseException as e:
-            logger.error("更新消息失败")
+            logger.error(lang_text.failOnMessageUpdate)
             logger.error(e)
             return False
         else:
@@ -127,7 +134,7 @@ class API:
                             "id": proxy_id,
                             "action": "report_proxy_error"}).text)
         except BaseException as e:
-            logger.error("上报代理错误失败")
+            logger.error(lang_text.failOnReportingProxyError)
             logger.error(e)
             return False
         else:
@@ -165,23 +172,23 @@ class Config:
                 try:
                     self.proxy = get(self.proxy_content).text
                 except BaseException as e:
-                    logger.error("从API获取代理失败")
+                    logger.error(lang_text.failOnRetrievingProxyFromAPI)
                     logger.error(e)
                     self.proxy = ""
                 else:
-                    logger.info(f"从API获取到代理：{self.proxy}")
-            elif self.proxy_type=="socks5" or self.proxy_type=="http":
+                    logger.info(f"{lang_text.retrievedProxyFromAPI}: {self.proxy}")
+            elif self.proxy_type == "socks5" or self.proxy_type == "http":
                 self.proxy = self.proxy_type+"://"+self.proxy_content
         if self.headless:
-            logger.info("已启用 后台运行")
+            logger.info(lang_text.backgroundRunning)
         if self.enable_delete_devices:
-            logger.info("已启用 删除设备")
+            logger.info(lang_text.removeDevice)
         if self.enable_check_password_correct:
-            logger.info("已启用 检查密码正确")
+            logger.info(lang_text.checkPassword)
         if self.enable_auto_update_password:
-            logger.info("已启用 定时更新密码")
+            logger.info(lang_text.autoUpdatePassword)
         if self.proxy_id != -1:
-            logger.info(f"使用代理ID：{self.proxy_id}")
+            logger.info(f"{lang_text.usingProxyID}: {self.proxy_id}")
 
 
 class ID:
@@ -214,15 +221,15 @@ class ID:
             WebDriverWait(driver, 30 if config.proxy != "" else 10).until(
                 EC.presence_of_element_located((By.CLASS_NAME, "iforgot-apple-id")))
         except BaseException:
-            logger.error("刷新页面失败")
+            logger.error(lang_text.failOnRefreshingPage)
             if config.proxy != "":
-                logger.error("已启用代理，请检查代理是否可用")
-                api.update_message(self.username, "页面加载失败，可能是代理不可用")
+                logger.error(lang_text.proxyEnabledRefreshing)
+                api.update_message(self.username, lang_text.proxyEnabledRefreshingAPI)
                 api.report_proxy_error(config.proxy_id)
-                notification("页面加载失败，可能是代理不可用")
+                notification(lang_text.proxyEnabledRefreshingAPI)
             else:
-                api.update_message(self.username, "页面加载失败")
-                notification("页面加载失败")
+                api.update_message(self.username, lang_text.failOnLoadingPage)
+                notification(lang_text.failOnLoadingPage)
             get_ip()
             return False
         try:
@@ -230,12 +237,12 @@ class ID:
         except BaseException:
             return True
         else:
-            logger.error("页面加载失败，疑似服务器IP被拒绝访问")
+            logger.error(lang_text.IPBlocked)
             logger.error(text)
-            api.update_message(self.username, "页面加载失败，具体原因请查看日志")
+            api.update_message(self.username, lang_text.seeLog)
             if config.proxy != "":
                 api.report_proxy_error(config.proxy_id)
-            notification("页面加载失败，具体原因请查看日志")
+            notification(lang_text.seeLog)
             get_ip()
             return False
 
@@ -247,7 +254,7 @@ class ID:
             code = ocr.classification(img)
             driver.find_element(By.CLASS_NAME, "captcha-input").send_keys(code)
         except BaseException:
-            logger.error("无法获取验证码")
+            logger.error(lang_text.failOnGettingCaptcha)
             return False
         else:
             return True
@@ -259,15 +266,15 @@ class ID:
             WebDriverWait(driver, 7).until(
                 EC.presence_of_element_located((By.CLASS_NAME, "iforgot-apple-id"))).send_keys(self.username)
         except BaseException:
-            logger.error("无法获取页面内容，即将退出程序")
+            logger.error(lang_text.failOnRetrievingPage)
             if config.proxy != "":
-                logger.error("已启用代理，请检查代理是否可用")
-                api.update_message(self.username, "无法获取页面内容，可能是代理不可用")
+                logger.error(lang_text.proxyEnabledRefreshing)
+                api.update_message(self.username, lang_text.proxyEnabledGettingContent)
                 api.report_proxy_error(config.proxy_id)
-                notification("无法获取页面内容，可能是代理不可用")
+                notification(lang_text.proxyEnabledGettingContent)
             else:
-                api.update_message(self.username, "无法获取页面内容")
-                notification("无法获取页面内容")
+                api.update_message(self.username, lang_text.failOnGettingPage)
+                notification(lang_text.failOnGettingPage)
             return False
         while True:
             if not self.process_verify():
@@ -279,10 +286,10 @@ class ID:
                 WebDriverWait(driver, 3).until(EC.presence_of_element_located((By.XPATH,
                                                                                "/html/body/div[1]/iforgot-v2/app-container/div/iforgot-body/global-v2/div/idms-flow/div/forgot-password/div/div/div[1]/idms-step/div/div/div/div[2]/div/div[1]/div[2]/div/iforgot-captcha/div/div[2]/idms-textbox/idms-error-wrapper/div/idms-error/div/div/span")))
             except BaseException:
-                logger.info("验证码正确")
+                logger.info(lang_text.captchaCorrect)
                 break
             else:
-                logger.info("验证码错误，重新输入")
+                logger.info(lang_text.captchaFail)
                 continue
 
         try:
@@ -290,12 +297,12 @@ class ID:
                                                                                  "/html/body/div[1]/iforgot-v2/app-container/div/iforgot-body/global-v2/div/idms-flow/div/forgot-password/div/div/div[1]/idms-step/div/div/div/div[2]/div/div[1]/div[1]/div/idms-textbox/idms-error-wrapper/div/idms-error/div/div/span"))).get_attribute(
                 "innerHTML")
         except BaseException:
-            logger.info("登录成功")
+            logger.info(lang_text.login)
             return True
         else:
-            logger.error(f"无法处理请求，可能是账号失效或服务器IP被拉黑\n错误信息：{msg.strip()}")
-            api.update_message(self.username, "解锁登录失败，可能是账号失效或服务器IP被拉黑，具体请查看后端日志")
-            notification(f"Apple ID解锁登录失败，可能是账号失效或服务器IP被拉黑")
+            logger.error(f"{lang_text.blocked}\n{msg.strip()}")
+            api.update_message(self.username, lang_text.loginFailCheckLog)
+            notification(lang_text.loginFailCheckLog)
             get_ip()
             return False
 
@@ -744,7 +751,7 @@ def job():
 
 
 logger.info(f"{'=' * 80}\n"
-            f"启动AppleID_Auto\n"
+            f"{lang_text.launch}\n"
             f"项目地址 https://github.com/pplulee/appleid_auto\n"
             f"Telegram交流群 @appleunblocker")
 logger.info("当前版本：v1.44-20230312")
