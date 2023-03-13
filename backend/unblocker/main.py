@@ -34,7 +34,7 @@ chlr = logging.StreamHandler()
 chlr.setFormatter(formatter)
 logger.addHandler(chlr)
 
-if args.lang == "zh_cn":
+if args.lang == "zh_cn" or args.lang == "":
     from lang import zh_cn as lang
 
     lang_text = lang()
