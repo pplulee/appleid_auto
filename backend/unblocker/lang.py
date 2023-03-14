@@ -163,7 +163,7 @@ class en_us:
         self.getAPIFail = "Failed to get config from API"
         self.checkComplete = "Account check complete"
         
-class vi_VN:
+class vi_vn:
     def __init__(self):
         self.ErrorRetrievingConfig = "Lỗi khi truy xuất cấu hình"
         self.launch = "Khởi động AppleID_Auto"
