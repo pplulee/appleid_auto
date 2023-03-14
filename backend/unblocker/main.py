@@ -4,6 +4,7 @@ import random
 import re
 import string
 import time
+import traceback
 from json import loads
 
 import ddddocr
@@ -175,7 +176,7 @@ class Config:
             # 新版本代理
             if "url" in self.proxy_type:
                 try:
-                    self.proxy = self.proxy_type+"://"+get(self.proxy_content).text
+                    self.proxy = self.proxy_type + "://" + get(self.proxy_content).text
                 except BaseException as e:
                     logger.error(lang_text.failOnRetrievingProxyFromAPI)
                     logger.error(e)
@@ -251,6 +252,7 @@ class ID:
             if config.proxy != "":
                 api.report_proxy_error(config.proxy_id)
             notification(lang_text.seeLog)
+            record_error()
             get_ip()
             return False
 
@@ -353,10 +355,7 @@ class ID:
                 msg = WebDriverWait(driver, 3).until(
                     EC.presence_of_element_located((By.CLASS_NAME, "error-content"))).get_attribute("innerHTML")
             except BaseException:
-                self.process_dob()
-                self.process_security_question()
-                driver.find_element(By.CLASS_NAME, "button-primary").click()
-                self.process_password()
+                pass
             else:
                 logger.error(f"{lang_text.rejectedByApple}\n{msg.strip()}")
                 api.update_message(self.username, lang_text.rejectedByApple)
@@ -364,6 +363,13 @@ class ID:
                 notification(lang_text.rejectedByApple)
                 get_ip()
                 return False
+            if self.process_dob():
+                if self.process_security_question():
+                    driver.find_element(By.CLASS_NAME, "button-primary").click()
+                    if self.process_password():
+                        return True
+            return False
+        # 无需解锁
         return True
 
     def unlock(self):
@@ -405,6 +411,20 @@ class ID:
             driver.switch_to.alert.accept()
         except BaseException:
             pass
+        try:
+            text = driver.find_element(By.XPATH, "/html/body/center[1]/h1").text
+        except BaseException:
+            pass
+        else:
+            logger.error(lang_text.IPBlocked)
+            logger.error(text)
+            api.update_message(self.username, lang_text.seeLog)
+            if config.proxy != "":
+                api.report_proxy_error(config.proxy_id)
+            notification(lang_text.seeLog)
+            record_error()
+            get_ip()
+            return False
         driver.switch_to.frame(WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.TAG_NAME, "iframe"))))
         WebDriverWait(driver, 10).until(EC.element_to_be_clickable((By.ID, "account_name_text_field"))).send_keys(
             self.username)
@@ -569,7 +589,6 @@ class ID:
             api.update_message(self.username, lang_text.rejectedByApple)
             api.report_proxy_error(config.proxy_id)
             notification(lang_text.rejectedByApple)
-            record_error()
             get_ip()
             return False
         self.password = new_password
@@ -694,41 +713,41 @@ def job():
     config = Config(config_result)
     id = ID(config.username, config.password, config.dob, config.answer)
 
-    unlock = False
-    unlock_success = True
+    job_success = True
     driver_result = setup_driver()
     logger.info(f"{lang_text.CurrentAccount}{id.username}")
     if not driver_result:
         api.update_message(id.username, lang_text.failOnCallingWD)
         notification(lang_text.failOnCallingWD)
+        job_success = False
     try:
         if driver_result and id.login():
+            origin_password = id.password
             # 检查账号
             if id.check_2fa():
                 logger.info(lang_text.twoStepDetected)
-                unlock_success = id.unlock_2fa()
-                unlock = True
+                login_result = id.unlock_2fa()
             elif not (id.check()):
                 logger.info(lang_text.accountLocked)
-                unlock_success = id.unlock()
-                unlock = True
+                login_result = id.unlock()
+            else:
+                login_result = True
             logger.info(lang_text.checkComplete)
 
-            if unlock_success:
-                # 更新账号信息
-                if unlock:
-                    update_account(id.username, id.password)
-                    notification(f"{lang_text.updateSuccess}\n{lang_text.newPassword}{id.password}")
-                else:
-                    update_account(id.username, "")
+            # 更新账号信息
+            if password_changed := (origin_password != id.password):
+                update_account(id.username, id.password)
+                notification(f"{lang_text.updateSuccess}\n{lang_text.newPassword}{id.password}")
+            elif login_result:
+                update_account(id.username, "")
 
+            if login_result:
                 # 自动重置密码
                 if config.enable_auto_update_password:
-                    if not unlock:
+                    if not password_changed:
                         logger.info(lang_text.startChangePassword)
                         reset_pw_result = id.change_password()
                         if reset_pw_result:
-                            unlock = True
                             update_account(id.username, id.password)
                             notification(f"{lang_text.updateSuccess}\n{lang_text.newPassword}{id.password}")
                         else:
@@ -738,9 +757,6 @@ def job():
                 # 自动删除设备
                 if config.enable_delete_devices or config.enable_check_password_correct:
                     need_login = False
-                    if not unlock:
-                        # 未重置密码，先获取最新密码再执行登录
-                        id.password = api.get_password(id.username)
                     login_result = id.login_appleid()
                     if not login_result and config.enable_check_password_correct:
                         logger.info(lang_text.passwordChanged)
@@ -763,21 +779,26 @@ def job():
                 # 解锁失败
                 logger.error(lang_text.UnlockFail)
                 notification(lang_text.UnlockFail)
+                job_success = False
         else:
             logger.error(lang_text.missionFailed)
+            job_success = False
     except BaseException as e:
         logger.error(lang_text.unknownError)
-        logger.error(e)
+        traceback.print_exc()
         record_error()
         api.update_message(id.username, lang_text.unknownError)
         notification(lang_text.unknownError)
+        job_success = False
     try:
         driver.quit()
     except BaseException:
         logger.error(lang_text.WDCloseError)
-    schedule.every(config.check_interval).minutes.do(job)
-    logger.info(lang_text.nextRun(config.check_interval))
-    return unlock
+    # 如果任务执行失败，5分钟后再次执行
+    next_time = config.check_interval if job_success else 5
+    schedule.every(next_time).minutes.do(job)
+    logger.info(lang_text.nextRun(next_time))
+    return
 
 
 logger.info(f"{'=' * 80}\n"
