@@ -163,6 +163,12 @@ class en_us:
         self.getAPIFail = "Failed to get config from API"
         self.checkComplete = "Account check complete"
         
+    def nextRun(self, time):
+        return f"Next job will be executed in {time} minutes"
+
+    def totalDevices(self, total):
+        return f"{total} devices in total"
+        
 class vi_vn:
     def __init__(self):
         self.ErrorRetrievingConfig = "Lỗi khi truy xuất cấu hình"
