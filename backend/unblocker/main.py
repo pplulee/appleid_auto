@@ -36,20 +36,14 @@ logger.addHandler(chlr)
 
 if args.lang == "zh_cn" or args.lang == "":
     from lang import zh_cn as lang
-
-    lang_text = lang()
 elif args.lang == "en_us":
     from lang import en_us as lang
-
-    lang_text = lang()
-    
 elif args.lang == "vi_vn":
     from lang import vi_vn as lang
-    
-    lang_text = lang()
 else:
     logger.error("未知语言 | Language not supported")
     exit(1)
+lang_text = lang()
 
 
 class API:
