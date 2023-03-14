@@ -193,7 +193,8 @@ class vi_VN:
         self.login = "Đăng nhập thành công"
         self.loginFail = "Đăng nhập thất bại"
         self.blocked = "Không thể xử lý yêu cầu, tài khoản có thể không hợp lệ hoặc địa chỉ IP của máy chủ có thể bị chặn"
-        self.loginFailCheckLog = "Đăng nhập thất bại, tài khoản có thể không hợp lệ hoặc địa chỉ IP của máy chủ có thể bị chặn, vui lòng kiểm tra nhật ký phía sau để biết chi tiết"
+        self.loginFailCheckLog = "Login failed, account may be invalid or server IP may be blocked, " \
+                                 "please check the backend log for details"        
         self.notLocked = "Tài khoản không bị khóa"
         self.locked = "Tài khoản bị khóa"
         self.twoStepnotEnabled = "2FA không được kích hoạt"
@@ -235,7 +236,8 @@ class vi_VN:
         self.CurrentAccount = "Tài khoản hiện tại:"
         self.invalidProxyType = "Loại proxy không hợp lệ"
         self.failOnSavingScreenshot = "Không thể lưu ảnh chụp màn hình của trang lỗi"
-        self.screenshotSaved = "Ảnh chụp màn hình của trang lỗi đã được lưu vào /app/error.html và /app/error.png, vui lòng liên hệ nhà phát triển"
+        self.screenshotSaved = "Screenshot of error page saved to /app/error.html and /app/error.png, " \
+                               "please contact the developer"        
         self.getIPFail = "Không thể lấy địa chỉ IP hiện tại"
         self.updateFail = "Cập nhật tài khoản thất bại"
         self.getAPIFail = "Lấy cấu hình từ API thất bại"
