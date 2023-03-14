@@ -23,6 +23,8 @@ if args.lang == '1':
     language = 'zh_cn'
 elif args.lang == '2':
     language = 'en_us'
+elif args.lang == '3':
+    language = 'vi_vn'
 else:
     print("Invalid language")
     exit(1)

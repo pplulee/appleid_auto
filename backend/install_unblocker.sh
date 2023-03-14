@@ -1,10 +1,22 @@
 #!/bin/bash
+
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[0;33m'
+PLAIN='\033[0m'
+BLUE="\033[36m"
+
 install_path="/opt/apple_auto"
-echo "请选择语言 | Please select language"
-echo "1.简体中文"
-echo "2.English"
+echo "请选择语言 | Please select a language"
+echo -e "${YELLOW}Please note that the language you choose will affect the output of the backend program"
+echo -e "请注意，你选择的语言将影响后端程序的输出${PLAIN}"
+echo -e "${BLUE}However no support for language other than Chinese and English is provided in this installation script${PLAIN}"
+echo -e "${BLUE}但是本安装脚本仅提供中文和英文支持${PLAIN}"
+echo "1.简体中文(zh_cn)"
+echo "2.English(en_us)"
+echo "3.Vietnamese(vi_vn)"
 read -e language
-if [ $language != "1" ] && [ $language != "2" ]; then
+if [ $language != "1" ] && [ $language != "2" ] && [ $language != "3" ]; then
     echo "输入错误，已退出 | Input error, exit"
     exit;
 fi
