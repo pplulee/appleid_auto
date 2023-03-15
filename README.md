@@ -1,4 +1,4 @@
-<h1 align="center">Apple ID 一键解锁工具</h1>
+<h1 align="center">Apple ID One-Click Unlocking Tool</h1>
 <p align="center">
     <a href="https://github.com/pplulee/appleid_auto/issues" style="text-decoration:none">
         <img src="https://img.shields.io/github/issues/pplulee/appleid_auto.svg" alt="GitHub issues"/>
@@ -13,171 +13,180 @@
         <img src="https://img.shields.io/github/license/pplulee/appleid_auto" alt="GitHub license"/>
     </a>
 </p>
-<h3 align="center">请仔细阅读本文档以及未来我们会推出的 Wiki 文档，再使用。</h3>  
-<h3 align="center">本项目仍在更新当中。</h3>
+<h3 align="center"><a href="README_zh_CN.md" style="text-decoration:none">中文文档</a> | English</h3>
+<h3 align="center">Follow the instruction below to hae better experience</h3>  
+<h3 align="center">Our project is open-source and will be updated from time to time</h3>
 
-# 基本简介
 
-“以全新方式管理你的 Apple ID” —— 这是一款基于密保问题的自动化 Apple ID 检测&解锁程序。
+# Basic Introduction
 
-前端用于管理账号，支持添加多个账号，并提供展示账号页面；
+"Manage your Apple ID in a brand-new way" - This is an automated Apple ID detection & unlocking program based on security questions.
 
-支持创建包含多个账号的分享页面，并可以为分享页面设置密码。
+The frontend is used to manage accounts, support adding multiple accounts, and provide a display account page.
 
-后端定时检测账号是否被锁定，若被锁定或开启二步验证则自动解锁，修改密码并向API回报密码。
+Support creating a shared page containing multiple accounts and setting a password for the shared page.
 
-登录Apple ID并自动删除Apple ID中的设备。
+The backend checks whether the account is locked at regular intervals. If it is locked or two-step verification is enabled, it will be automatically unlocked, the password will be changed, and the password will be reported to the API.
 
-启用代理池和Selenium集群，提高解锁成功率，防止风控。
+Log in to Apple ID and automatically delete devices in Apple ID.
 
-### 注意事项：
+Enable proxy pool and Selenium cluster to improve the success rate of unlocking and prevent wind control.
 
-1. 目前**后端运行基于docker**，请确保机器已安装docker；
-2. unblocker_manager为**后端管理程序**，会定时从API获取任务列表并部署docker容器（每个账号对应一个容器）；
-3. 程序**需要使用Chrome webdriver**
-   ，推荐使用Docker版 [selenium/standalone-chrome](https://hub.docker.com/r/selenium/standalone-chrome)
-   ，docker部署指令如下，请根据需求修改参数。
 
+### Reminder:
+
+1. The **backend runs based on docker**, please make sure that docker is installed on the machine;
+2. unblocker_manager is the **backend management program**, 
+which will get the task list from the API at regular intervals and deploy docker containers (one container for each account);
+3. The program **needs to use Chrome webdriver**, 
+it is recommended to use the Docker version [selenium/standalone-chrome](https://hub.docker.com/r/selenium/standalone-chrome),
+the docker deployment command is as follows, please modify the parameters according to your needs.
 ```bash
 docker run -d --name=webdriver --log-opt max-size=1m --log-opt max-file=1 --shm-size="2g" --restart=always -e SE_NODE_MAX_SESSIONS=10 -e SE_NODE_OVERRIDE_MAX_SESSIONS=true -e SE_SESSION_RETRY_INTERVAL=1 -e SE_VNC_VIEW_ONLY=1 -p 4444:4444 -p 5900:5900 selenium/standalone-chrome
 ```
-
-# 使用方法
-
-**请先部署好前端，再安装后端。后端安装脚本提供一键安装webdriver** \
-如果你想了解Selenium Grid集群，请前往 [sahuidhsu/selenium-grid-docker](https://github.com/sahuidhsu/selenium-grid-docker) \
-网页端运行环境推荐 php7.4 & MySQL8.0，理论支持MySQL5.x，其他版本php可能不支持。
-
-1. 从Release下载网页源码并部署，导入数据库 (`sql/db.sql`) ，复制配置文件`config.bak.php`到`config.php`，并填写设置项 \
-   默认账户：`admin` 密码：`admin`
-2. 登录网站后，添加Apple账号，填写账号信息
-3. 部署`backend\unblocker_manager.py`（提供一键部署脚本，请见下方）
-4. 查看`unblocker_manager`是否成功获取到任务列表
-5. 查看容器是否部署并正常运行
-
-### 关于密保问题的说明：
-
-问题一栏仅需填写关键词即可，例如”生日“、”工作“等，但请注意账号**安全问题的语言**
-
-# 前端更新
-
-从Release下载网页源码并覆盖原有文件，重新填写config.php，导入更新的数据库文件（开头为update_的文件）即可。
-
-# 后端更新
-
-若是最新版本的后端管理脚本，只需重启appleauto服务即可。若无法更新，可重新执行安装脚本
-
-# 问题反馈&交流
-
-开发者水平和能力有限，程序可能存在诸多bug，欢迎提出 Issue 或 Pull Request ，也欢迎各位大佬加入项目！
-Telegram群：[@appleunblocker](https://t.me/appleunblocker)
+4. The program **backend** supports 3 languages currently: English, Simplified Chinese, and Vietnamese. 
+The language can be easily set by using the one-click deployment script provided in section [Usage](#Usage).
 
 
-### 一键部署unblocker_manager（后端+webdriver）：
+# Usage
+
+**Please deploy the frontend first, and then install the backend. The backend installation script provides a one-click installation of webdriver** \
+If you want to know more about Selenium Grid cluster, please go to [sahuidhsu/selenium-grid-docker](https://github.com/sahuidhsu/selenium-grid-docker) \
+The recommended web page running environment is php7.4 & MySQL8.0, theoretically supporting MySQL5.x, other versions of php may not be supported.
+
+1. Download the web page source code from Release and deploy it, import the database (`sql/db.sql`), copy the configuration file `config.bak.php` to `config.php`, and fill in the settings \
+   Default account: `admin` password: `admin`
+2. After logging in to the website, add the Apple account and fill in the account information
+3. Deploy `backend\unblocker_manager.py` (we provide a one-click deployment script, please see below)
+4. Check whether `unblocker_manager` successfully obtains the task list
+5. Check whether the container is deployed and running normally
+
+### One-click deployment of unblocker_manager (backend + webdriver):
 
 ```bash
 bash <(curl -Ls https://raw.githubusercontent.com/pplulee/appleid_auto/main/backend/install_unblocker.sh)
 ```
 
-# 文件说明
+### Description of security questions:
 
-- `backend\unblocker_manager.py` 后端管理程序 \
-  说明：用于定时从API获取任务列表，并部署task对应的docker容器 \
-  启动参数：`-api_url <API地址> -api_key <API key> ` （API地址格式为http://xxx.xxx 末尾不需要加斜杠和路径）
-- `backend\unlocker\main.py` 后端解锁程序 \
-  说明：通过Webdriver实现账号改密解锁，并向API提交新密码。**该程序依赖API运行** \
-  启动参数：`-api_url <API地址> -api_key <API key> -taskid <Task ID>`
+Questions only need to fill in keywords, such as "birthday", "work", etc., but please note that the **language of the account security question**
 
-仅部署**后端管理程序**即可，该脚本会自动从API站点获取任务并部署容器，默认同步时间为10分钟（手动同步可重启服务） \
-若不想使用自动同步，也可以直接部署**后端解锁程序** ，docker版 [sahuidhsu/appleid_auto](https://hub.docker.com/r/sahuidhsu/appleid_auto)
+
+# Frontend update
+
+Download the web page source code from Release and overwrite the original files, re-fill in config.php, and import the updated database file (the file beginning with update_).
+
+
+# Backend update
+
+If the latest version of the backend management script is being used, simply restart the appleauto service to update. If unable to update, the installation script can be re-executed.
+
+
+# Q&A
+
+The developer's level and ability are limited, and the program may have many bugs. Welcome to submit Issues or Pull Requests, and welcome everyone to join the project!
+Telegram group: [@appleunblocker](https://t.me/appleunblocker)
+
+
+# File Description
+
+- `backend\unblocker_manager.py` Backend management program \
+  Description: Used to get the task list from API at regular intervals and deploy docker containers corresponding to task \
+  Launch parameters: `-api_url <API address> -api_key <API key> ` (The API address should be in the format of http://xxx.xxx, and should not include a trailing slash or path.)
+- `backend\unlocker\main.py` Backend unlock program \
+  Description: Unlock the account by changing the password through Webdriver and submit the new password to the API. **This program depends on the API to run** \
+  Launch parameters: `-api_url <API地址> -api_key <API key> -taskid <Task ID>`
+
+It is only necessary to deploy the **backend management program**, and the script will automatically obtain the task from the API site and deploy the container. The default synchronization time is 10 minutes (manual synchronization can restart the service) \
+If you want to use the **backend unlock program** directly, please use the docker version [sahuidhsu/appleid_auto](https://hub.docker.com/r/sahuidhsu/appleid_auto)
 
 ---
-# 赞助开发者
+# Sponsor the developer
 [![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/baiyimiao) \
 USDT-TRC20: TV1su1RnQny27YEF9WG4DbC8AAz3udt6d4 \
 ETH-ERC20：0xea8fbe1559b1eb4b526c3bb69285203969b774c5 \
-广告：如果您有使用邮局的需求，欢迎咨询开发者
+Entertainment: If you have a need to use the mailbox, please feel free to consult the developer
 
 ---
 
-# API说明
+# API Documentation
 
-路径： `/api/` \
-方法： `GET` \
-所有action均需要传入`key`参数，值为`config.php`中的`apikey` \
-返回类型： `JSON` \
-通用返回参数
+Path: `/api/` \
+Method: `GET` \
+All actions need to pass in the `key` parameter, the value is `apikey` in `config.php` \
+Return type: `JSON` \
+Common return parameters
 
-| 参数        | 值/类型             | 说明      |
-|-----------|------------------|---------|
-| `status`  | `success`/`fail` | 操作成功/失败 |
-| `message` | `String`         | 提示信息    |
+| parameter | value / type     | description              |
+|-----------|------------------|--------------------------|
+| `status`  | `success`/`fail` | operation success / fail |
+| `message` | `String`         | prompt information       |
 
 Action: `random_sharepage_password` \
-说明： 生成随机分享页密码 \
-输入参数：
+Description: Generate a random share page password \
+Input parameters:
 
-| 参数       | 值/类型                        | 说明    |
-|----------|-----------------------------|-------|
-| `action` | `random_sharepage_password` | 操作    |
-| `id`     | `Int`                       | 分享页ID |
+| parameter | value / type                | description   |
+|-----------|-----------------------------|---------------|
+| `action`  | `random_sharepage_password` | operation     |
+| `id`      | `Int`                       | share page ID |
 
-返回参数：
+return parameters:
 
-| 参数         | 值/类型     | 说明  |
-|------------|----------|-----|
-| `password` | `String` | 新密码 |
+| parameter  | value / type | description  |
+|------------|--------------|--------------|
+| `password` | `String`     | new password |
 
-……其余等待添加
+……The rest are waiting to be added (๑•̀ㅂ•́)و✧
 
 ---
 
-# JSON API接口
+# JSON API interface
 
-支持通过分享页面链接，以JSON方式获取账号信息，用于对接其他APP \
-分享页面链接指页面的代码，并非整个URL
+It is possible to obtain account information in JSON format by sharing a page link, which can be used to integrate with other apps. \
+The page link refers to the page's code, rather than the entire URL.
 
-API地址：`/api/share.php` \
-请求方法：`GET` \
-输入参数：
+API address: `/api/share.php` \
+Request method: `GET` \
+Input parameters:
 
-| 参数           | 值/类型     | 说明                |
-|--------------|----------|-------------------|
-| `share_link` | `String` | 分享页代码             |
-| `password`   | `String` | 分享页密码（若未设置密码则不需要） |
+| parameter    | value / type | description        |
+|--------------|--------------|--------------------|
+| `share_link` | `String`     | 分享页代码              |
+| `password`   | `String`     | 分享页密码（若未设置密码则不需要）  |
 
-返回参数：
+return parameters:
 
-| 参数         | 值/类型             | 说明            |
-|------------|------------------|---------------|
-| `status`   | `success`/`fail` | 操作成功/失败       |
-| `message`  | `String`         | 提示信息          |
-| `accounts` | `Array`          | 账号信息列表（内容见下表） |
+| parameter   | value / type     | description                                       |
+|-------------|------------------|---------------------------------------------------|
+| `status`    | `success`/`fail` | operation success / fail                          |
+| `message`   | `String`         | prompt information                                |
+| `accounts`  | `Array`          | List of account information (see the table below) |
 
-账号信息：
+Account information:
 
-| 参数           | 值/类型     | 说明     |
-|--------------|----------|--------|
-| `id`         | `Int`    | 账号ID   |
-| `username`   | `String` | 账号     |
-| `password`   | `String` | 密码     |
-| `status`     | `Bool`   | 账号状态   |
-| `last_check` | `String` | 上次检查时间 |
-| `remark`     | `String` | 账号前端备注 |
+| parameter     | value / type | description               |
+|---------------|--------------|---------------------------|
+| `id`          | `Int`        | Account ID                |
+| `username`    | `String`     | Account                   |
+| `password`    | `String`     | Password                  |
+| `status`      | `Bool`       | Account status            |
+| `last_check`  | `String`     | Last check time           |
+| `remark`      | `String`     | Account front-end remarks |
 
 
 ---
 # TODO List
 
-- [x] 自动识别验证码
-- [x] 检测账号被锁
-- [x] 检测二步验证
-- [x] 分享页面支持多个账号
-- [x] 分享页可开启密码
-- [x] 检查密码正确
-- [x] 删除设备
-- [x] 定时修改密码
-- [x] 上报密码
-- [x] 代理池
-- [x] Telegram Bot通知
-- [x] JSON API接口获取账号信息
+- [x] Auto recognition of verification code
+- [x] Check if the account is locked
+- [x] Check two-step verification
+- [x] Share page supports multiple accounts
+- [x] Share page can be opened with password
+- [x] Check password correctness
+- [x] Delete device
+- [x] Change password at regular intervals
+- [x] Report password
+- [x] Proxy pool
+- [x] Telegram Bot notification
+- [x] JSON API interface to obtain account information
