@@ -37,7 +37,8 @@
 2. unblocker_manager为**后端管理程序**，会定时从API获取任务列表并部署docker容器（每个账号对应一个容器）；
 3. 程序**需要使用Chrome webdriver**
    ，推荐使用Docker版 [selenium/standalone-chrome](https://hub.docker.com/r/selenium/standalone-chrome)
-   ，docker部署指令如下，请根据需求修改参数。
+   ，docker部署指令如下，请根据需求修改参数。(仅支持x86_64，如您有ARM需求
+   ，请尝试[seleniarm/standalone-chromium](https://hub.docker.com/r/seleniarm/standalone-chromium) 或使用docker集群: [sahuidhsu/selenium-grid-docker](https://github.com/sahuidhsu/selenium-grid-docker))
 ```bash
 docker run -d --name=webdriver --log-opt max-size=1m --log-opt max-file=1 --shm-size="2g" --restart=always -e SE_NODE_MAX_SESSIONS=10 -e SE_NODE_OVERRIDE_MAX_SESSIONS=true -e SE_SESSION_RETRY_INTERVAL=1 -e SE_VNC_VIEW_ONLY=1 -p 4444:4444 -p 5900:5900 selenium/standalone-chrome
 ```
@@ -64,7 +65,7 @@ bash <(curl -Ls https://raw.githubusercontent.com/pplulee/appleid_auto/main/back
 
 ### 关于密保问题的说明：
 
-问题一栏仅需填写关键词即可，例如”生日“、”工作“等，但请注意账号**安全问题的语言**
+问题一栏仅需填写关键词即可，例如”生日“、”工作“等，但请注意账号安全问题的**语言**
 
 # 前端更新
 
@@ -76,27 +77,27 @@ bash <(curl -Ls https://raw.githubusercontent.com/pplulee/appleid_auto/main/back
 
 # 问题反馈&交流
 
-开发者水平和能力有限，程序可能存在诸多bug，欢迎提出 Issue 或 Pull Request ，也欢迎各位大佬加入项目！
+开发者水平和能力有限，程序可能存在诸多bug，欢迎提出 Issue 或 Pull Request ，也欢迎各位大佬加入项目！ \
 Telegram群：[@appleunblocker](https://t.me/appleunblocker)
 
 # 文件说明
 
 - `backend\unblocker_manager.py` 后端管理程序 \
   说明：用于定时从API获取任务列表，并部署task对应的docker容器 \
-  启动参数：`-api_url <API地址> -api_key <API key> ` （API地址格式为http://xxx.xxx 末尾不需要加斜杠和路径）
+  启动参数：`-api_url <API地址> -api_key <API key> ` （API地址格式为`http(s)://xxx.xxx` 末尾不需要加`/`或路径）
 - `backend\unlocker\main.py` 后端解锁程序 \
   说明：通过Webdriver实现账号改密解锁，并向API提交新密码。**该程序依赖API运行** \
   启动参数：`-api_url <API地址> -api_key <API key> -taskid <Task ID>`
 
-仅部署**后端管理程序**即可，该脚本会自动从API站点获取任务并部署容器，默认同步时间为10分钟（手动同步可重启服务） \
+仅部署**后端管理程序**即可，该脚本会自动从API站点获取任务并部署容器，默认同步时间为10分钟（重启服务即可立即同步） \
 若不想使用自动同步，也可以直接部署**后端解锁程序** ，docker版 [sahuidhsu/appleid_auto](https://hub.docker.com/r/sahuidhsu/appleid_auto)
 
 ---
-# 赞助开发者
+# 请我喝杯可乐
 [![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/baiyimiao) \
 USDT-TRC20: TV1su1RnQny27YEF9WG4DbC8AAz3udt6d4 \
 ETH-ERC20：0xea8fbe1559b1eb4b526c3bb69285203969b774c5 \
-广告：如果您有使用邮局的需求，欢迎咨询开发者
+【广告】如果您有使用邮局的需求，欢迎咨询[开发者](https://t.me/baiyimiao) (Telegram)
 
 ---
 

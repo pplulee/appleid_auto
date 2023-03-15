@@ -14,7 +14,7 @@
     </a>
 </p>
 <h3 align="center"><a href="README_zh_CN.md" style="text-decoration:none">中文文档</a> | English</h3>
-<h3 align="center">Follow the instruction below to hae better experience</h3>  
+<h3 align="center">Follow the instruction below to have better experience</h3>  
 <h3 align="center">Our project is open-source and will be updated from time to time</h3>
 
 
@@ -24,13 +24,13 @@
 
 The frontend is used to manage accounts, support adding multiple accounts, and provide a display account page.
 
-Support creating a shared page containing multiple accounts and setting a password for the shared page.
+Creates a shared page containing multiple accounts and setting a password for the shared page.(Optional)
 
-The backend checks whether the account is locked at regular intervals. If it is locked or two-step verification is enabled, it will be automatically unlocked, the password will be changed, and the password will be reported to the API.
+The backend regularly checks whether the account is locked. If it is locked or 2FA is enabled, it will be automatically unlocked, the password will be changed, and the password will be reported to the API.
 
 Log in to Apple ID and automatically delete devices in Apple ID.
 
-Enable proxy pool and Selenium cluster to improve the success rate of unlocking and prevent wind control.
+Enable proxy pool and Selenium cluster to improve the success rate and prevent risk control.(Optional)
 
 
 ### Reminder:
@@ -40,7 +40,8 @@ Enable proxy pool and Selenium cluster to improve the success rate of unlocking 
 which will get the task list from the API at regular intervals and deploy docker containers (one container for each account);
 3. The program **needs to use Chrome webdriver**, 
 it is recommended to use the Docker version [selenium/standalone-chrome](https://hub.docker.com/r/selenium/standalone-chrome),
-the docker deployment command is as follows, please modify the parameters according to your needs.
+the docker deployment command is as follows, please modify the parameters according to your needs.(Only supports x86_64,
+if you are using ARM, try [seleniarm/standalone-chromium](https://hub.docker.com/r/seleniarm/standalone-chromium) or use cluster grid: [sahuidhsu/selenium-grid-docker](https://github.com/sahuidhsu/selenium-grid-docker))
 ```bash
 docker run -d --name=webdriver --log-opt max-size=1m --log-opt max-file=1 --shm-size="2g" --restart=always -e SE_NODE_MAX_SESSIONS=10 -e SE_NODE_OVERRIDE_MAX_SESSIONS=true -e SE_SESSION_RETRY_INTERVAL=1 -e SE_VNC_VIEW_ONLY=1 -p 4444:4444 -p 5900:5900 selenium/standalone-chrome
 ```
@@ -69,7 +70,7 @@ bash <(curl -Ls https://raw.githubusercontent.com/pplulee/appleid_auto/main/back
 
 ### Description of security questions:
 
-Questions only need to fill in keywords, such as "birthday", "work", etc., but please note that the **language of the account security question**
+Questions only need to fill in keywords, such as "birthday", "work", etc., but please be aware of the **language** of the account security questions.
 
 
 # Frontend update
@@ -79,33 +80,34 @@ Download the web page source code from Release and overwrite the original files,
 
 # Backend update
 
-If the latest version of the backend management script is being used, simply restart the appleauto service to update. If unable to update, the installation script can be re-executed.
+If you are using the latest version of the backend management script, just simply restart the appleauto service to update. If not working, re-run the installation script.
 
 
-# Q&A
+# Feedback and Communication
 
-The developer's level and ability are limited, and the program may have many bugs. Welcome to submit Issues or Pull Requests, and welcome everyone to join the project!
+We are not professional, so as the program. Issues and Pull Requests are welcomed, and we're looking forward for your contribution! \
 Telegram group: [@appleunblocker](https://t.me/appleunblocker)
 
 
 # File Description
 
 - `backend\unblocker_manager.py` Backend management program \
-  Description: Used to get the task list from API at regular intervals and deploy docker containers corresponding to task \
-  Launch parameters: `-api_url <API address> -api_key <API key> ` (The API address should be in the format of http://xxx.xxx, and should not include a trailing slash or path.)
+  **Description**: Regularly fetch the task list from API and deploy docker containers corresponding to task \
+  **Launch parameters**: `-api_url <API address> -api_key <API key> -lang <1/2/3> ` (The API address should be in the format of `http(s)://xxx.xxx`, never include a `/` or path at the end.
+  lang: 1 - Simplified Chinese, 2 - English, 3 - Vietnamese)
 - `backend\unlocker\main.py` Backend unlock program \
-  Description: Unlock the account by changing the password through Webdriver and submit the new password to the API. **This program depends on the API to run** \
-  Launch parameters: `-api_url <API地址> -api_key <API key> -taskid <Task ID>`
+  **Description**: Unlock the account by changing the password through Webdriver and return the new password to the API. **This program depends on the API to run** \
+  **Launch parameters**: `-api_url <API地址> -api_key <API key> -taskid <Task ID> -lang <zh_cn/en_us/vi_vn>`
 
-It is only necessary to deploy the **backend management program**, and the script will automatically obtain the task from the API site and deploy the container. The default synchronization time is 10 minutes (manual synchronization can restart the service) \
-If you want to use the **backend unlock program** directly, please use the docker version [sahuidhsu/appleid_auto](https://hub.docker.com/r/sahuidhsu/appleid_auto)
+The **backend management program** is only necessary program to be running, it will automatically obtain the task from the API site and deploy the docker containers. The default sync time is 10 minutes (restart the service to manually sync) \
+If you only want to use the **backend unlock program**, feel free to use the docker version [sahuidhsu/appleid_auto](https://hub.docker.com/r/sahuidhsu/appleid_auto)
 
 ---
-# Sponsor the developer
+# Buy me a coffee
 [![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/baiyimiao) \
 USDT-TRC20: TV1su1RnQny27YEF9WG4DbC8AAz3udt6d4 \
 ETH-ERC20：0xea8fbe1559b1eb4b526c3bb69285203969b774c5 \
-Entertainment: If you have a need to use the mailbox, please feel free to consult the developer
+[AD] If you have a need to use the mailbox, please feel free to consult the [developer](https://t.me/baiyimiao) (Telegram)
 
 ---
 
@@ -113,14 +115,14 @@ Entertainment: If you have a need to use the mailbox, please feel free to consul
 
 Path: `/api/` \
 Method: `GET` \
-All actions need to pass in the `key` parameter, the value is `apikey` in `config.php` \
+All actions need to pass the `key` parameter, which is the `apikey` argument in `config.php` \
 Return type: `JSON` \
 Common return parameters
 
 | parameter | value / type     | description              |
 |-----------|------------------|--------------------------|
 | `status`  | `success`/`fail` | operation success / fail |
-| `message` | `String`         | prompt information       |
+| `message` | `String`         | prompt info              |
 
 Action: `random_sharepage_password` \
 Description: Generate a random share page password \
@@ -180,10 +182,10 @@ Account information:
 
 - [x] Auto recognition of verification code
 - [x] Check if the account is locked
-- [x] Check two-step verification
-- [x] Share page supports multiple accounts
-- [x] Share page can be opened with password
-- [x] Check password correctness
+- [x] Check 2FA status
+- [x] Add supports for multiple accounts in share page
+- [x] Add restriction to share page(password protection)
+- [x] Check password
 - [x] Delete device
 - [x] Change password at regular intervals
 - [x] Report password
