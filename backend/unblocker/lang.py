@@ -251,7 +251,7 @@ class vi_vn:
 
 
     def nextRun(self, time):
-        return f"Next job will be executed in {time} minutes"
+        return f"Việc tiếp theo sẽ được thực hiện trong {time} phút"
 
     def totalDevices(self, total):
-        return f"{total} devices in total"
+        return f"Tổng số {total} thiết bị"
