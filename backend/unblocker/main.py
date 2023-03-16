@@ -360,8 +360,7 @@ class ID:
                 logger.error(f"{lang_text.rejectedByApple}\n{msg.strip()}")
                 api.update_message(self.username, lang_text.rejectedByApple)
                 api.report_proxy_error(config.proxy_id)
-                notification(lang_text.rejectedByApple)
-                get_ip()
+                notification(f"{lang_text.rejectedByApple}\nIP:{get_ip()}")
                 return False
             if self.process_dob():
                 if self.process_security_question():
@@ -392,7 +391,7 @@ class ID:
                     try:
                         driver.find_element(By.CLASS_NAME, "pwdChange").click()
                     except BaseException:
-                        return True
+                        pass
                     # 重置密码
                     return self.process_password()
             return False
@@ -687,8 +686,10 @@ def get_ip():
         driver.get("https://api.ip.sb/ip")
         ip_address = WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.TAG_NAME, "pre"))).text
         logger.info(f"IP: {ip_address}")
+        return ip_address
     except BaseException:
         logger.error(lang_text.getIPFail)
+        return ""
 
 
 def update_account(username, password):
@@ -805,7 +806,7 @@ logger.info(f"{'=' * 80}\n"
             f"{lang_text.launch}\n"
             f"{lang_text.repoAddress}: https://github.com/pplulee/appleid_auto\n"
             f"{lang_text.TG_Group}: @appleunblocker")
-logger.info(f"{lang_text.version}: v1.44-20230313")
+logger.info(f"{lang_text.version}: v1.44-20230316")
 job()
 while True:
     schedule.run_pending()
