@@ -176,7 +176,7 @@ class Config:
             # 新版本代理
             if "url" in self.proxy_type:
                 try:
-                    self.proxy = self.proxy_type + "://" + get(self.proxy_content).text
+                    self.proxy = self.proxy_type.split("+")[0] + "://" + get(self.proxy_content).text
                 except BaseException as e:
                     logger.error(lang_text.failOnRetrievingProxyFromAPI)
                     logger.error(e)
@@ -197,7 +197,7 @@ class Config:
         if self.enable_auto_update_password:
             logger.info(lang_text.autoUpdatePassword)
         if self.proxy_id != -1:
-            logger.info(f"{lang_text.usingProxyID}: {self.proxy_id}")
+            logger.info(f"{lang_text.usingProxyID}: {self.proxy_id}\n{self.proxy}")
 
 
 class ID:

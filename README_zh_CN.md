@@ -182,3 +182,5 @@ API地址：`/api/share.php` \
 - [x] 代理池
 - [x] Telegram Bot通知
 - [x] JSON API接口获取账号信息
+- [x] 后端支持从API接口获取代理
+- [ ] 分享页支持有效期
