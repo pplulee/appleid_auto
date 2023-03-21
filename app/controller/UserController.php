@@ -1,12 +1,13 @@
 <?php
-declare (strict_types = 1);
+declare (strict_types=1);
 
 namespace app\controller;
 
 use app\BaseController;
+use app\model\Account;
 use app\model\User;
 use think\facade\Session;
-use think\Request;
+use think\response\View;
 
 class UserController extends BaseController
 {
@@ -17,7 +18,9 @@ class UserController extends BaseController
         if (!$user) {
             return alert("error", "用户不存在", "2000", "/index");
         }
-        return view('/user/index', ['user' => $user]);
+        $account_count = 0; // TODO
+        $share_count = 0; // TODO
+        return view('/user/index', ['user' => $user, 'account_count' => $account_count, 'share_count' => $share_count]);
 
     }
 
@@ -47,5 +50,12 @@ class UserController extends BaseController
     {
         Session::delete('user_id');
         return alert("success", "登出成功", "2000", "/index");
+    }
+
+    public function account(): View
+    {
+        $accountList = new Account();
+        $accountList = $accountList->fetchByUserId(Session::get('user_id'));
+        return view('/user/account', ['accounts' => $accountList]);
     }
 }

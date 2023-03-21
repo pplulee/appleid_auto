@@ -17,6 +17,7 @@ use think\facade\Route;
 Route::rule('/', 'index/index');
 Route::get('index', 'index/index');
 
+// 注册用户登录部分服务
 Route::group('user', function () {
     Route::post('login', 'user/login');
     Route::post('register', 'user/register');
@@ -28,5 +29,6 @@ Route::rule('user/', 'user/index')->middleware(UserIndex::class);
 Route::group('user', function () {
     Route::get('/', 'user/index');
     Route::get('index', 'user/index');
+    Route::get('account', 'user/account');
     Route::get('logout', 'user/logout');
 })->middleware(UserIndex::class);
