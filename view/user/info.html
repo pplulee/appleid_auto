@@ -1,0 +1,20 @@
+{include file="user/header"}
+
+<title>个人信息</title>
+<div class="container" style="margin-top: 2%;width: {isMobile()?" auto" : "30%"};">
+<div class='card border-dark'>
+    <h4 class='card-header bg-primary text-white text-center'>个人信息</h4>
+    <form action='' method='post' style="margin: 20px;">
+        <div class="input-group mb-3">
+            <span class='input-group-text' id='username'>用户名</span>
+            <input type='text' class='form-control' name='username'
+                   value='{$user->username}'>
+        </div>
+        <div class="input-group mb-3">
+            <span class='input-group-text' id='name'>密码</span>
+            <input type='password' class='form-control' name='password' placeholder='不修改请留空'>
+        </div>
+        <input type='submit' class='btn btn-primary' name='submit' value='保存'>
+    </form>
+</div>
+</div>

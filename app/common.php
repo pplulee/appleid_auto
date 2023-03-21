@@ -1,5 +1,8 @@
 <?php
 // 应用公共文件
+use app\model\User;
+use think\facade\Db;
+
 function alert($type, $message, $delay, $dest): string
 {
     echo '
@@ -67,6 +70,26 @@ function isMobile(): bool
                 false || (strpos($_SERVER['HTTP_ACCEPT'], 'vnd.wap.wml') < strpos($_SERVER['HTTP_ACCEPT'], 'text/html')))) {
             return true;
         }
+    }
+    return false;
+}
+
+function random_str($length): string
+{
+    $str = null;
+    $strPol = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789abcdefghijklmnopqrstuvwxyz";
+    $max = strlen($strPol) - 1;
+    for ($i = 0; $i < $length; $i++) {
+        $str .= $strPol[rand(0, $max)];
+    }
+    return $str;
+}
+
+function isAdmin($id): bool
+{
+    $result = Db::name('user')->field('is_admin')->where('id', $id)->find();
+    if ($result) {
+        return $result['is_admin'];
     }
     return false;
 }

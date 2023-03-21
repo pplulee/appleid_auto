@@ -1,7 +1,8 @@
 <nav class="navbar navbar-expand-lg navbar-light bg-light">
     <div class="container-fluid">
         <a class="navbar-brand" href="/user">AppleID 自动化管理</a>
-        <button aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation" class="navbar-toggler"
+        <button aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation"
+                class="navbar-toggler"
                 data-bs-target="#navbarSupportedContent" data-bs-toggle="collapse" type="button">
             <span class="navbar-toggler-icon"></span>
         </button>
@@ -22,10 +23,10 @@
                 <li class='nav-item'>
                     <a class='nav-link' href='/user/info'>个人信息</a>
                 </li>
-                {if $user->is_admin}
-                <li class='nav-item'>
-                    <a class='nav-link' href='/admin'>管理面板</a>
-                </li>
+                {if isAdmin(session('user_id'))}
+                    <li class='nav-item'>
+                        <a class='nav-link' href='/admin'>管理面板</a>
+                    </li>
                 {/if}
             </ul>
             <a class="btn btn-danger" href="/user/logout">登出</a>

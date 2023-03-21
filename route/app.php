@@ -29,6 +29,10 @@ Route::rule('user/', 'user/index')->middleware(UserIndex::class);
 Route::group('user', function () {
     Route::get('/', 'user/index');
     Route::get('index', 'user/index');
+    Route::get('info', 'user/info');
+    Route::post('info', 'user/updateUser');
+    Route::get('account/edit/:id', 'user/accountEdit');
+    Route::get('account/add', 'user/accountAdd');
     Route::get('account', 'user/account');
     Route::get('logout', 'user/logout');
 })->middleware(UserIndex::class);

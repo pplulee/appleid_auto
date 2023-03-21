@@ -46,9 +46,13 @@ class User extends Model
                 $update['password'] = $password;
             }
             if ($username != $user->username) {
+                // 检查用户名是否重复
+                if ($this->where('username', $username)->find()) {
+                    return false;
+                }
                 $update['username'] = $username;
             }
-            if ($user->is_admin != $data['is_admin']) {
+            if (isset($data['is_admin']) && $user->is_admin != $data['is_admin']) {
                 $update['is_admin'] = $data['is_admin'];
             }
             if (count($update) > 0) {

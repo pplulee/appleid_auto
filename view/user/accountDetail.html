@@ -1,0 +1,93 @@
+{include file="user/header"}
+
+<div class='container' style='margin-top: 2%; width: {isMobile()?"auto" : "30%"};'>
+    <div class='card border-dark'>
+        <h4 class='card-header bg-primary text-white text-center'>添加账号</h4>
+        <form action='' method='post' style='margin: 20px;'>
+            <div class='input-group mb-3'>
+                <span class='input-group-text' id='id'>用户名</span>
+                <input type='text' class='form-control' name='username' required autocomplete='off'
+                       value="{$account->username}">
+            </div>
+            <div class='input-group mb-3'>
+                <span class='input-group-text' id='password'>密码</span>
+                <input type='text' class='form-control' name='password' required autocomplete='off'
+                       value="{$account->password}">
+            </div>
+            <div class='input-group mb-3'>
+                <span class='input-group-text' id='remark'>备注</span>
+                <input type='text' class='form-control' name='remark' autocomplete='off' value="{$account->remark}">
+            </div>
+            <div class='input-group mb-3'>
+                <span class='input-group-text' id='frontend_remark'>前端备注</span>
+                <input type='text' class='form-control' name='frontend_remark' placeholder='账号的说明，在分享页显示'
+                       autocomplete='off' value="{$account->frontend_remark}">
+            </div>
+            <div class='input-group mb-3'>
+                <span class='input-group-text' id='dob'>生日</span>
+                <input type='text' class='form-control' name='dob' placeholder='格式：mmddyyyy' required
+                       autocomplete='off' maxlength='8' minlength='8' value="{$account->dob}">
+            </div>
+            <div class='input-group mb-3'>
+                <span class='input-group-text' id='question1'>问题1</span>
+                <input type='text' class='form-control' name='question1' required autocomplete='off'
+                       value="{$account->question1}">
+            </div>
+            <div class='input-group mb-3'>
+                <span class='input-group-text' id='answer1'>答案1</span>
+                <input type='text' class='form-control' name='answer1' required autocomplete='off'
+                       value="{$account->answer1}">
+            </div>
+            <div class='input-group mb-3'>
+                <span class='input-group-text' id='question2'>问题2</span>
+                <input type='text' class='form-control' name='question2' required autocomplete='off'
+                       value="{$account->question2}">
+            </div>
+            <div class='input-group mb-3'>
+                <span class='input-group-text' id='answer2'>答案2</span>
+                <input type='text' class='form-control' name='answer2' required autocomplete='off'
+                       value="{$account->answer2}">
+            </div>
+            <div class='input-group mb-3'>
+                <span class='input-group-text' id='question3'>问题3</span>
+                <input type='text' class='form-control' name='question3' required autocomplete='off'
+                       value="{$account->question3}">
+            </div>
+            <div class='input-group mb-3'>
+                <span class='input-group-text' id='answer3'>答案3</span>
+                <input type='text' class='form-control' name='answer3' required autocomplete='off'
+                       value="{$account->answer3}">
+            </div>
+            <div class='input-group mb-3'>
+                <span class='input-group-text' id='question2'>分享代码</span>
+                <input type='text' class='form-control' name='share_link' required
+                       autocomplete='off' value="{$account->share_link}">
+            </div>
+            <div class='input-group mb-3'>
+                <span class='input-group-text' id='check_interval'>检查间隔</span>
+                <input type='number' class='form-control' name='check_interval' required autocomplete='off'
+                       placeholder='单位：分钟' value="{$account->check_interval}">
+            </div>
+            <div class='input-group mb-3'>
+                <div class='form-check form-switch'>
+                    开启密码正确检测<input class='form-check-input' type='checkbox'
+                                           name='enable_check_password_correct' {$account->enable_check_password_correct?"checked":""}>
+                    若密码错误则自动修改密码
+                </div>
+            </div>
+            <div class='input-group mb-3'>
+                <div class='form-check form-switch'>
+                    开启删除设备<input class='form-check-input' type='checkbox'
+                                       name='enable_delete_devices' {$account->enable_delete_devices?"checked":""}>
+                </div>
+            </div>
+            <div class='input-group mb-3'>
+                <div class='form-check form-switch'>
+                    开启自动修改密码<input class='form-check-input' type='checkbox'
+                                           name='enable_auto_update_password' {$account->enable_auto_update_password?"checked":""}>
+                </div>
+            </div>
+            <input type='submit' name='submit' class='btn btn-primary btn-block' value='添加'>
+        </form>
+    </div>
+</div>

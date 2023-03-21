@@ -24,6 +24,35 @@ class UserController extends BaseController
 
     }
 
+    public function info()
+    {
+        $user = new User();
+        $user = $user->fetch(Session::get('user_id'));
+        if (!$user) {
+            return alert("error", "用户不存在", "2000", "/index");
+        }
+        return view('/user/info', ['user' => $user]);
+    }
+
+    public function updateUser(): string
+    {
+        $user = new User();
+        $user = $user->fetch(Session::get('user_id'));
+        if (!$user) {
+            return alert("error", "用户不存在", "2000", "/index");
+        }
+        $data = [
+            'id' => $user->id,
+            'username' => $this->request->post('username'),
+            'password' => $this->request->post('password'),
+        ];
+        if ($user->updateUser($data)) {
+            return alert("success", "修改成功", "2000", "/user/info");
+        } else {
+            return alert("error", "修改失败", "2000", "/user/info");
+        }
+    }
+
     public function login(): string
     {
         $username = $this->request->post('username');
@@ -54,8 +83,37 @@ class UserController extends BaseController
 
     public function account(): View
     {
-        $accountList = new Account();
-        $accountList = $accountList->fetchByUserId(Session::get('user_id'));
+        $accountList = $this->app->accountService->fetchByOwner(Session::get('user_id'));
         return view('/user/account', ['accounts' => $accountList]);
+    }
+
+    public function accountEdit($id)
+    {
+        $account = new Account();
+        $account = $account->fetch($id);
+        if (!$account) {
+            return alert("error", "账号不存在", "2000", "/user/account");
+        }
+        if ($account->owner != Session::get('user_id')) {
+            return alert("error", "无权操作", "2000", "/user/account");
+        }
+        return view('/user/accountDetail', ['account' => $account]);
+    }
+
+    public function accountAdd(): View
+    {
+        $account = new Account();
+        $account->share_link = random_str(10);
+        $account->check_interval = 30;
+        return view('/user/accountDetail', ['account' => $account]);
+    }
+
+    public function accountUpdate()
+    {
+        // TODO
+        if (!$data['operation'] != "update" && !$data['operation'] != "add") {
+            return alert("error", "操作错误", "2000", "/user/account");
+        }
+        $account = new Account();
     }
 }

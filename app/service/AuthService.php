@@ -36,4 +36,13 @@ class AuthService extends Service
     {
         return (new User)->addUser($username, $password);
     }
+
+    public function isAdmin($user_id): bool
+    {
+        $user = Db::table('user')->where('id', $user_id)->find();
+        if ($user) {
+            return $user['is_admin'];
+        }
+        return false;
+    }
 }
