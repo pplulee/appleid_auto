@@ -49,8 +49,8 @@
                     <td>{$account.last_check}</td>
                     <td>{$account.check_interval}</td>
                     <td>
-                        <a class="btn btn-secondary" href="/user/account/edit?id={$account.id}">编辑</a>
-                        <a class="btn btn-danger" href="/user/account/delete?id={$account.id}">删除</a>
+                        <a class="btn btn-secondary" href="/user/account/{$account.id}">编辑</a>
+                        <button class="btn btn-danger delete-button" data-id="{$account.id}">删除</button>
                     </td>
                 </tr>
                 {/volist}
@@ -60,3 +60,67 @@
         </div>
     </div>
 </div>
+<script>
+    // 找到所有带有.delete-user类名的按钮
+    var deleteButtons = document.querySelectorAll('.delete-button');
+    // 遍历所有按钮并为每个按钮添加一个点击事件监听器
+    deleteButtons.forEach(function (button) {
+        button.addEventListener('click', function () {
+            // 获取该按钮的data-id属性，即任务ID
+            var Id = button.getAttribute('data-id');
+
+            // 显示SweetAlert2确认弹窗
+            Swal.fire({
+                title: '您确定要删除该账户吗？',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: '确认删除',
+                cancelButtonText: '取消'
+            }).then(function (result) {
+                // 如果用户点击了“确认”按钮，则向服务器发送DELETE请求
+                if (result.value) {
+                    // 发送DELETE请求
+                    fetch('/user/account/' + Id, {
+                        method: 'DELETE'
+                    }).then(function (response) {
+                        // 处理服务器响应
+                        if (response.ok) {
+                            // 解析响应数据
+                            return response.json();
+                        } else {
+                            // 如果删除失败，显示SweetAlert2错误提示框
+                            throw new Error('HTTP error ' + response.status);
+                        }
+                    }).then(data => {
+                        if (data.status === true) {
+                            // 如果删除成功，显示SweetAlert2成功提示框
+                            Swal.fire({
+                                title: '已成功删除！',
+                                confirmButtonText: '确定',
+                                icon: 'success'
+                            }).then(function (result) {
+                                // 如果用户点击了“确定”按钮，则刷新页面
+                                if (result.value) {
+                                    location.reload();
+                                }
+                            });
+                            setTimeout(function () {
+                                location.reload();
+                            }, 2000);
+                        } else {
+                            // 如果删除失败，显示SweetAlert2错误提示框
+                            throw new Error(data.msg);
+                        }
+                    }).catch(error => {
+                        // 处理错误
+                        Swal.fire({
+                            title: error.message,
+                            text: error.toString(),
+                            icon: 'error'
+                        });
+                    });
+                }
+            });
+        });
+    });
+</script>

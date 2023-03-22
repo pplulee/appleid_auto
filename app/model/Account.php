@@ -3,9 +3,7 @@ declare (strict_types=1);
 
 namespace app\model;
 
-use think\facade\Db;
 use think\Model;
-use think\Paginator;
 
 /**
  * @mixin Model
@@ -21,6 +19,7 @@ class Account extends Model
             return false;
         }
         $account = new Account();
+        $data['message'] = "未执行任务";
         $account->create($data);
         return true;
     }
@@ -32,27 +31,34 @@ class Account extends Model
 
     function deleteAccount($id): bool
     {
-        $account = $this->fetch($id);
+        if (!$this) {
+            $account = $this->fetch($id);
+        } else {
+            $account = $this;
+        }
         if (!$account) {
             return false;
         }
         // TODO 删除关联的分享页
-        $account->delete();
-        return true;
-    }
-
-    function updateAccount($data): bool
-    {
-        $account = $this->fetch($data['id']);
-        if (!$account) {
-            return false;
-        }
-        $account->update($data,['id' => $data['id']]);
-        return true;
+        return $account->delete();
     }
 
     function fetch($id)
     {
         return $this->where('id', $id)->find();
+    }
+
+    function updateAccount($id, $data): bool
+    {
+        if (!$this) {
+            $account = $this->fetch($id);
+        } else {
+            $account = $this;
+        }
+        if (!$account) {
+            return false;
+        }
+        $account->update($data, ['id' => $id]);
+        return true;
     }
 }

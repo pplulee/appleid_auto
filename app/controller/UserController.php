@@ -6,7 +6,9 @@ namespace app\controller;
 use app\BaseController;
 use app\model\Account;
 use app\model\User;
+use think\console\Output;
 use think\facade\Session;
+use think\response\Json;
 use think\response\View;
 
 class UserController extends BaseController
@@ -97,7 +99,7 @@ class UserController extends BaseController
         if ($account->owner != Session::get('user_id')) {
             return alert("error", "无权操作", "2000", "/user/account");
         }
-        return view('/user/accountDetail', ['account' => $account]);
+        return view('/user/accountDetail', ['account' => $account, 'action' => 'edit']);
     }
 
     public function accountAdd(): View
@@ -105,15 +107,69 @@ class UserController extends BaseController
         $account = new Account();
         $account->share_link = random_str(10);
         $account->check_interval = 30;
-        return view('/user/accountDetail', ['account' => $account]);
+        return view('/user/accountDetail', ['account' => $account, 'action' => 'add']);
     }
 
-    public function accountUpdate()
+    public function accountUpdate($id = 0): string
     {
-        // TODO
-        if (!$data['operation'] != "update" && !$data['operation'] != "add") {
-            return alert("error", "操作错误", "2000", "/user/account");
-        }
+        $data = [
+            'username' => $this->request->post('username'),
+            'password' => $this->request->post('password'),
+            'remark' => $this->request->post('remark'),
+            'dob' => $this->request->post('dob'),
+            'question1' => $this->request->post('question1'),
+            'answer1' => $this->request->post('answer1'),
+            'question2' => $this->request->post('question2'),
+            'answer2' => $this->request->post('answer2'),
+            'question3' => $this->request->post('question3'),
+            'answer3' => $this->request->post('answer3'),
+            'share_link' => $this->request->post('share_link'),
+            'check_interval' => $this->request->post('check_interval'),
+            'frontend_remark' => $this->request->post('frontend_remark'),
+            'enable_check_password_correct' => $this->request->post('enable_check_password_correct') !== null,
+            'enable_delete_devices' => $this->request->post('enable_delete_devices') !== null,
+            'enable_auto_update_password' => $this->request->post('enable_auto_update_password') !== null,
+        ];
         $account = new Account();
+        switch ($this->request->post('action')) {
+            case "edit":
+                $account = $account->fetch($id);
+                if (!$account) {
+                    return alert("error", "账号不存在", "2000", "/user/account");
+                }
+                if ($account->owner != Session::get('user_id')) {
+                    return alert("error", "无权操作", "2000", "/user/account");
+                }
+                return $account->updateAccount($account->id, $data) ?
+                    alert("success", "修改成功", "2000", "/user/account") :
+                    alert("error", "修改失败", "2000", "/user/account");
+            case "add":
+                $data['owner'] = Session::get('user_id');
+                return $account->addAccount($data) ?
+                    alert("success", "添加成功", "2000", "/user/account") :
+                    alert("error", "添加失败", "2000", "/user/account");
+            default:
+                return alert("error", "未知操作", "2000", "/user/account");
+        }
+    }
+
+    public function accountDelete($id): Json
+    {
+        $account = new Account();
+        $result = [];
+        $account = $account->fetch($id);
+        if (!$account) {
+            $result['msg'] = "账号不存在";
+            $result['status'] = false;
+        } elseif ($account->owner != Session::get('user_id')) {
+            $result['msg'] = "无权操作";
+            $result['status'] = false;
+        } else {
+            $result['status'] = $account->deleteAccount($account->id);
+            $output = new Output();
+            $output->writeln((string)$result['status']);
+            $result['msg'] = $result['status'] ? "删除成功" : "删除失败";
+        }
+        return json($result);
     }
 }

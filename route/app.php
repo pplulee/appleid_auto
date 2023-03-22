@@ -31,8 +31,11 @@ Route::group('user', function () {
     Route::get('index', 'user/index');
     Route::get('info', 'user/info');
     Route::post('info', 'user/updateUser');
-    Route::get('account/edit/:id', 'user/accountEdit');
     Route::get('account/add', 'user/accountAdd');
+    Route::post('account/add', 'user/accountUpdate');
+    Route::get('account/:id', 'user/accountEdit');
+    Route::post('account/:id', 'user/accountUpdate');
+    Route::delete('account/:id', 'user/accountDelete');
     Route::get('account', 'user/account');
     Route::get('logout', 'user/logout');
 })->middleware(UserIndex::class);
