@@ -8,24 +8,24 @@
         </button>
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
             <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-                <li class='nav-item'>
-                    <a class='nav-link' href='/user/index'>用户中心</a>
+                <li class="nav-item">
+                    <a class="nav-link" href="/user/index">用户中心</a>
                 </li>
-                <li class='nav-item'>
-                    <a class='nav-link' href='/user/account'>账号管理</a>
+                <li class="nav-item">
+                    <a class="nav-link" href="/user/account">账号管理</a>
                 </li>
-                <li class='nav-item'>
-                    <a class='nav-link' href='/user/share'>分享页管理</a>
+                <li class="nav-item">
+                    <a class="nav-link" href="/user/share">分享页管理</a>
                 </li>
-                <li class='nav-item'>
-                    <a class='nav-link' href='/user/proxy'>代理池</a>
+                <li class="nav-item">
+                    <a class="nav-link" href="/user/proxy">代理池</a>
                 </li>
-                <li class='nav-item'>
-                    <a class='nav-link' href='/user/info'>个人信息</a>
+                <li class="nav-item">
+                    <a class="nav-link" href="/user/info">个人信息</a>
                 </li>
-                {if isAdmin(session('user_id'))}
-                    <li class='nav-item'>
-                        <a class='nav-link' href='/admin'>管理面板</a>
+                {if isAdmin(session("user_id"))}
+                    <li class="nav-item">
+                        <a class="nav-link" href="/admin">管理面板</a>
                     </li>
                 {/if}
             </ul>

@@ -2,31 +2,31 @@
 
 <title>个人信息</title>
 <div class="container" style="margin-top: 2%;width: {isMobile()?" auto" : "30%"};">
-<div class='card border-dark'>
-    <h4 class='card-header bg-primary text-white text-center'>个人信息</h4>
-    <form action='' method='post' style="margin: 20px;">
+<div class="card border-dark">
+    <h4 class="card-header bg-primary text-white text-center">个人信息</h4>
+    <form action="" method="post" style="margin: 20px;">
         <div class="input-group mb-3">
-            <span class='input-group-text' id='username'>用户名</span>
-            <input type='text' class='form-control' name='username'
-                   value='{$user->username}'>
+            <span class="input-group-text" id="username">用户名</span>
+            <input type="text" class="form-control" name="username"
+                   value="{$user->username}">
         </div>
         <div class="input-group mb-3">
-            <span class='input-group-text' id='name'>密码</span>
-            <input type='password' class='form-control' name='password' placeholder='不修改请留空'>
+            <span class="input-group-text" id="name">密码</span>
+            <input type="password" class="form-control" name="password" placeholder="不修改请留空">
         </div>
         <div class="input-group mb-3">
-            <span class='input-group-text' id='tg_bot_token'>Telegram Bot Token</span>
-            <input type='text' class='form-control' name='tg_bot_token' value='{$user->tg_bot_token}'>
+            <span class="input-group-text" id="tg_bot_token">Telegram Bot Token</span>
+            <input type="text" class="form-control" name="tg_bot_token" value="{$user->tg_bot_token}">
         </div>
         <div class="input-group mb-3">
-            <span class='input-group-text' id='tg_chat_id'>Telegram Chat ID</span>
-            <input type='text' class='form-control' name='tg_chat_id' value='{$user->tg_chat_id}'>
+            <span class="input-group-text" id="tg_chat_id">Telegram Chat ID</span>
+            <input type="text" class="form-control" name="tg_chat_id" value="{$user->tg_chat_id}">
         </div>
         <div class="input-group mb-3">
-            <span class='input-group-text' id='wx_pusher_id'>微信Pusher ID</span>
-            <input type='text' class='form-control' name='wx_pusher_id' value='{$user->wx_pusher_id}'>
+            <span class="input-group-text" id="wx_pusher_id">微信Pusher ID</span>
+            <input type="text" class="form-control" name="wx_pusher_id" value="{$user->wx_pusher_id}">
         </div>
-        <input type='submit' class='btn btn-primary' name='submit' value='保存'>
+        <input type="submit" class="btn btn-primary" name="submit" value="保存">
     </form>
 </div>
 </div>
