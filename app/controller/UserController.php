@@ -47,6 +47,9 @@ class UserController extends BaseController
             'id' => $user->id,
             'username' => $this->request->post('username'),
             'password' => $this->request->post('password'),
+            'tg_bot_token' => $this->request->post('tg_bot_token'),
+            'tg_chat_id' => $this->request->post('tg_chat_id'),
+            'wx_pusher_id' => $this->request->post('wx_pusher_id'),
         ];
         if ($user->updateUser($data)) {
             return alert("success", "修改成功", "2000", "/user/info");

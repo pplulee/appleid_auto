@@ -14,6 +14,18 @@
             <span class='input-group-text' id='name'>密码</span>
             <input type='password' class='form-control' name='password' placeholder='不修改请留空'>
         </div>
+        <div class="input-group mb-3">
+            <span class='input-group-text' id='tg_bot_token'>Telegram Bot Token</span>
+            <input type='text' class='form-control' name='tg_bot_token' value='{$user->tg_bot_token}'>
+        </div>
+        <div class="input-group mb-3">
+            <span class='input-group-text' id='tg_chat_id'>Telegram Chat ID</span>
+            <input type='text' class='form-control' name='tg_chat_id' value='{$user->tg_chat_id}'>
+        </div>
+        <div class="input-group mb-3">
+            <span class='input-group-text' id='wx_pusher_id'>微信Pusher ID</span>
+            <input type='text' class='form-control' name='wx_pusher_id' value='{$user->wx_pusher_id}'>
+        </div>
         <input type='submit' class='btn btn-primary' name='submit' value='保存'>
     </form>
 </div>

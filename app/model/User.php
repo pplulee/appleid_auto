@@ -55,6 +55,9 @@ class User extends Model
             if (isset($data['is_admin']) && $user->is_admin != $data['is_admin']) {
                 $update['is_admin'] = $data['is_admin'];
             }
+            $update['tg_bot_token'] = $data['tg_bot_token'];
+            $update['tg_chat_id'] = $data['tg_chat_id'];
+            $update['wx_pusher_id'] = $data['wx_pusher_id'];
             if (count($update) > 0) {
                 $user->update($update, ['id' => $id]);
             }
