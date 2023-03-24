@@ -3,6 +3,7 @@ declare (strict_types=1);
 
 namespace app\model;
 
+use think\facade\Db;
 use think\Model;
 
 /**
@@ -39,7 +40,24 @@ class Account extends Model
         if (!$account) {
             return false;
         }
-        // TODO 删除关联的分享页
+        $pages = Db::table('share')
+            ->field('id, account_list')
+            ->where('locate(:id, account_list)', ['id' => $id])
+            ->select();
+        foreach ($pages as $page) {
+            $account_list = explode(",", $page['account_list']);
+            if (count($account_list) == 1) {
+                Db::table('share')
+                    ->where('id', $page['id'])
+                    ->delete();
+                continue;
+            }
+            $account_list = array_diff($account_list, [$id]);
+            $account_list = implode(",", $account_list);
+            Db::table('share')
+                ->where('id', $page['id'])
+                ->update(['account_list' => $account_list]);
+        }
         return $account->delete();
     }
 
