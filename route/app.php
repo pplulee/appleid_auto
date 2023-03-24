@@ -31,11 +31,16 @@ Route::group('user', function () {
     Route::get('index', 'user/index');
     Route::get('info', 'user/info');
     Route::post('info', 'user/updateUser');
+    // 账号相关
     Route::get('account/add', 'user/accountAdd');
     Route::post('account/add', 'user/accountUpdate');
     Route::get('account/:id', 'user/accountEdit');
     Route::post('account/:id', 'user/accountUpdate');
     Route::delete('account/:id', 'user/accountDelete');
     Route::get('account', 'user/account');
+    // 分享页相关
+    Route::get('share/add', 'user/shareAdd');
+    Route::post('share/add', 'user/shareUpdate');
+    Route::get('share', 'user/share');
     Route::get('logout', 'user/logout');
 })->middleware(UserIndex::class);

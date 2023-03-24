@@ -175,4 +175,10 @@ class UserController extends BaseController
         }
         return json($result);
     }
+
+    public function share(): View
+    {
+        $shareList = $this->app->shareService->fetchByOwner(Session::get('user_id'));
+        return view('/user/share', ['shares' => $shareList]);
+    }
 }

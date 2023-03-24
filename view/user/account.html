@@ -18,19 +18,6 @@
                     <th>检查间隔</th>
                     <th>操作</th>
                 </tr>
-                <script>
-                    var clipboard = new ClipboardJS('.btn');
-
-                    function alert_success() {
-                        Swal.fire({
-                            icon: 'success',
-                            title: '提示',
-                            text: '复制成功',
-                            timer: 1000,
-                            timerProgressBar: true
-                        });
-                    }
-                </script>
                 </thead>
                 <tbody>
                 {if $accounts->isEmpty()}
