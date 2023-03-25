@@ -1,0 +1,35 @@
+{include file="user/header"}
+<div class="container" style="margin-top: 2%; width: {isMobile()?" auto" : "30%"};">
+<div class="card border-dark">
+    <h4 class="card-header bg-primary text-white text-center">添加分享页</h4>
+    <form action="" method="post" style="margin: 20px;">
+        <span class="input-group-text" id="account_list">请选择账号</span>
+        <div class="form-check mb-3">
+            {foreach $accounts as $id => $username}
+            {$username} <input class="form-check-input" type="checkbox" role="switch" name="account_list[]"
+                               value="{$id}" {$checked=in_array($id, $share->account_list) ? "checked" : ""}><br>
+            {/foreach}
+        </div>
+        <div class="input-group mb-3">
+            <span class="input-group-text" id="share_link">分享代码</span>
+            <input type="text" class="form-control" name="share_link" value="{$share->share_link}" required
+                   autocomplete="off">
+        </div>
+        <div class="input-group mb-3">
+            <span class="input-group-text" id="password">页面密码</span>
+            <input type="text" class="form-control" name="password" placeholder="留空则不启用密码"
+                   autocomplete="off" value="{$share->password}">
+        </div>
+        <div class="input-group mb-3">
+            <span class="input-group-text" id="remark">备注</span>
+            <input type="text" class="form-control" name="remark" autocomplete="off" value="{$share->remark}">
+        </div>
+        <div class="input-group mb-3">
+            <span class="input-group-text" id="html">HTML内容</span>
+            <textarea name="html" cols="100" rows=4>{$share->html}</textarea>
+        </div>
+        <input type="hidden" name="action" value="{$action}">
+        <input type="submit" name="submit" class="btn btn-primary btn-block" value="{$action=="add"?"添加":"保存"}">
+    </form>
+</div>
+</div>

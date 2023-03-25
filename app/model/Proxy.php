@@ -13,12 +13,6 @@ class Proxy extends Model
     protected $table = 'proxy';
     protected $pk = 'id';
 
-
-    public function fetch($id): ?Proxy
-    {
-        return $this->where('id', $id)->find();
-    }
-
     public function addProxy($data): bool
     {
         $proxy = new Proxy();
@@ -38,6 +32,11 @@ class Proxy extends Model
         }
         $proxy->update($data, ['id' => $id]);
         return true;
+    }
+
+    public function fetch($id): ?Proxy
+    {
+        return $this->where('id', $id)->find();
     }
 
     public function deleteProxy($id): bool

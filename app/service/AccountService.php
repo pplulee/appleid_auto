@@ -26,8 +26,10 @@ class AccountService extends Service
 
     public function fetchIDByOwner($user_id): array
     {
-        $accounts = Db::name('account')->field('id, username')->where('owner', $user_id)->select();
-        return $accounts;
+        return Db::name('account')
+            ->field('id, username')
+            ->where('owner', $user_id)
+            ->column('username', 'id');
     }
 
 }

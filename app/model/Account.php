@@ -43,9 +43,9 @@ class Account extends Model
         $pages = Db::table('share')
             ->field('id, account_list')
             ->where('locate(:id, account_list)', ['id' => $id])
-            ->select();
+            ->column('id, account_list');
         foreach ($pages as $page) {
-            $account_list = explode(",", $page['account_list']);
+            $account_list = array_map('intval', explode(",", $page['account_list']));
             if (count($account_list) == 1) {
                 Db::table('share')
                     ->where('id', $page['id'])

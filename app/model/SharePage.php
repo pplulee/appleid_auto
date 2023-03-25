@@ -15,12 +15,7 @@ class SharePage extends Model
 
     public function addSharePage($data): bool
     {
-        if ($this->fetchByLink($data['link'])) {
-            return false;
-        }
-        if (isset($data['account_list'])) {
-            $data['account_list'] = implode(",", $data['account_list']);
-        } else {
+        if ($this->fetchByLink($data['share_link'])) {
             return false;
         }
         $share = new SharePage();
@@ -30,7 +25,7 @@ class SharePage extends Model
 
     public function fetchByLink($link): ?SharePage
     {
-        return $this->where('link', $link)->find();
+        return $this->where('share_link', $link)->find();
     }
 
     public function updateSharePage($id, $data): bool
@@ -43,13 +38,16 @@ class SharePage extends Model
         if (!$share) {
             return false;
         }
-        if (isset($data['account_list'])) {
-            $data['account_list'] = implode(",", $data['account_list']);
-        } else {
-            return false;
-        }
         $share->update($data, ['id' => $id]);
         return true;
+    }
+
+    public function fetch($id): ?SharePage
+    {
+        $share = $this->where('id', $id)->find();
+        if (!$share) return null;
+        $share->account_list = array_map('intval', explode(",", $share->account_list));
+        return $share;
     }
 
     public function deleteSharePage($id): bool

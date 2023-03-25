@@ -41,6 +41,9 @@ Route::group('user', function () {
     // 分享页相关
     Route::get('share/add', 'user/shareAdd');
     Route::post('share/add', 'user/shareUpdate');
+    Route::get('share/:id', 'user/shareEdit');
+    Route::post('share/:id', 'user/shareUpdate');
+    Route::delete('share/:id', 'user/shareDelete');
     Route::get('share', 'user/share');
     Route::get('logout', 'user/logout');
 })->middleware(UserIndex::class);

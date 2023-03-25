@@ -7,7 +7,6 @@ use app\BaseController;
 use app\model\Account;
 use app\model\SharePage;
 use app\model\User;
-use think\console\Output;
 use think\facade\Session;
 use think\response\Json;
 use think\response\View;
@@ -170,8 +169,6 @@ class UserController extends BaseController
             $result['status'] = false;
         } else {
             $result['status'] = $account->deleteAccount($account->id);
-            $output = new Output();
-            $output->writeln((string)$result['status']);
             $result['msg'] = $result['status'] ? "删除成功" : "删除失败";
         }
         return json($result);
@@ -186,11 +183,81 @@ class UserController extends BaseController
     public function shareAdd()
     {
         $share = new SharePage();
-        $userAccountList = $this->app->accountService->fetchByOwner(Session::get('user_id'));
+        $userAccountList = $this->app->accountService->fetchIDByOwner(Session::get('user_id'));
         // 检查用户是否有账号
         if (count($userAccountList) == 0) {
             return alert("error", "请先添加账号", "2000", "/user/account");
         }
+        $share->share_link = random_str(10);
+        $share->account_list = $userAccountList;
         return view('/user/shareDetail', ['share' => $share, 'accounts' => $userAccountList, 'action' => 'add']);
+    }
+
+    public function shareEdit($id)
+    {
+        $share = new SharePage();
+        $share = $share->fetch($id);
+        if (!$share) {
+            return alert("error", "分享页面不存在", "2000", "/user/share");
+        }
+        if ($share->owner != Session::get('user_id')) {
+            return alert("error", "无权操作", "2000", "/user/share");
+        }
+        $userAccountList = $this->app->accountService->fetchIDByOwner(Session::get('user_id'));
+        return view('/user/shareDetail', ['share' => $share, 'accounts' => $userAccountList, 'action' => 'edit']);
+    }
+
+    public function shareUpdate($id = 0): string
+    {
+        $account_list = $this->request->post('account_list');
+        if (!$account_list) {
+            return alert("error", "请至少选择一个账号", "2000", "/user/share/$id");
+        }
+        $accounts = implode(',', $account_list);
+        $data = [
+            'share_link' => $this->request->post('share_link'),
+            'account_list' => $accounts,
+            'owner' => Session::get('user_id'),
+            'html' => $this->request->post('html'),
+            'remark' => $this->request->post('remark')
+        ];
+        $sharePage = new SharePage();
+        switch ($this->request->post('action')) {
+            case "edit":
+                $sharePage = $sharePage->fetch($id);
+                if (!$sharePage) {
+                    return alert("error", "分享页面不存在", "2000", "/user/share");
+                }
+                if ($sharePage->owner != Session::get('user_id')) {
+                    return alert("error", "无权操作", "2000", "/user/share");
+                }
+                return $sharePage->updateSharePage($sharePage->id, $data) ?
+                    alert("success", "修改成功", "2000", "/user/share") :
+                    alert("error", "修改失败", "2000", "/user/share");
+            case "add":
+                return $sharePage->addSharePage($data) ?
+                    alert("success", "添加成功", "2000", "/user/share") :
+                    alert("error", "添加失败", "2000", "/user/share");
+            default:
+                return alert("error", "未知操作", "2000", "/user/share");
+        }
+    }
+
+    public function shareDelete($id): Json
+    {
+        $sharePage = new SharePage();
+        $result = [];
+        $sharePage = $sharePage->fetch($id);
+        if (!$sharePage) {
+            $result['msg'] = "分享页面不存在";
+            $result['status'] = false;
+        } elseif ($sharePage->owner != Session::get('user_id')) {
+            $result['msg'] = "无权操作";
+            $result['status'] = false;
+        } else {
+            $result['status'] = $sharePage->deleteSharePage($sharePage->id);
+            $result['msg'] = $result['status'] ? "删除成功" : "删除失败";
+        }
+        return json($result);
     }
 }
