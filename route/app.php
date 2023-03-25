@@ -45,5 +45,13 @@ Route::group('user', function () {
     Route::post('share/:id', 'user/shareUpdate');
     Route::delete('share/:id', 'user/shareDelete');
     Route::get('share', 'user/share');
+    // 代理相关
+    Route::get('proxy/add', 'user/proxyAdd');
+    Route::post('proxy/add', 'user/proxyUpdate');
+    Route::get('proxy/:id', 'user/proxyEdit');
+    Route::post('proxy/:id', 'user/proxyUpdate');
+    Route::delete('proxy/:id', 'user/proxyDelete');
+    Route::get('proxy', 'user/proxy');
+    //
     Route::get('logout', 'user/logout');
 })->middleware(UserIndex::class);

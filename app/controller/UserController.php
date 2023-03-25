@@ -5,6 +5,7 @@ namespace app\controller;
 
 use app\BaseController;
 use app\model\Account;
+use app\model\Proxy;
 use app\model\SharePage;
 use app\model\User;
 use think\facade\Session;
@@ -256,6 +257,81 @@ class UserController extends BaseController
             $result['status'] = false;
         } else {
             $result['status'] = $sharePage->deleteSharePage($sharePage->id);
+            $result['msg'] = $result['status'] ? "删除成功" : "删除失败";
+        }
+        return json($result);
+    }
+
+    public function proxy(): View
+    {
+        $proxyList = $this->app->proxyService->fetchByOwner(Session::get('user_id'));
+        return view('/user/proxy', ['proxies' => $proxyList]);
+    }
+
+    public function proxyAdd(): View
+    {
+        $proxy = new Proxy();
+        $protocols = $this->app->proxyService->getProtocols();
+        return view('/user/proxyDetail', ['proxy' => $proxy, 'action' => 'add', 'protocols' => $protocols]);
+    }
+
+    public function proxyEdit($id)
+    {
+        $proxy = new Proxy();
+        $proxy = $proxy->fetch($id);
+        if (!$proxy) {
+            return alert("error", "代理不存在", "2000", "/user/proxy");
+        }
+        if ($proxy->owner != Session::get('user_id')) {
+            return alert("error", "无权操作", "2000", "/user/proxy");
+        }
+        $protocols = $this->app->proxyService->getProtocols();
+        return view('/user/proxyDetail', ['proxy' => $proxy, 'action' => 'edit', 'protocols' => $protocols]);
+    }
+
+    public function proxyUpdate(): string
+    {
+        $data = [
+            'protocol' => $this->request->post('protocol'),
+            'content' => $this->request->post('content'),
+            'status' => $this->request->post('status'),
+            'owner' => Session::get('user_id'),
+        ];
+        $proxy = new Proxy();
+        switch ($this->request->post('action')) {
+            case "edit":
+                $proxy = $proxy->fetch($this->request->post('id'));
+                if (!$proxy) {
+                    return alert("error", "代理不存在", "2000", "/user/proxy");
+                }
+                if ($proxy->owner != Session::get('user_id')) {
+                    return alert("error", "无权操作", "2000", "/user/proxy");
+                }
+                return $proxy->updateProxy($proxy->id, $data) ?
+                    alert("success", "修改成功", "2000", "/user/proxy") :
+                    alert("error", "修改失败", "2000", "/user/proxy");
+            case "add":
+                return $proxy->addProxy($data) ?
+                    alert("success", "添加成功", "2000", "/user/proxy") :
+                    alert("error", "添加失败", "2000", "/user/proxy");
+            default:
+                return alert("error", "未知操作", "2000", "/user/proxy");
+        }
+    }
+
+    public function proxyDelete($id): Json
+    {
+        $proxy = new Proxy();
+        $result = [];
+        $proxy = $proxy->fetch($id);
+        if (!$proxy) {
+            $result['msg'] = "代理不存在";
+            $result['status'] = false;
+        } elseif ($proxy->owner != Session::get('user_id')) {
+            $result['msg'] = "无权操作";
+            $result['status'] = false;
+        } else {
+            $result['status'] = $proxy->deleteProxy($proxy->id);
             $result['msg'] = $result['status'] ? "删除成功" : "删除失败";
         }
         return json($result);
