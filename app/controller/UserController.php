@@ -5,6 +5,7 @@ namespace app\controller;
 
 use app\BaseController;
 use app\model\Account;
+use app\model\SharePage;
 use app\model\User;
 use think\console\Output;
 use think\facade\Session;
@@ -180,5 +181,16 @@ class UserController extends BaseController
     {
         $shareList = $this->app->shareService->fetchByOwner(Session::get('user_id'));
         return view('/user/share', ['shares' => $shareList]);
+    }
+
+    public function shareAdd()
+    {
+        $share = new SharePage();
+        $userAccountList = $this->app->accountService->fetchByOwner(Session::get('user_id'));
+        // 检查用户是否有账号
+        if (count($userAccountList) == 0) {
+            return alert("error", "请先添加账号", "2000", "/user/account");
+        }
+        return view('/user/shareDetail', ['share' => $share, 'accounts' => $userAccountList, 'action' => 'add']);
     }
 }

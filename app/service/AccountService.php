@@ -24,4 +24,10 @@ class AccountService extends Service
         return Db::name('account')->where('owner', $user_id)->paginate(25);
     }
 
+    public function fetchIDByOwner($user_id): array
+    {
+        $accounts = Db::name('account')->field('id, username')->where('owner', $user_id)->select();
+        return $accounts;
+    }
+
 }
