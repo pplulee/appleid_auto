@@ -37,6 +37,7 @@
                 {/volist}
                 </tbody>
             </table>
+            {$proxies|raw}
         </div>
     </div>
 </div>
@@ -51,7 +52,7 @@
 
             // 显示SweetAlert2确认弹窗
             Swal.fire({
-                title: '您确定要删除该账户吗？',
+                title: '您确定要删除该代理吗？',
                 icon: 'warning',
                 showCancelButton: true,
                 confirmButtonText: '确认删除',

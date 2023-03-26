@@ -145,15 +145,14 @@
             <div class="col">
                 <div class="input-group mb-3">
                     <div class="form-check form-switch">
-                        允许用户解锁<input class="form-check-input" type="checkbox"
-                                           name="allow_manual_unlock" {$account->allow_manual_unlock?"checked":""}>
+                        用户解锁最短间隔<input type="number" class="form-control" min="0" name="min_manual_unlock" value="{$account->min_manual_unlock}">
                         <div class="alert alert-info" role="alert">
                             <div class="d-flex">
                                 <div>
                                     <i class="fas fa-circle-info"></i>
                                 </div>
                                 <div>
-                                    <div class="text-muted">在分享页显示按钮，允许用户点击解锁。</div>
+                                    <div class="text-muted">启用后端API时，分享页中允许手动解锁账号。设置决定两次手动解锁之间的最短时间间隔。设为0表示不允许用户手动解锁。</div>
                                 </div>
                             </div>
                         </div>

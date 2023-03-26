@@ -16,11 +16,11 @@ class Auth
             return response(alert("error", "您已登录", "2000", "/user/index"));
         }
         // 检查是否存在用户名密码
-        if (!$request->post('username') || !$request->post('password')) {
+        if (!$request->param('username') || !$request->param('password')) {
             return response(alert("error", "用户名或密码不能为空", "2000", "/index"));
         }
         // 检查是否有登录或注册操作
-        if ($request->post('login') xor $request->post('register')) {
+        if ($request->param('login') xor $request->param('register')) {
             return $next($request);
         } else {
             return response(alert("error", "未知操作", "2000", "/index"));

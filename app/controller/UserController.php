@@ -8,6 +8,7 @@ use app\model\Account;
 use app\model\Proxy;
 use app\model\SharePage;
 use app\model\User;
+use Exception;
 use think\facade\Session;
 use think\response\Json;
 use think\response\View;
@@ -44,14 +45,18 @@ class UserController extends BaseController
         if (!$user) {
             return alert("error", "用户不存在", "2000", "/index");
         }
-        $data = [
-            'id' => $user->id,
-            'username' => $this->request->post('username'),
-            'password' => $this->request->post('password'),
-            'tg_bot_token' => $this->request->post('tg_bot_token'),
-            'tg_chat_id' => $this->request->post('tg_chat_id'),
-            'wx_pusher_id' => $this->request->post('wx_pusher_id'),
-        ];
+        try {
+            $data = [
+                'id' => $user->id,
+                'username' => $this->request->param('username'),
+                'password' => $this->request->param('password'),
+                'tg_bot_token' => $this->request->param('tg_bot_token'),
+                'tg_chat_id' => $this->request->param('tg_chat_id'),
+                'wx_pusher_id' => $this->request->param('wx_pusher_id'),
+            ];
+        } catch (Exception $e) {
+            return alert("error", "参数错误", "2000", "/user/info");
+        }
         if ($user->updateUser($data)) {
             return alert("success", "修改成功", "2000", "/user/info");
         } else {
@@ -61,8 +66,8 @@ class UserController extends BaseController
 
     public function login(): string
     {
-        $username = $this->request->post('username');
-        $password = $this->request->post('password');
+        $username = $this->request->param('username');
+        $password = $this->request->param('password');
         if ($this->app->authService->userLogin($username, $password)) {
             return alert("success", "登录成功", "2000", "/user/index");
         } else {
@@ -72,8 +77,8 @@ class UserController extends BaseController
 
     public function register(): string
     {
-        $username = $this->request->post('username');
-        $password = $this->request->post('password');
+        $username = $this->request->param('username');
+        $password = $this->request->param('password');
         if ($this->app->authService->userRegister($username, $password)) {
             return alert("success", "注册成功", "2000", "/index");
         } else {
@@ -116,27 +121,31 @@ class UserController extends BaseController
 
     public function accountUpdate($id = 0): string
     {
-        $data = [
-            'username' => $this->request->post('username'),
-            'password' => $this->request->post('password'),
-            'remark' => $this->request->post('remark'),
-            'dob' => $this->request->post('dob'),
-            'question1' => $this->request->post('question1'),
-            'answer1' => $this->request->post('answer1'),
-            'question2' => $this->request->post('question2'),
-            'answer2' => $this->request->post('answer2'),
-            'question3' => $this->request->post('question3'),
-            'answer3' => $this->request->post('answer3'),
-            'share_link' => $this->request->post('share_link'),
-            'check_interval' => $this->request->post('check_interval'),
-            'frontend_remark' => $this->request->post('frontend_remark'),
-            'enable_check_password_correct' => $this->request->post('enable_check_password_correct') !== null,
-            'enable_delete_devices' => $this->request->post('enable_delete_devices') !== null,
-            'enable_auto_update_password' => $this->request->post('enable_auto_update_password') !== null,
-            'allow_manual_unlock' => $this->request->post('allow_manual_unlock') !== null,
-        ];
+        try {
+            $data = [
+                'username' => $this->request->param('username'),
+                'password' => $this->request->param('password'),
+                'remark' => $this->request->param('remark'),
+                'dob' => $this->request->param('dob'),
+                'question1' => $this->request->param('question1'),
+                'answer1' => $this->request->param('answer1'),
+                'question2' => $this->request->param('question2'),
+                'answer2' => $this->request->param('answer2'),
+                'question3' => $this->request->param('question3'),
+                'answer3' => $this->request->param('answer3'),
+                'share_link' => $this->request->param('share_link'),
+                'check_interval' => $this->request->param('check_interval'),
+                'frontend_remark' => $this->request->param('frontend_remark'),
+                'enable_check_password_correct' => $this->request->param('enable_check_password_correct') !== null,
+                'enable_delete_devices' => $this->request->param('enable_delete_devices') !== null,
+                'enable_auto_update_password' => $this->request->param('enable_auto_update_password') !== null,
+                'min_manual_unlock' => $this->request->param('min_manual_unlock'),
+            ];
+        } catch (Exception $e) {
+            return alert("error", "参数错误", "2000", "/user/account");
+        }
         $account = new Account();
-        switch ($this->request->post('action')) {
+        switch ($this->request->param('action')) {
             case "edit":
                 $account = $account->fetch($id);
                 if (!$account) {
@@ -214,7 +223,7 @@ class UserController extends BaseController
     {
         $shareList = $this->app->shareService->fetchByOwner(Session::get('user_id'));
         $shareURL = $this->request->domain() . "/share/";
-        return view('/user/share', ['shares' => $shareList,'shareURL'=>$shareURL]);
+        return view('/user/share', ['shares' => $shareList, 'shareURL' => $shareURL]);
     }
 
     public function shareAdd()
@@ -246,21 +255,25 @@ class UserController extends BaseController
 
     public function shareUpdate($id = 0): string
     {
-        $account_list = $this->request->post('account_list');
-        if (!$account_list) {
-            return alert("error", "请至少选择一个账号", "2000", "/user/share".$id==0?"":"/$id");
+        try {
+            $account_list = $this->request->param('account_list');
+            if (!$account_list) {
+                return alert("error", "请至少选择一个账号", "2000", "/user/share" . $id == 0 ? "" : "/$id");
+            }
+            $accounts = implode(',', $account_list);
+            $data = [
+                'share_link' => $this->request->param('share_link'),
+                'account_list' => $accounts,
+                'owner' => Session::get('user_id'),
+                'html' => $this->request->param('html'),
+                'remark' => $this->request->param('remark'),
+                'expire' => $this->request->param('expire') == "" ? null : $this->request->param('expire'),
+            ];
+        } catch (Exception $e) {
+            return alert("error", "参数错误", "2000", "/user/share" . $id == 0 ? "" : "/$id");
         }
-        $accounts = implode(',', $account_list);
-        $data = [
-            'share_link' => $this->request->post('share_link'),
-            'account_list' => $accounts,
-            'owner' => Session::get('user_id'),
-            'html' => $this->request->post('html'),
-            'remark' => $this->request->post('remark'),
-            'expire' => $this->request->post('expire')==""?null:$this->request->post('expire'),
-        ];
         $sharePage = new SharePage();
-        switch ($this->request->post('action')) {
+        switch ($this->request->param('action')) {
             case "edit":
                 $sharePage = $sharePage->fetch($id);
                 if (!$sharePage) {
@@ -326,16 +339,20 @@ class UserController extends BaseController
         return view('/user/proxyDetail', ['proxy' => $proxy, 'action' => 'edit', 'protocols' => $protocols]);
     }
 
-    public function proxyUpdate($id=0): string
+    public function proxyUpdate($id = 0): string
     {
-        $data = [
-            'protocol' => $this->request->post('protocol'),
-            'content' => $this->request->post('content'),
-            'status' => $this->request->post('status')!==null,
-            'owner' => Session::get('user_id'),
-        ];
+        try {
+            $data = [
+                'protocol' => $this->request->param('protocol'),
+                'content' => $this->request->param('content'),
+                'status' => $this->request->param('status') !== null,
+                'owner' => Session::get('user_id'),
+            ];
+        } catch (Exception $e) {
+            return alert("error", "参数错误", "2000", "/user/proxy" . $id == 0 ? "" : "/$id");
+        }
         $proxy = new Proxy();
-        switch ($this->request->post('action')) {
+        switch ($this->request->param('action')) {
             case "edit":
                 $proxy = $proxy->fetch($id);
                 if (!$proxy) {

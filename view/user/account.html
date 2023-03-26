@@ -16,7 +16,7 @@
                     <th>状态</th>
                     <th>上次检查</th>
                     <th>检查间隔</th>
-                    <th>允许用户解锁</th>
+                    <th>手动解锁间隔</th>
                     <th>操作</th>
                 </tr>
                 </thead>
@@ -36,7 +36,7 @@
                     <td>{$account.message}</td>
                     <td>{$account.last_check}</td>
                     <td>{$account.check_interval}</td>
-                    <td>{$account.allow_manual_unlock?"是":"否"}</td>
+                    <td>{$account.min_manual_unlock ? $account.min_manual_unlock : "未启用"}</td>
                     <td>
                         {if env('enable_backend_api')}
                         <a class="btn btn-yellow" href="/user/account/{$account.id}/restart">重启任务</a>
