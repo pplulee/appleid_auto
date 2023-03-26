@@ -10,14 +10,9 @@ use think\Service;
 
 class AuthService extends Service
 {
-    /**
-     * 注册服务
-     *
-     * @return mixed
-     */
     public function register(): void
     {
-        $this->app->bind('authService', authService::class);
+        $this->app->bind('authService', AuthService::class);
     }
 
     public function userLogin($username, $password): bool

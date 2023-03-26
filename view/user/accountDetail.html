@@ -135,7 +135,25 @@
                                     <i class="fas fa-circle-info"></i>
                                 </div>
                                 <div>
-                                    <div class="text-muted">每次执行任务时强制修改密码，实现定时改密</div>
+                                    <div class="text-muted">每次执行任务时强制修改密码，实现定时改密。</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col">
+                <div class="input-group mb-3">
+                    <div class="form-check form-switch">
+                        允许用户解锁<input class="form-check-input" type="checkbox"
+                                           name="allow_manual_unlock" {$account->allow_manual_unlock?"checked":""}>
+                        <div class="alert alert-info" role="alert">
+                            <div class="d-flex">
+                                <div>
+                                    <i class="fas fa-circle-info"></i>
+                                </div>
+                                <div>
+                                    <div class="text-muted">在分享页显示按钮，允许用户点击解锁。</div>
                                 </div>
                             </div>
                         </div>

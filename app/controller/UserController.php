@@ -133,6 +133,7 @@ class UserController extends BaseController
             'enable_check_password_correct' => $this->request->post('enable_check_password_correct') !== null,
             'enable_delete_devices' => $this->request->post('enable_delete_devices') !== null,
             'enable_auto_update_password' => $this->request->post('enable_auto_update_password') !== null,
+            'allow_manual_unlock' => $this->request->post('allow_manual_unlock') !== null,
         ];
         $account = new Account();
         switch ($this->request->post('action')) {
@@ -144,16 +145,50 @@ class UserController extends BaseController
                 if ($account->owner != Session::get('user_id')) {
                     return alert("error", "无权操作", "2000", "/user/account");
                 }
-                return $account->updateAccount($account->id, $data) ?
-                    alert("success", "修改成功", "2000", "/user/account") :
-                    alert("error", "修改失败", "2000", "/user/account");
+                $result = $account->updateAccount($account->id, $data);
+                if ($result) {
+                    $backendResult = $this->app->backendService->restartTask($id);
+                    if ($backendResult['status']) {
+                        return alert("success", "修改成功", "2000", "/user/account");
+                    } else {
+                        return alert("question", "修改成功，但后端重启失败：" . $backendResult['msg'], "2000", "/user/account");
+                    }
+                } else {
+                    return alert("error", "修改失败", "2000", "/user/account");
+                }
             case "add":
                 $data['owner'] = Session::get('user_id');
-                return $account->addAccount($data) ?
-                    alert("success", "添加成功", "2000", "/user/account") :
-                    alert("error", "添加失败", "2000", "/user/account");
+                $result = $account->addAccount($data);
+                if ($result) {
+                    $backendResult = $this->app->backendService->restartTask($result);
+                    if ($backendResult['status']) {
+                        return alert("success", "添加成功", "2000", "/user/account");
+                    } else {
+                        return alert("question", "添加成功，但后端重启失败：" . $backendResult['msg'], "2000", "/user/account");
+                    }
+                } else {
+                    return alert("error", "添加失败", "2000", "/user/account");
+                }
             default:
                 return alert("error", "未知操作", "2000", "/user/account");
+        }
+    }
+
+    public function accountRestart($id): string
+    {
+        $account = new Account();
+        $account = $account->fetch($id);
+        if (!$account) {
+            return alert("error", "账号不存在", "2000", "/user/account");
+        }
+        if ($account->owner != Session::get('user_id')) {
+            return alert("error", "无权操作", "2000", "/user/account");
+        }
+        $backendResult = $this->app->backendService->restartTask($id);
+        if ($backendResult['status']) {
+            return alert("success", "重启成功", "2000", "/user/account");
+        } else {
+            return alert("error", "重启失败：" . $backendResult['msg'], "2000", "/user/account");
         }
     }
 

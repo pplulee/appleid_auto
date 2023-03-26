@@ -16,13 +16,14 @@
                     <th>状态</th>
                     <th>上次检查</th>
                     <th>检查间隔</th>
+                    <th>允许用户解锁</th>
                     <th>操作</th>
                 </tr>
                 </thead>
                 <tbody>
                 {if $accounts->isEmpty()}
                 <tr>
-                    <td class="text-center" colspan="9">暂无数据</td>
+                    <td class="text-center" colspan="10">暂无数据</td>
                 </tr>
                 {/if}
                 {volist name="accounts" id="account"}
@@ -35,7 +36,11 @@
                     <td>{$account.message}</td>
                     <td>{$account.last_check}</td>
                     <td>{$account.check_interval}</td>
+                    <td>{$account.allow_manual_unlock?"是":"否"}</td>
                     <td>
+                        {if env('enable_backend_api')}
+                        <a class="btn btn-yellow" href="/user/account/{$account.id}/restart">重启任务</a>
+                        {/if}
                         <a class="btn btn-secondary" href="/user/account/{$account.id}">编辑</a>
                         <button class="btn btn-danger delete-button" data-id="{$account.id}">删除</button>
                     </td>

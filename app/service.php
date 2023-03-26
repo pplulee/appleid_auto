@@ -3,6 +3,7 @@
 use app\AppService;
 use app\service\AccountService;
 use app\service\AuthService;
+use app\service\BackendService;
 use app\service\ProxyService;
 use app\service\ShareService;
 
@@ -12,6 +13,7 @@ return [
     AppService::class,
     AuthService::class,
     AccountService::class,
+    BackendService::class,
+    ProxyService::class,
     ShareService::class,
-    ProxyService::class
 ];
