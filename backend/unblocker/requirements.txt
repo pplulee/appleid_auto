@@ -1,5 +1,5 @@
 ddddocr~=1.4.7
 schedule~=1.1.0
-requests~=2.28.1
+requests[socks]~=2.28.1
 selenium~=4.8.2
 urllib3~=1.26.14

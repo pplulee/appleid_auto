@@ -626,8 +626,10 @@ class ID:
 
 
 def notification(content):
-    proxy_info = config.proxy.split("://")
-    proxies = {proxy_info[0]: proxy_info[1]} if len(proxy_info) == 2 else None
+    proxies = {
+        'http': config.proxy,
+        'https': config.proxy,
+    } if config.proxy else None
 
     content = f"【{config.username}】{content}"
     if config.tgbot_token != "" and config.tgbot_chatid != "":
