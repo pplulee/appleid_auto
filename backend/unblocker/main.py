@@ -14,6 +14,7 @@ from requests import get, post
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
+from selenium.webdriver.common.proxy import Proxy, ProxyType
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.wait import WebDriverWait
 
@@ -176,7 +177,9 @@ class Config:
             # 新版本代理
             if "url" in self.proxy_type:
                 try:
-                    self.proxy = self.proxy_type.split("+")[0] + "://" + get(self.proxy_content).text
+                    self.proxy_type = self.proxy_type.split("+")[0]
+                    self.proxy_content = get(self.proxy_content).text
+                    self.proxy = self.proxy = self.proxy_type + "://" + self.proxy_content
                 except BaseException as e:
                     logger.error(lang_text.failOnRetrievingProxyFromAPI)
                     logger.error(e)
@@ -621,9 +624,10 @@ class ID:
                     return True
         return False
 
+
 def notification(content):
     proxy_info = config.proxy.split("://")
-    proxies =  {proxy_info[0]: proxy_info[1]} if len(proxy_info) == 2 else None
+    proxies = {proxy_info[0]: proxy_info[1]} if len(proxy_info) == 2 else None
 
     content = f"【{config.username}】{content}"
     if config.tgbot_token != "" and config.tgbot_chatid != "":
@@ -637,11 +641,13 @@ def notification(content):
             logger.error(f"{lang_text.TGFail}\nError: {e}")
             logger.error(lang_text.cnTG)
 
+
 ocr = ddddocr.DdddOcr()
 
 
 def setup_driver():
     global driver
+    proxy = None
     options = webdriver.ChromeOptions()
     options.add_argument("--no-sandbox")
     options.add_argument("--disable-gpu")
@@ -654,12 +660,19 @@ def setup_driver():
     if config.headless:
         options.add_argument("--headless")
     if config.proxy != "":
+        proxy = Proxy()
+        proxy.proxy_type = ProxyType.MANUAL
+        if config.proxy_type == "http":
+            proxy.http_proxy = config.proxy
+            proxy.ssl_proxy = config.proxy
+        elif config.proxy_type == "socks5":
+            proxy.socks_proxy = config.proxy
         options.add_argument(f"--proxy-server={config.proxy}")
     options.add_argument(
         "user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/108.0.0.0 Safari/537.36")
     try:
         if config.webdriver != "local":
-            driver = webdriver.Remote(command_executor=config.webdriver, options=options)
+            driver = webdriver.Remote(command_executor=config.webdriver, options=options, proxy=proxy)
         else:
             driver = webdriver.Chrome(options=options)
     except BaseException as e:
