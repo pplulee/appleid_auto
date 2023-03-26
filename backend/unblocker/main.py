@@ -621,17 +621,21 @@ class ID:
                     return True
         return False
 
-
 def notification(content):
+    proxy_info = config.proxy.split("://")
+    proxies =  {proxy_info[0]: proxy_info[1]} if len(proxy_info) == 2 else None
+
     content = f"【{config.username}】{content}"
     if config.tgbot_token != "" and config.tgbot_chatid != "":
         try:
-            post(f"https://api.telegram.org/bot{config.tgbot_token}/sendMessage",
-                 data={"chat_id": config.tgbot_chatid, "text": content})
+            post(
+                f"https://api.telegram.org/bot{config.tgbot_token}/sendMessage",
+                data={"chat_id": config.tgbot_chatid, "text": content},
+                proxies=proxies
+            )
         except BaseException as e:
             logger.error(f"{lang_text.TGFail}\nError: {e}")
             logger.error(lang_text.cnTG)
-
 
 ocr = ddddocr.DdddOcr()
 
