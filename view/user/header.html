@@ -1,26 +1,71 @@
 <header class="navbar navbar-expand-md navbar-light d-print-none">
     <div class="container-xl">
+        <button class="navbar-toggler collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#navbar-menu" aria-controls="navbar-menu" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
         <a class="navbar-brand" href="/user">AppleID 自动化管理</a>
-        <div class="collapse navbar-collapse" id="navbarNav">
+        <div class="collapse navbar-collapse" id="navbar-menu">
             <ul class="navbar-nav">
                 <li class="nav-item">
-                    <a class="nav-link" href="/user/index">用户中心</a>
+                    <a class="nav-link" href="/user">
+                        <span class="nav-link-icon d-md-none d-lg-inline-block">
+                            <i class="fas fa-house"></i>
+                        </span>
+                        <span class="nav-link-title">
+                            主页
+                        </span>
+                    </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="/user/account">账号管理</a>
+                    <a class="nav-link" href="/user/account">
+                        <span class="nav-link-icon d-md-none d-lg-inline-block">
+                            <i class="fas fa-user"></i>
+                        </span>
+                        <span class="nav-link-title">
+                            账号管理
+                        </span>
+                    </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="/user/share">分享页管理</a>
+                    <a class="nav-link" href="/user/share">
+                        <span class="nav-link-icon d-md-none d-lg-inline-block">
+                            <i class="fas fa-share-from-square"></i>
+                        </span>
+                        <span class="nav-link-title">
+                            分享页管理
+                        </span>
+                    </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="/user/proxy">代理池</a>
+                    <a class="nav-link" href="/user/proxy">
+                        <span class="nav-link-icon d-md-none d-lg-inline-block">
+                            <i class="fas fa-earth-asia"></i>
+                        </span>
+                        <span class="nav-link-title">
+                            代理池管理
+                        </span>
+                    </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="/user/info">个人信息</a>
+                    <a class="nav-link" href="/user/info">
+                        <span class="nav-link-icon d-md-none d-lg-inline-block">
+                            <i class="fas fa-circle-info"></i>
+                        </span>
+                        <span class="nav-link-title">
+                            个人信息
+                        </span>
+                    </a>
                 </li>
                 {if isAdmin(session("user_id"))}
                     <li class="nav-item">
-                        <a class="nav-link" href="/admin">管理面板</a>
+                        <a class="nav-link" href="/admin">
+                        <span class="nav-link-icon d-md-none d-lg-inline-block">
+                            <i class="fas fa-gear"></i>
+                        </span>
+                            <span class="nav-link-title">
+                            管理面板
+                        </span>
+                        </a>
                     </li>
                 {/if}
             </ul>

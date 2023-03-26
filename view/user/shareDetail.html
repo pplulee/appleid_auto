@@ -1,7 +1,7 @@
 {include file="user/header"}
 <div class="container" style="margin-top: 2%; width: {isMobile()?" auto" : "30%"};">
-<div class="card border-dark">
-    <h4 class="card-header bg-primary text-white text-center">添加分享页</h4>
+<div class="card border">
+    <h2 class="card-header bg-primary text-white text-center">添加分享页</h4>
     <form action="" method="post" style="margin: 20px;">
         <span class="input-group-text" id="account_list">请选择账号</span>
         <div class="form-check mb-3">
@@ -11,7 +11,7 @@
             {/foreach}
         </div>
         <div class="input-group mb-3">
-            <span class="input-group-text" id="share_link">分享代码</span>
+            <span class="input-group-text">分享代码</span>
             <input type="text" class="form-control" name="share_link" value="{$share->share_link}" required
                    autocomplete="off">
         </div>
@@ -26,12 +26,21 @@
         </div>
         <div class="input-group mb-3">
             <span class="input-group-text" id="html">HTML内容</span>
-            <textarea name="html" cols="100" rows=4>{$share->html}</textarea>
+            <textarea name="html" style="width: 100%;" rows="10">{$share->html}</textarea>
         </div>
         <div class="input-group mb-3">
             <span class="input-group-text" id="expire">过期时间</span>
             <input type="datetime-local" class="form-control" name="expire" value="{$share->expire}">
-            <span class="input-group-text" id="expire">留空表示永不过期</span>
+        </div>
+        <div class="alert alert-info" role="alert">
+            <div class="d-flex">
+                <div>
+                    <i class="fas fa-circle-info"></i>
+                </div>
+                <div>
+                    <div class="text-muted">过期时间留空表示永不过期</div>
+                </div>
+            </div>
         </div>
         <input type="hidden" name="action" value="{$action}">
         <input type="submit" name="submit" class="btn btn-primary btn-block" value="{$action=="add"?"添加":"保存"}">

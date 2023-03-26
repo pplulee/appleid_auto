@@ -1,8 +1,8 @@
 {include file="user/header"}
 
 <div class="container" style="margin-top: 2%; width: {isMobile()?" auto" : "30%"};">
-<div class="card border-dark">
-    <h4 class="card-header bg-primary text-white text-center">添加账号</h4>
+<div class="card border">
+    <h2 class="card-header bg-primary text-white text-center">添加账号</h2>
     <form action="" method="post" style="margin: 20px;">
         <div class="input-group mb-3">
             <span class="input-group-text" id="id">用户名</span>
@@ -28,35 +28,53 @@
             <input type="text" class="form-control" name="dob" placeholder="格式：mmddyyyy" required
                    autocomplete="off" maxlength="8" minlength="8" value="{$account->dob}">
         </div>
-        <div class="input-group mb-3">
-            <span class="input-group-text" id="question1">问题1</span>
-            <input type="text" class="form-control" name="question1" required autocomplete="off"
-                   value="{$account->question1}">
+        <div class="row">
+            <div class="col">
+                <div class="input-group mb-3">
+                    <span class="input-group-text" id="question1">问题1</span>
+                    <input type="text" class="form-control" name="question1" required autocomplete="off"
+                           value="{$account->question1}">
+                </div>
+            </div>
+            <div class="col">
+                <div class="input-group mb-3">
+                    <span class="input-group-text" id="answer1">答案1</span>
+                    <input type="text" class="form-control" name="answer1" required autocomplete="off"
+                           value="{$account->answer1}">
+                </div>
+            </div>
         </div>
-        <div class="input-group mb-3">
-            <span class="input-group-text" id="answer1">答案1</span>
-            <input type="text" class="form-control" name="answer1" required autocomplete="off"
-                   value="{$account->answer1}">
+        <div class="row">
+            <div class="col">
+                <div class="input-group mb-3">
+                    <span class="input-group-text" id="question2">问题2</span>
+                    <input type="text" class="form-control" name="question2" required autocomplete="off"
+                           value="{$account->question2}">
+                </div>
+            </div>
+            <div class="col">
+                <div class="input-group mb-3">
+                    <span class="input-group-text" id="answer2">答案2</span>
+                    <input type="text" class="form-control" name="answer2" required autocomplete="off"
+                           value="{$account->answer2}">
+                </div>
+            </div>
         </div>
-        <div class="input-group mb-3">
-            <span class="input-group-text" id="question2">问题2</span>
-            <input type="text" class="form-control" name="question2" required autocomplete="off"
-                   value="{$account->question2}">
-        </div>
-        <div class="input-group mb-3">
-            <span class="input-group-text" id="answer2">答案2</span>
-            <input type="text" class="form-control" name="answer2" required autocomplete="off"
-                   value="{$account->answer2}">
-        </div>
-        <div class="input-group mb-3">
-            <span class="input-group-text" id="question3">问题3</span>
-            <input type="text" class="form-control" name="question3" required autocomplete="off"
-                   value="{$account->question3}">
-        </div>
-        <div class="input-group mb-3">
-            <span class="input-group-text" id="answer3">答案3</span>
-            <input type="text" class="form-control" name="answer3" required autocomplete="off"
-                   value="{$account->answer3}">
+        <div class="row">
+            <div class="col">
+                <div class="input-group mb-3">
+                    <span class="input-group-text" id="question2">问题3</span>
+                    <input type="text" class="form-control" name="question3" required autocomplete="off"
+                           value="{$account->question3}">
+                </div>
+            </div>
+            <div class="col">
+                <div class="input-group mb-3">
+                    <span class="input-group-text" id="answer2">答案3</span>
+                    <input type="text" class="form-control" name="answer3" required autocomplete="off"
+                           value="{$account->answer3}">
+                </div>
+            </div>
         </div>
         <div class="input-group mb-3">
             <span class="input-group-text" id="check_interval">检查间隔</span>
@@ -69,25 +87,63 @@
                 <input type="text" class="form-control" disabled value="{$account->message}">
             </div>
         {/if}
-        <div class="input-group mb-3">
-            <div class="form-check form-switch">
-                开启密码正确检测<input class="form-check-input" type="checkbox"
-                                       name="enable_check_password_correct" {$account->enable_check_password_correct?"checked":""}>
-                若密码错误则自动修改密码
+        <div class="row">
+            <div class="col">
+                <div class="input-group mb-3">
+                    <div class="form-check form-switch">
+                        密码正确检测<input class="form-check-input" type="checkbox"
+                                           name="enable_check_password_correct" {$account->enable_check_password_correct?"checked":""}>
+                        <div class="alert alert-info" role="alert">
+                            <div class="d-flex">
+                                <div>
+                                    <i class="fas fa-circle-info"></i>
+                                </div>
+                                <div>
+                                    <div class="text-muted">若密码错误则自动修改密码</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col">
+                <div class="input-group mb-3">
+                    <div class="form-check form-switch">
+                        删除设备<input class="form-check-input" type="checkbox"
+                                       name="enable_delete_devices" {$account->enable_delete_devices?"checked":""}>
+                        <div class="alert alert-info" role="alert">
+                            <div class="d-flex">
+                                <div>
+                                    <i class="fas fa-circle-info"></i>
+                                </div>
+                                <div>
+                                    <div class="text-muted">自动删除账号上设备</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col">
+                <div class="input-group mb-3">
+                    <div class="form-check form-switch">
+                        自动修改密码<input class="form-check-input" type="checkbox"
+                                           name="enable_auto_update_password" {$account->enable_auto_update_password?"checked":""}>
+                        <div class="alert alert-info" role="alert">
+                            <div class="d-flex">
+                                <div>
+                                    <i class="fas fa-circle-info"></i>
+                                </div>
+                                <div>
+                                    <div class="text-muted">每次执行任务时强制修改密码，实现定时改密</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
-        <div class="input-group mb-3">
-            <div class="form-check form-switch">
-                开启删除设备<input class="form-check-input" type="checkbox"
-                                   name="enable_delete_devices" {$account->enable_delete_devices?"checked":""}>
-            </div>
-        </div>
-        <div class="input-group mb-3">
-            <div class="form-check form-switch">
-                开启自动修改密码<input class="form-check-input" type="checkbox"
-                                       name="enable_auto_update_password" {$account->enable_auto_update_password?"checked":""}>
-            </div>
-        </div>
+
         <input type="hidden" name="action" value="{$action}">
         <input type="submit" name="submit" class="btn btn-primary btn-block" value="{$action=="add"?"添加":"保存"}">
     </form>

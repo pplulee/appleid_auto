@@ -16,7 +16,7 @@ class ProxyService extends Service
 
     public function getProtocolList(): array
     {
-        return ['http', 'socks5', 'url+http', 'url+socks5'];
+        return ['http', 'socks5', 'http+url', 'socks5+url'];
     }
 
     public function fetchByOwner($user_id): Paginator
