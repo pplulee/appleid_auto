@@ -18,4 +18,13 @@ class ShareService extends Service
     {
         return Db::name('share')->where('owner', $user_id)->paginate(25);
     }
+
+    public function countALl($id = 0): int
+    {
+        if ($id == 0) {
+            return Db::name('share')->count();
+        } else {
+            return Db::name('share')->where('owner', $id)->count();
+        }
+    }
 }

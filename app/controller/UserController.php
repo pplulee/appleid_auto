@@ -21,8 +21,8 @@ class UserController extends BaseController
         if (!$user) {
             return alert("error", "用户不存在", "2000", "/index");
         }
-        $account_count = 0; // TODO
-        $share_count = 0; // TODO
+        $account_count = $this->app->accountService->countAll($user->id);
+        $share_count = $this->app->shareService->countAll($user->id);
         return view('/user/index', ['user' => $user, 'account_count' => $account_count, 'share_count' => $share_count]);
 
     }
@@ -178,7 +178,8 @@ class UserController extends BaseController
     public function share(): View
     {
         $shareList = $this->app->shareService->fetchByOwner(Session::get('user_id'));
-        return view('/user/share', ['shares' => $shareList]);
+        $shareURL = $this->request->domain() . "/share/";
+        return view('/user/share', ['shares' => $shareList,'shareURL'=>$shareURL]);
     }
 
     public function shareAdd()
@@ -290,18 +291,18 @@ class UserController extends BaseController
         return view('/user/proxyDetail', ['proxy' => $proxy, 'action' => 'edit', 'protocols' => $protocols]);
     }
 
-    public function proxyUpdate(): string
+    public function proxyUpdate($id=0): string
     {
         $data = [
             'protocol' => $this->request->post('protocol'),
             'content' => $this->request->post('content'),
-            'status' => $this->request->post('status'),
+            'status' => $this->request->post('status')!==null,
             'owner' => Session::get('user_id'),
         ];
         $proxy = new Proxy();
         switch ($this->request->post('action')) {
             case "edit":
-                $proxy = $proxy->fetch($this->request->post('id'));
+                $proxy = $proxy->fetch($id);
                 if (!$proxy) {
                     return alert("error", "代理不存在", "2000", "/user/proxy");
                 }

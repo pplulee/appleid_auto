@@ -32,4 +32,13 @@ class AccountService extends Service
             ->column('username', 'id');
     }
 
+    public function countAll($id = 0): int
+    {
+        if ($id == 0) {
+            return Db::name('account')->count();
+        } else {
+            return Db::name('account')->where('owner', $id)->count();
+        }
+    }
+
 }

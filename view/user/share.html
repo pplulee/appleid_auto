@@ -43,6 +43,7 @@
                     <td>
                         <a class="btn btn-secondary" href="/user/share/{$share.id}">编辑</a>
                         <button class="btn btn-danger delete-button" data-id="{$share.id}">删除</button>
+                        <button class="btn btn-success" data-clipboard-text="{$shareURL.$share.share_link}" onclick="alert_success()">复制链接</button>
                     </td>
                 </tr>
                 {/volist}

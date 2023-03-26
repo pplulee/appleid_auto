@@ -17,9 +17,15 @@
             <input type="text" class="form-control" name="content" required autocomplete="off"
                    value="{$proxy->content}">
         </div>
+        {if $action=="edit"}
+            <div class="input-group mb-3">
+                <span class="input-group-text" id="last_use">上次使用</span>
+                <input type="text" class="form-control" disabled value="{$proxy->last_use}">
+            </div>
+        {/if}
         <div class="input-group mb-3">
             <div class='form-check form-switch'>启用
-            <input type="checkbox" class="form-check-input" name="status" value="{$proxy->status}">
+                <input type="checkbox" class="form-check-input" name="status" value="{$proxy->status}">
             </div>
         </div>
         <input type="hidden" name="action" value="{$action}">
