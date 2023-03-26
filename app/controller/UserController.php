@@ -272,7 +272,7 @@ class UserController extends BaseController
     public function proxyAdd(): View
     {
         $proxy = new Proxy();
-        $protocols = $this->app->proxyService->getProtocols();
+        $protocols = $this->app->proxyService->getProtocolList();
         return view('/user/proxyDetail', ['proxy' => $proxy, 'action' => 'add', 'protocols' => $protocols]);
     }
 
@@ -286,7 +286,7 @@ class UserController extends BaseController
         if ($proxy->owner != Session::get('user_id')) {
             return alert("error", "无权操作", "2000", "/user/proxy");
         }
-        $protocols = $this->app->proxyService->getProtocols();
+        $protocols = $this->app->proxyService->getProtocolList();
         return view('/user/proxyDetail', ['proxy' => $proxy, 'action' => 'edit', 'protocols' => $protocols]);
     }
 

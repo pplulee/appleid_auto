@@ -1,0 +1,32 @@
+{include file="user/header"}
+
+<div class="container" style="margin-top: 2%; width: {isMobile()?" auto" : "30%"};">
+<div class="card border-dark">
+    <h4 class="card-header bg-primary text-white text-center">添加代理</h4>
+    <form action="" method="post" style="margin: 20px;">
+        <div class="input-group mb-3">
+            <span class="input-group-text" id="protocol">协议</span>
+            <select class="form-select" name="protocol" aria-label="protocol">
+                <option value="99">Choose...</option>
+                {volist name="protocols" id="protocol"}
+                    <option value="{$protocol}">{$protocol}</option>
+                {/volist}
+            </select>
+        </div>
+        <div class="input-group mb-3">
+            <span class="input-group-text" id="password">内容</span>
+            <input type="text" class="form-control" name="content" required autocomplete="off"
+                   value="{$proxy->content}">
+        </div>
+        <div class="input-group mb-3">
+            <span class="input-group-text" id="status">状态</span>
+            <div class='form-check form-switch'>启用
+            <input type="checkbox" class="form-check-input" name="status" autocomplete="off"
+                   value="{$proxy->status}">
+            </div>
+        </div>
+        <input type="hidden" name="action" value="{$action}">
+        <input type="submit" name="submit" class="btn btn-primary btn-block" value="{$action=="add"?"添加":"保存"}">
+    </form>
+</div>
+</div>
