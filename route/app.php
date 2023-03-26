@@ -9,6 +9,7 @@
 // | Author: liu21st <liu21st@gmail.com>
 // +----------------------------------------------------------------------
 use app\middleware\Auth;
+use app\middleware\Share;
 use app\middleware\UserIndex;
 use think\facade\Route;
 
@@ -24,7 +25,7 @@ Route::group('user', function () {
 })->middleware(Auth::class);
 
 
-// 注册userindex
+// 注册用户中心
 Route::rule('user/', 'user/index')->middleware(UserIndex::class);
 Route::group('user', function () {
     Route::get('/', 'user/index');
@@ -57,3 +58,8 @@ Route::group('user', function () {
     //
     Route::get('logout', 'user/logout');
 })->middleware(UserIndex::class);
+
+// 注册分享页
+Route::group('share', function () {
+    Route::rule('/:link', 'share/index');
+})->middleware(Share::class);

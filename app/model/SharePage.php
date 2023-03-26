@@ -25,7 +25,10 @@ class SharePage extends Model
 
     public function fetchByLink($link): ?SharePage
     {
-        return $this->where('share_link', $link)->find();
+        $share = $this->where('share_link', $link)->find();
+        if (!$share) return null;
+        $share->account_list = array_map('intval', explode(",", $share->account_list));
+        return $share;
     }
 
     public function updateSharePage($id, $data): bool
