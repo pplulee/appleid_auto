@@ -1,13 +1,8 @@
-<nav class="navbar navbar-expand-lg navbar-light bg-light">
-    <div class="container-fluid">
+<header class="navbar navbar-expand-md navbar-light d-print-none">
+    <div class="container-xl">
         <a class="navbar-brand" href="/user">AppleID 自动化管理</a>
-        <button aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation"
-                class="navbar-toggler"
-                data-bs-target="#navbarSupportedContent" data-bs-toggle="collapse" type="button">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="navbarSupportedContent">
-            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav">
                 <li class="nav-item">
                     <a class="nav-link" href="/user/index">用户中心</a>
                 </li>
@@ -29,7 +24,7 @@
                     </li>
                 {/if}
             </ul>
-            <a class="btn btn-danger" href="/user/logout">登出</a>
         </div>
+        <a class="btn btn-danger order-md-last" href="/user/logout">登出</a>
     </div>
-</nav>
+</header>
