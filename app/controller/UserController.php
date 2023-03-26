@@ -212,7 +212,7 @@ class UserController extends BaseController
     {
         $account_list = $this->request->post('account_list');
         if (!$account_list) {
-            return alert("error", "请至少选择一个账号", "2000", "/user/share/$id");
+            return alert("error", "请至少选择一个账号", "2000", "/user/share".$id==0?"":"/$id");
         }
         $accounts = implode(',', $account_list);
         $data = [
@@ -220,7 +220,8 @@ class UserController extends BaseController
             'account_list' => $accounts,
             'owner' => Session::get('user_id'),
             'html' => $this->request->post('html'),
-            'remark' => $this->request->post('remark')
+            'remark' => $this->request->post('remark'),
+            'expire' => $this->request->post('expire')==""?null:$this->request->post('expire'),
         ];
         $sharePage = new SharePage();
         switch ($this->request->post('action')) {

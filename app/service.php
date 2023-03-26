@@ -3,6 +3,7 @@
 use app\AppService;
 use app\service\AccountService;
 use app\service\AuthService;
+use app\service\ProxyService;
 use app\service\ShareService;
 
 // 系统服务定义文件
@@ -12,4 +13,5 @@ return [
     AuthService::class,
     AccountService::class,
     ShareService::class,
+    ProxyService::class
 ];

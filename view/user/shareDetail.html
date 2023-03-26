@@ -28,6 +28,11 @@
             <span class="input-group-text" id="html">HTML内容</span>
             <textarea name="html" cols="100" rows=4>{$share->html}</textarea>
         </div>
+        <div class="input-group mb-3">
+            <span class="input-group-text" id="expire">过期时间</span>
+            <input type="datetime-local" class="form-control" name="expire" value="{$share->expire}">
+            <span class="input-group-text" id="expire">留空表示永不过期</span>
+        </div>
         <input type="hidden" name="action" value="{$action}">
         <input type="submit" name="submit" class="btn btn-primary btn-block" value="{$action=="add"?"添加":"保存"}">
     </form>
