@@ -14,6 +14,12 @@ class Share
         if (!$shareLink) {
             return view('share/error', ['errorTitle' => '页面不存在', 'errorMsg' => '此分享链接不存在']);
         }
+        if ($request->param('id')){
+            // 触发手动解锁
+            $request->id = $request->param('id');
+            $request->link = $shareLink;
+            return $next($request);
+        }
         $share = new SharePage();
         $share = $share->fetchByLink($shareLink);
         if (!$share) {

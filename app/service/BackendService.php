@@ -20,20 +20,6 @@ class BackendService extends Service
         return $this->setCurl($backendUrl, $backendToken, "addTask", $id);
     }
 
-    public function restartTask($id): array
-    {
-        $backendUrl = env('backend_url');
-        $backendToken = env('backend_token');
-        return $this->setCurl($backendUrl, $backendToken, "restartTask", $id);
-    }
-
-    public function removeTask($id): array
-    {
-        $backendUrl = env('backend_url');
-        $backendToken = env('backend_token');
-        return $this->setCurl($backendUrl, $backendToken, "removeTask", $id);
-    }
-
     public function setCurl(string $backendUrl, string $backendToken, $operation, $id): array
     {
         if (!env('enable_backend_api')) return ["status" => true, "msg" => "后端接口未启用"];
@@ -61,5 +47,19 @@ class BackendService extends Service
                 return ["status" => false, "msg" => "后端接口异常"];
             }
         }
+    }
+
+    public function restartTask($id): array
+    {
+        $backendUrl = env('backend_url');
+        $backendToken = env('backend_token');
+        return $this->setCurl($backendUrl, $backendToken, "restartTask", $id);
+    }
+
+    public function removeTask($id): array
+    {
+        $backendUrl = env('backend_url');
+        $backendToken = env('backend_token');
+        return $this->setCurl($backendUrl, $backendToken, "removeTask", $id);
     }
 }

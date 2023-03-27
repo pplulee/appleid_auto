@@ -64,6 +64,7 @@ Route::group('user', function () {
 Route::rule('share/', 'share/index')->middleware(Share::class);
 Route::group('share', function () {
     Route::get('/', 'share/index');
+    Route::get('/:link/:id/unlock', 'share/manualUnlock');
     Route::rule('/:link', 'share/index');
 })->middleware(Share::class);
 

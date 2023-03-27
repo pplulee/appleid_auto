@@ -1,7 +1,7 @@
 <?php
 // 应用公共文件
-use app\model\User;
 use think\facade\Db;
+use think\facade\Request;
 
 function alert($type, $message, $delay, $dest): string
 {
@@ -92,4 +92,15 @@ function isAdmin($id): bool
         return $result['is_admin'];
     }
     return false;
+}
+
+function getUserIP(): string
+{
+    $ip = Request::ip();
+    $ip = filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4 | FILTER_FLAG_IPV6);
+    // 如果IP地址校验不通过，返回空字符串
+    if (!$ip) {
+        return '';
+    }
+    return $ip;
 }

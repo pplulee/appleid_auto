@@ -18,34 +18,43 @@
     }
 </script>
 <div class="container">
-<div class="row row-deck">
-    {volist name="accounts" id="account"}
-        <div class="col-xs-4 col-md-4">
-            <div class='card border border-3 border-info shadow-lg' style='margin-top: 1rem;'>
-                <div class='card-body'>
-                    <h5 class='card-title'>账号信息</h5>
-                    <h6 class='card-text'>{$account->username}</h6>
-                    {if $account->remark!=""}
-                        <p class='card-subtitle mb-2 text-muted'>备注：{$account->remark}</p>
-                    {/if}
-                    <p class='card-subtitle mb-2 text-muted'>上次检测时间：{$account->last_check}</p>
-                    {$status = $account->message == "正常" && ((time() - strtotime($account->last_check)) < (($account->check_interval + 2) * 60))}
-                    <p class='card-subtitle mb-2 text-muted'>状态：{$status?"正常":"异常"}</p>
-                    <button id='username_$account->id' class='btn btn-primary'
-                            data-clipboard-text='{$account->username}'
-                            onclick='alert_success()'>复制账号
-                    </button>
-                    <button id='password_$account->id' class='btn btn-success'
-                            data-clipboard-text='{$account->password}'
-                            onclick='alert_success()'>复制密码
-                    </button>
+    <div class="row row-deck">
+        {volist name="accounts" id="account"}
+            <div class="col-xs-4 col-md-4">
+                <div class="card shadow-lg" style="margin-top: 1rem;">
+                    <div class="card-status-start bg-{$account->status?"green":"red"}"></div>
+                    <div class="card-body">
+                        <h3 class="card-title">账号信息</h3>
+                        <h3 class="card-text">{$account->username}</h3>
+                        {if $account->frontend_remark!=""}
+                            {$account->frontend_remark|raw}
+                        {/if}
+                        <p class="card-subtitle mb-2 text-muted">上次检测时间：{$account->last_check}</p>
+                        <p class="card-subtitle mb-2 text-muted">状态：
+                        {if $account->status}
+                            <span class="badge bg-green">正常</span>
+                        {else}
+                            <span class="badge bg-red">异常</span>
+                        {/if}
+                        </p>
+                        <button id="username_{$account->id}" class="btn btn-primary"
+                                data-clipboard-text="{$account->username}"
+                                onclick="alert_success()">复制账号
+                        </button>
+                        <button id="password_{$account->id}" class="btn btn-success"
+                                data-clipboard-text="{$account->password}"
+                                onclick="alert_success()">复制密码
+                        </button>
+                        {if $account->min_manual_unlock!=0 && env('enable_backend_api')}
+                                <a href="/share/{$link}/{$account->id}/unlock" class="btn btn-warning">手动解锁</a>
+                        {/if}
+                    </div>
                 </div>
             </div>
-        </div>
-    {/volist}
-</div>
-<br>
-{$html|raw}
+        {/volist}
+    </div>
+    <br>
+    {$html|raw}
 </div>
 </body>
 </html>

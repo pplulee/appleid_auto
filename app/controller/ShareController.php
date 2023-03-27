@@ -22,9 +22,24 @@ class ShareController extends BaseController
             if (!$account) {
                 continue;
             } else {
+                $account->status = $account->message == "正常" && ((time() - strtotime($account->last_check)) < (($account->check_interval + 2) * 60));
                 $accounts[] = $account;
             }
         }
-        return view('share/result', ['accounts' => $accounts, 'html' => $share->html]);
+        // 账号随机排序
+        shuffle($accounts);
+        return view('share/result', ['accounts' => $accounts, 'html' => $share->html, 'link' => $share->share_link]);
+    }
+
+    public function manualUnlock(Request $request): string
+    {
+        $id = $request->id;
+        $link = $request->link;
+        $result = $this->app->manualUnlockService->unlock($id);
+        if ($result['status']) {
+            return alert('success', '任务已提交，稍后将会自动解锁', 2000, '/share/' . $link);
+        } else {
+            return alert('error', $result['msg'], 2000, '/share/' . $link);
+        }
     }
 }
