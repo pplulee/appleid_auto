@@ -8,6 +8,7 @@
 // +----------------------------------------------------------------------
 // | Author: liu21st <liu21st@gmail.com>
 // +----------------------------------------------------------------------
+use app\middleware\Admin;
 use app\middleware\Auth;
 use app\middleware\Share;
 use app\middleware\UserIndex;
@@ -63,3 +64,35 @@ Route::group('user', function () {
 Route::group('share', function () {
     Route::rule('/:link', 'share/index');
 })->middleware(Share::class);
+
+// 注册管理面板
+Route::rule('admin/', 'admin/index')->middleware(Admin::class);
+Route::group('admin', function () {
+    Route::get('/', 'admin/index');
+    Route::get('index', 'admin/index');
+    Route::post('info', 'admin/updateUser');
+    // 账号相关
+    Route::post('account/add', 'admin/accountUpdate');
+    Route::get('account/:id', 'admin/accountEdit');
+    Route::post('account/:id', 'admin/accountUpdate');
+    Route::delete('account/:id', 'admin/accountDelete');
+    Route::get('account', 'admin/account');
+    // 用户相关
+    Route::post('user/add', 'admin/userUpdate');
+    Route::get('user/:id', 'admin/userEdit');
+    Route::post('user/:id', 'admin/userUpdate');
+    Route::delete('user/:id', 'admin/userDelete');
+    Route::get('user', 'admin/user');
+    // 分享页相关
+    Route::post('share/add', 'admin/shareUpdate');
+    Route::get('share/:id', 'admin/shareEdit');
+    Route::post('share/:id', 'admin/shareUpdate');
+    Route::delete('share/:id', 'admin/shareDelete');
+    Route::get('share', 'admin/share');
+    // 代理相关
+    Route::post('proxy/add', 'admin/proxyUpdate');
+    Route::get('proxy/:id', 'admin/proxyEdit');
+    Route::post('proxy/:id', 'admin/proxyUpdate');
+    Route::delete('proxy/:id', 'admin/proxyDelete');
+    Route::get('proxy', 'admin/proxy');
+})->middleware(Admin::class);
