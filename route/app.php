@@ -61,7 +61,9 @@ Route::group('user', function () {
 })->middleware(UserIndex::class);
 
 // 注册分享页
+Route::rule('share/', 'share/index')->middleware(Share::class);
 Route::group('share', function () {
+    Route::get('/', 'share/index');
     Route::rule('/:link', 'share/index');
 })->middleware(Share::class);
 

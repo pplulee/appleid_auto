@@ -5,7 +5,6 @@ namespace app\middleware;
 
 use app\model\SharePage;
 use Closure;
-use think\Response;
 
 class Share
 {
@@ -13,23 +12,23 @@ class Share
     {
         $shareLink = $request->param('link');
         if (!$shareLink) {
-            return Response::create("<h1>分享链接未设置</h1>");
+            return view('share/error', ['errorTitle' => '页面不存在', 'errorMsg' => '此分享链接不存在']);
         }
         $share = new SharePage();
-        $share= $share->fetchByLink($shareLink);
+        $share = $share->fetchByLink($shareLink);
         if (!$share) {
-            return Response::create("<h1>分享链接不存在</h1>");
+            return view('share/error', ['errorTitle' => '页面不存在', 'errorMsg' => '此分享链接不存在']);
         }
         if ($share->password) {
             if (!$request->param('password')) {
                 return view('share/password', ['link' => $shareLink]);
             }
             if ($request->param('password') != $share->password) {
-                return Response::create("<h1>密码错误</h1>");
+                return view('share/error', ['errorTitle' => '密码错误', 'errorMsg' => '分享链接密码错误']);
             }
         }
-        if ($share->expire_time!=null && $share->expire_time < time()) {
-            return Response::create("<h1>分享链接已过期</h1>");
+        if ($share->expire_time != null && $share->expire_time < time()) {
+            return view('share/error', ['errorTitle' => '页面已过期', 'errorMsg' => '此分享链接已过期']);
         }
         $request->share = $share;
         return $next($request);

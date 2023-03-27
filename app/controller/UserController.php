@@ -264,6 +264,7 @@ class UserController extends BaseController
             $data = [
                 'share_link' => $this->request->param('share_link'),
                 'account_list' => $accounts,
+                'password' => $this->request->param('password') == "" ? null : $this->request->param('password'),
                 'owner' => Session::get('user_id'),
                 'html' => $this->request->param('html'),
                 'remark' => $this->request->param('remark'),
