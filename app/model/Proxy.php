@@ -4,6 +4,7 @@ declare (strict_types=1);
 namespace app\model;
 
 use think\Model;
+use think\facade\Db;
 
 /**
  * @mixin Model
@@ -31,6 +32,38 @@ class Proxy extends Model
             return false;
         }
         $proxy->update($data, ['id' => $id]);
+        return true;
+    }
+
+    public function updateUse($id): bool
+    {
+        if (!$this) {
+            $proxy = $this->fetch($id);
+        } else {
+            $proxy = $this;
+        }
+        if (!$proxy) {
+            return false;
+        }
+        Db::table('proxy')
+            ->where('id', $id)
+            ->update(['last_use' => 'now()']);
+        return true;
+    }
+
+    public function setDisable($id): bool
+    {
+        if (!$this) {
+            $proxy = $this->fetch($id);
+        } else {
+            $proxy = $this;
+        }
+        if (!$proxy) {
+            return false;
+        }
+        Db::table('proxy')
+            ->where('id', $id)
+            ->update(['status' => 0]);
         return true;
     }
 
