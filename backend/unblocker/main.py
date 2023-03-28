@@ -58,15 +58,17 @@ class API:
             result = loads(post(f"{self.url}/api/get_task_info",
                                 verify=False,
                                 headers={'key': self.key},
-                                params={
+                                data={
                                     "id": id
                                 }).text)
+
         except BaseException as e:
             logger.error(lang_text.ErrorRetrievingConfig)
             logger.error(e)
             return {"status": False}
         else:
             if result["status"]:
+                result["data"]["status"] = True
                 return result["data"]
             else:
                 logger.error(result["msg"])
@@ -74,26 +76,25 @@ class API:
 
     def update(self, username, password, status, message):
         try:
-            result = loads(
-                post(f"{self.url}/api/update_account",
-                     verify=False,
-                     headers={'key': self.key},
-                     params={
-                         "username": username,
-                         "password": password,
-                         "status": status,
-                         "message": message
-                     }).text)
+            result = loads(post(f"{self.url}/api/update_account",
+                                verify=False,
+                                headers={'key': self.key},
+                                data={
+                                    "username": username,
+                                    "password": password,
+                                    "status": status,
+                                    "message": message
+                                }).text)
         except BaseException as e:
             logger.error(lang_text.failOnPasswordUpdate)
             logger.error(e)
-            return {"status": "fail"}
+            return False
         else:
             if result["status"]:
-                return result["data"]
+                return True
             else:
                 logger.error(result["msg"])
-                return {"status": False}
+                return False
 
     def update_message(self, username, message):
         return self.update(username, "", False, message)
@@ -104,7 +105,7 @@ class API:
                 post(f"{self.url}/api/get_password",
                      verify=False,
                      headers={'key': self.key},
-                     params={
+                     data={
                          "username": username,
                      }).text)
         except BaseException as e:
@@ -124,7 +125,7 @@ class API:
                 post(f"{self.url}/api/report_proxy_error",
                      verify=False,
                      headers={'key': self.key},
-                     params={"id": proxy_id}).text)
+                     data={"id": proxy_id}).text)
         except BaseException as e:
             logger.error(lang_text.failOnReportingProxyError)
             logger.error(e)
@@ -151,12 +152,15 @@ class Config:
         self.proxy_id = config_result["proxy_id"] if "proxy_id" in config_result.keys() else -1
         self.proxy_type = config_result["proxy_type"] if "proxy_type" in config_result.keys() else ""
         self.proxy_content = config_result["proxy_content"] if "proxy_content" in config_result.keys() else ""
-        self.tgbot_chatid = config_result["tgbot_chatid"] if "tgbot_chatid" in config_result.keys() else ""
-        self.tgbot_token = config_result["tgbot_token"] if "tgbot_token" in config_result.keys() else ""
+        self.tg_chat_id = config_result["tg_chat_id"] if "tg_chat_id" in config_result.keys() else ""
+        self.tg_bot_token = config_result["tg_bot_token"] if "tg_bot_token" in config_result.keys() else ""
+        self.wx_pusher_id = config_result["wx_pusher_id"] if "wx_pusher_id" in config_result.keys() else ""
+        self.webhook = config_result["webhook"] if "webhook" in config_result.keys() else ""
         self.enable_check_password_correct = "check_password_correct" in config_result.keys()
         self.enable_delete_devices = "delete_devices" in config_result.keys()
         self.enable_auto_update_password = "auto_update_password" in config_result.keys()
         self.headless = "headless" in config_result.keys()
+        self.fail_retry = "fail_retry" in config_result.keys()
         if self.proxy_content != "" and self.proxy_type != "":
             # 新版本代理
             if "url" in self.proxy_type:
@@ -616,16 +620,23 @@ def notification(content):
     } if config.proxy else None
 
     content = f"【{config.username}】{content}"
-    if config.tgbot_token != "" and config.tgbot_chatid != "":
+
+    if config.tg_bot_token != "" and config.tg_chat_id != "":
         try:
             post(
-                f"https://api.telegram.org/bot{config.tgbot_token}/sendMessage",
-                data={"chat_id": config.tgbot_chatid, "text": content},
+                f"https://api.telegram.org/bot{config.tg_bot_token}/sendMessage",
+                data={"chat_id": config.tg_chat_id, "text": content},
                 proxies=proxies
             )
         except BaseException as e:
             logger.error(f"{lang_text.TGFail}\nError: {e}")
             logger.error(lang_text.cnTG)
+    if config.wx_pusher_id != "":
+        try:
+            post("http://www.pushplus.plus/send", data={"token": config.wx_pusher_id, "content": content},
+                 proxies=proxies)
+        except BaseException as e:
+            logger.error(f"{lang_text.WXFail}\nError: {e}")
 
 
 ocr = ddddocr.DdddOcr()
@@ -697,13 +708,17 @@ def get_ip():
 
 def update_account(username, password):
     global api
-    update_result = api.update(username, password, True, "正常")
-    if update_result["status"] == "fail":
-        logger.error(lang_text.updateFail)
-        return False
-    else:
+    if config.webhook != "" and password != "":
+        try:
+            post(config.webhook, data={"username": username, "password": password})
+        except BaseException as e:
+            logger.error(f"{lang_text.WebhookFail}\nError: {e}")
+    if api.update(username, password, True, "正常"):
         logger.info(lang_text.updateSuccess)
         return True
+    else:
+        logger.error(lang_text.updateFail)
+        return False
 
 
 def job():
@@ -711,7 +726,7 @@ def job():
     schedule.clear()
     api = API(args.api_url, args.api_key)
     config_result = api.get_config(args.taskid)
-    if config_result["status"] == "fail":
+    if not config_result["status"]:
         logger.error(lang_text.getAPIFail)
         exit()
     config = Config(config_result)
@@ -798,8 +813,11 @@ def job():
         driver.quit()
     except BaseException:
         logger.error(lang_text.WDCloseError)
-    # 如果任务执行失败，5分钟后再次执行
-    next_time = config.check_interval if job_success else 5
+    if config.fail_retry:
+        # 如果任务执行失败，5分钟后再次执行
+        next_time = config.check_interval if job_success else 5
+    else:
+        next_time = config.check_interval
     schedule.every(next_time).minutes.do(job)
     logger.info(lang_text.nextRun(next_time))
     return

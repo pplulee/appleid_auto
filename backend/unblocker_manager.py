@@ -1,12 +1,14 @@
 import argparse
-import json
 import logging
 import os
+import threading
 import time
+from json import loads, dumps
 
 import schedule
 import urllib3
-from requests import get
+from flask import Flask, request
+from requests import post
 
 urllib3.disable_warnings()
 
@@ -14,20 +16,12 @@ prefix = "apple-auto_"
 parser = argparse.ArgumentParser(description="")
 parser.add_argument("-api_url", help="API URL", required=True)
 parser.add_argument("-api_key", help="API key", required=True)
-parser.add_argument('-lang', help='Language', required=True)
+parser.add_argument('-lang', help='Language', default='zh_cn')
 args = parser.parse_args()
+
 api_url = args.api_url
 api_key = args.api_key
-language = 'zh_cn'
-if args.lang == '1':
-    language = 'zh_cn'
-elif args.lang == '2':
-    language = 'en_us'
-elif args.lang == '3':
-    language = 'vi_vn'
-else:
-    print("Invalid language")
-    exit(1)
+language = args.lang
 
 logger = logging.getLogger()
 logger.setLevel('INFO')
@@ -44,23 +38,41 @@ class API:
         self.url = api_url
         self.key = api_key
 
+    def get_backend_api(self):
+        try:
+            result = loads(
+                post(f"{self.url}/api/get_backend_api",
+                     verify=False,
+                     headers={"key": self.key}).text)
+        except Exception as e:
+            logger.error("获取后端接口失败")
+            logger.error(e)
+            return {'enable': False}
+        else:
+            if result['status']:
+                return result['data']
+            else:
+                logger.error("获取后端接口失败")
+                logger.error(result['msg'])
+                return {'enable': False}
+
     def get_task_list(self):
         try:
-            result = json.loads(
-                get(f"{self.url}/api/", verify=False, params={"key": self.key, "action": "get_task_list"}).text)
+            result = loads(
+                post(f"{self.url}/api/get_task_list",
+                     verify=False,
+                     headers={"key": self.key}).text)
         except Exception as e:
             logger.error("获取任务列表失败")
             logger.error(e)
             return False
         else:
-            if result['status'] == "fail":
-                logger.error("获取任务列表失败")
-                logger.error(result['message'])
-                return False
-            elif result['data'] == "":
-                return []
+            if result['status']:
+                return result['data']
             else:
-                return result['data'].split(",")
+                logger.error("获取任务列表失败")
+                logger.error(result['msg'])
+                return None
 
 
 class local_docker:
@@ -91,6 +103,10 @@ class local_docker:
                 local_list.append(line.strip().split("_")[1])
         logger.info(f"本地存在{len(local_list)}个容器")
         return local_list
+
+    def restart_docker(self, id):
+        logger.info(f"重启容器{id}")
+        os.system(f"docker restart {prefix}{id}")
 
     def get_remote_list(self):
         result_list = self.api.get_task_list()
@@ -151,16 +167,87 @@ def update():
     Local.update()
 
 
-logger.info("AppleAuto后端管理服务启动")
-api = API()
-Local = local_docker(api)
-logger.info("拉取最新镜像")
-os.system(f"docker pull sahuidhsu/appleid_auto")
-logger.info("删除本地所有容器")
-Local.clean_local_docker()
-job()
-schedule.every(10).minutes.do(job)
-schedule.every().day.at("00:00").do(update)
-while True:
-    schedule.run_pending()
-    time.sleep(1)
+def start_app(ip, port, token):
+    logging.info("启动后端接口")
+    app = Flask(__name__)
+
+    @app.before_request
+    def before_request():
+        # 检测请求类型是和否为POST
+        if request.method != 'POST':
+            logging.error("请求类型错误")
+            data = {'status': False, 'msg': '请求类型错误'}
+            json_data = dumps(data).encode('utf-8')
+            return app.response_class(json_data, mimetype='application/json')
+        if 'token' not in request.headers:
+            logging.error("请求头中未包含token")
+            print(request.headers)
+            data = {'status': False, 'msg': '请求头中未包含token'}
+            json_data = dumps(data).encode('utf-8')
+            return app.response_class(json_data, mimetype='application/json')
+        if request.headers['token'] != token:
+            logging.error("密码错误")
+            data = {'status': False, 'msg': 'token错误'}
+            json_data = dumps(data).encode('utf-8')
+            return app.response_class(json_data, mimetype='application/json')
+        if 'id' not in request.form:
+            logging.error("缺少任务id")
+            data = {'status': False, 'msg': '缺少任务id'}
+            json_data = dumps(data).encode('utf-8')
+            return app.response_class(json_data, mimetype='application/json')
+
+    @app.route('/setTask', methods=['POST'])
+    def set_task():
+        logging.info("收到设置任务请求")
+        thread_set_task = threading.Thread(target=Local.deploy_docker, args=(request.form['id']))
+        thread_set_task.start()
+        data = {'status': True, 'msg': '设置成功'}
+        json_data = dumps(data).encode('utf-8')
+        return app.response_class(json_data, mimetype='application/json')
+
+    @app.route('/removeTask', methods=['POST'])
+    def remove_task():
+        logging.info("收到删除任务请求")
+        thread_remove_task = threading.Thread(target=Local.remove_docker, args=(request.form['id']))
+        thread_remove_task.start()
+        data = {'status': True, 'msg': '删除成功'}
+        json_data = dumps(data).encode('utf-8')
+        return app.response_class(json_data, mimetype='application/json')
+
+    @app.route('/restartTask', methods=['POST'])
+    def remove_task():
+        logging.info("收到重启任务请求")
+        thread_remove_task = threading.Thread(target=Local.restart_docker, args=(request.form['id']))
+        thread_remove_task.start()
+        data = {'status': True, 'msg': '删除成功'}
+        json_data = dumps(data).encode('utf-8')
+        return app.response_class(json_data, mimetype='application/json')
+
+    app.run(host=ip, port=port)
+
+
+def main():
+    logger.info("AppleAuto后端管理服务启动")
+    api = API()
+    backend_api_result = api.get_backend_api()
+    global Local
+    Local = local_docker(api)
+    logger.info("拉取最新镜像")
+    os.system(f"docker pull sahuidhsu/appleid_auto")
+    logger.info("删除本地所有容器")
+    os.system(f"docker stop $(docker ps -a |  grep \"{prefix}*\"  | awk '{{print $1}}')")
+    os.system(f"docker rm $(docker ps -a |  grep \"{prefix}*\"  | awk '{{print $1}}')")
+    if backend_api_result is not None and backend_api_result['enable']:
+        thread_app = threading.Thread(target=start_app, daemon=True, args=(
+        backend_api_result['ip'], backend_api_result['port'], backend_api_result['token']))
+        thread_app.start()
+    job()
+    schedule.every(10).minutes.do(job)
+    schedule.every().day.at("00:00").do(update)
+    while True:
+        schedule.run_pending()
+        time.sleep(1)
+
+
+if __name__ == '__main__':
+    main()

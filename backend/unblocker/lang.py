@@ -75,6 +75,8 @@ class zh_cn:
         self.updateFail = "更新账号失败"
         self.getAPIFail = "从API获取配置失败"
         self.checkComplete = "账号检测完毕"
+        self.WebhookFail = "Webhook发送失败"
+        self.WXFail = "微信通知发送失败"
 
     def nextRun(self, time):
         return f"下次任务将在{time}分钟后执行"
@@ -162,6 +164,8 @@ class en_us:
         self.updateFail = "Update account failed"
         self.getAPIFail = "Failed to get config from API"
         self.checkComplete = "Account check complete"
+        self.WebhookFail = "Webhook sending failed"
+        self.WXFail = "WeChat message sending failed"
         
     def nextRun(self, time):
         return f"Next job will be executed in {time} minutes"
@@ -248,6 +252,8 @@ class vi_vn:
         self.updateFail = "Cập nhật tài khoản thất bại"
         self.getAPIFail = "Lấy cấu hình từ API thất bại"
         self.checkComplete = "Kiểm tra tài khoản hoàn tất"
+        self.WebhookFail = "Webhook Gửi thông báo thất bại"
+        self.WXFail = "Gửi thông báo WeChat thất bại"
 
 
     def nextRun(self, time):
