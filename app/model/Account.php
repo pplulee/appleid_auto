@@ -14,15 +14,14 @@ class Account extends Model
     protected $table = 'account';
     protected $pk = 'id';
 
-    function addAccount($data): bool
+    function addAccount($data): ?Account
     {
         if ($this->fetchByUsername($data['username'])) {
-            return false;
+            return null;
         }
         $account = new Account();
         $data['message'] = "未执行任务";
-        $account->create($data);
-        return true;
+        return $account->create($data);
     }
 
     function fetchByUsername($username)

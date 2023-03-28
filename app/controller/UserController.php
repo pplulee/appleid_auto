@@ -170,7 +170,7 @@ class UserController extends BaseController
                 $data['owner'] = Session::get('user_id');
                 $result = $account->addAccount($data);
                 if ($result) {
-                    $backendResult = $this->app->backendService->restartTask($result);
+                    $backendResult = $this->app->backendService->addTask($result->id);
                     if ($backendResult['status']) {
                         return alert("success", "添加成功", "2000", "/user/account");
                     } else {
@@ -215,6 +215,7 @@ class UserController extends BaseController
             $result['status'] = false;
         } else {
             $result['status'] = $account->deleteAccount($account->id);
+            if ($result['status']) $this->app->backendService->removeTask($id);
             $result['msg'] = $result['status'] ? "删除成功" : "删除失败";
         }
         return json($result);
