@@ -116,6 +116,7 @@ class UserController extends BaseController
         $account = new Account();
         $account->share_link = random_str(10);
         $account->check_interval = 30;
+        $account->min_manual_unlock = 0;
         return view('/user/accountDetail', ['account' => $account, 'action' => 'add']);
     }
 

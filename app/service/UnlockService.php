@@ -16,7 +16,7 @@ class UnlockService extends Service
 
     public function unlock($id)
     {
-        if (!env("enable_backend_api")) {
+        if (!env("backend.enable_api")) {
             return ['status' => false, 'msg' => '后端API未启用'];
         }
         $account = Db::name('account')

@@ -9,10 +9,10 @@
 // | Author: liu21st <liu21st@gmail.com>
 // +----------------------------------------------------------------------
 use app\middleware\Admin;
+use app\middleware\Api;
 use app\middleware\Auth;
 use app\middleware\Share;
 use app\middleware\UserIndex;
-use app\middleware\Api;
 use think\facade\Route;
 
 
@@ -114,4 +114,5 @@ Route::group('api', function () {
     Route::rule('check_api', 'api/checkApi');
     Route::rule('random_sharepage_password', 'api/randomSharePagePassword');
     Route::rule('report_proxy_error', 'api/reportProxyError');
+    Route::rule('get_backend_api', 'api/getBackendApi');
 })->middleware(Api::class);

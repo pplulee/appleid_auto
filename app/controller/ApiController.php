@@ -157,4 +157,15 @@ class ApiController extends BaseController
         }
         return json(['code' => 500, 'msg' => '报告失败', 'status' => false]);
     }
+
+    public function getBackendApi(): json
+    {
+        $data['enable'] = env('backend.enable_api');
+        if ($data['enable']) {
+            $data['listen_ip'] = env('backend.listen_ip');
+            $data['listen_port'] = env('backend.listen_port');
+            $data['token'] = env('backend.token');
+        }
+        return json(['code' => 200, 'msg' => '获取成功', 'status' => true, 'data' => $data]);
+    }
 }

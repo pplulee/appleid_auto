@@ -52,14 +52,14 @@ class BackendService extends Service
     public function restartTask($id): array
     {
         $backendUrl = env('backend.api_url');
-        $backendToken = env('backend.api_token');
+        $backendToken = env('backend.token');
         return $this->setCurl($backendUrl, $backendToken, "restartTask", $id);
     }
 
     public function removeTask($id): array
     {
         $backendUrl = env('backend.api_url');
-        $backendToken = env('backend.api_token');
+        $backendToken = env('backend.token');
         return $this->setCurl($backendUrl, $backendToken, "removeTask", $id);
     }
 }
