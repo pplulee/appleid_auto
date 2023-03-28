@@ -55,100 +55,84 @@ class API:
 
     def get_config(self, id):
         try:
-            result = loads(get(f"{self.url}/api/",
-                               verify=False,
-                               params={
-                                   "key": self.key,
-                                   "action": "get_task_info",
-                                   "id": id
-                               }).text)
+            result = loads(post(f"{self.url}/api/get_task_info",
+                                verify=False,
+                                headers={'key': self.key},
+                                params={
+                                    "id": id
+                                }).text)
         except BaseException as e:
             logger.error(lang_text.ErrorRetrievingConfig)
             logger.error(e)
-            return {"status": "fail"}
+            return {"status": False}
         else:
-            if result["status"] == "success":
-                return result
+            if result["status"]:
+                return result["data"]
             else:
-                return {"status": "fail"}
+                logger.error(result["msg"])
+                return {"status": False}
 
-    def update(self, username, password):
+    def update(self, username, password, status, message):
         try:
             result = loads(
-                get(f"{self.url}/api/",
-                    verify=False,
-                    params={
-                        "key": self.key,
-                        "username": username,
-                        "password": password,
-                        "action": "update_password"
-                    }).text)
+                post(f"{self.url}/api/update_account",
+                     verify=False,
+                     headers={'key': self.key},
+                     params={
+                         "username": username,
+                         "password": password,
+                         "status": status,
+                         "message": message
+                     }).text)
         except BaseException as e:
             logger.error(lang_text.failOnPasswordUpdate)
             logger.error(e)
             return {"status": "fail"}
         else:
-            if result["status"] == "success":
-                return result
+            if result["status"]:
+                return result["data"]
             else:
-                return {"status": "fail"}
+                logger.error(result["msg"])
+                return {"status": False}
+
+    def update_message(self, username, message):
+        return self.update(username, "", False, message)
 
     def get_password(self, username):
         try:
             result = loads(
-                get(f"{self.url}/api/",
-                    verify=False,
-                    params={
-                        "key": self.key,
-                        "username": username,
-                        "action": "get_password"
-                    }).text)
+                post(f"{self.url}/api/get_password",
+                     verify=False,
+                     headers={'key': self.key},
+                     params={
+                         "username": username,
+                     }).text)
         except BaseException as e:
             logger.error(lang_text.failOnRetrievingPassword)
             logger.error(e)
             return ""
         else:
-            if result["status"] == "success":
-                return result["password"]
+            if result["status"]:
+                return result["data"]["password"]
             else:
+                logger.error(result["msg"])
                 return ""
-
-    def update_message(self, username, message):
-        try:
-            result = loads(
-                get(f"{self.url}/api/",
-                    verify=False,
-                    params={"key": self.key,
-                            "username": username,
-                            "message": message,
-                            "action": "update_message"}).text)
-        except BaseException as e:
-            logger.error(lang_text.failOnMessageUpdate)
-            logger.error(e)
-            return False
-        else:
-            if result["status"] == "success":
-                return True
-            else:
-                return False
 
     def report_proxy_error(self, proxy_id):
         try:
             result = loads(
-                get(f"{self.url}/api/",
-                    verify=False,
-                    params={"key": self.key,
-                            "id": proxy_id,
-                            "action": "report_proxy_error"}).text)
+                post(f"{self.url}/api/report_proxy_error",
+                     verify=False,
+                     headers={'key': self.key},
+                     params={"id": proxy_id}).text)
         except BaseException as e:
             logger.error(lang_text.failOnReportingProxyError)
             logger.error(e)
             return False
         else:
-            if result["status"] == "success":
-                return True
-            else:
-                return False
+            if not result["status"]:
+                logger.error(result["msg"])
+            return result["status"]
 
 
 class Config:
@@ -713,7 +697,7 @@ def get_ip():
 
 def update_account(username, password):
     global api
-    update_result = api.update(username, password)
+    update_result = api.update(username, password, True, "正常")
     if update_result["status"] == "fail":
         logger.error(lang_text.updateFail)
         return False
@@ -825,7 +809,7 @@ logger.info(f"{'=' * 80}\n"
             f"{lang_text.launch}\n"
             f"{lang_text.repoAddress}: https://github.com/pplulee/appleid_auto\n"
             f"{lang_text.TG_Group}: @appleunblocker")
-logger.info(f"{lang_text.version}: v1.45-20230326")
+logger.info(f"{lang_text.version}: v2.0-20230328")
 job()
 while True:
     schedule.run_pending()
