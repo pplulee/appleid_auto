@@ -1,5 +1,5 @@
 <?php
-declare (strict_types = 1);
+declare (strict_types=1);
 
 namespace app\service;
 
@@ -31,6 +31,19 @@ class UserService extends Service
     public function fetchAll(): Paginator
     {
         return Db::name('user')->paginate(25);
+    }
+
+    public function getNotifyMethods($id): array
+    {
+        $result = Db::name('user')
+            ->field('tg_bot_token,tg_chat_id,wx_pusher_id,webhook')
+            ->where('id', $id)
+            ->find();
+        if (count($result) == 0) {
+            return [];
+        } else {
+            return $result;
+        }
     }
 
 }

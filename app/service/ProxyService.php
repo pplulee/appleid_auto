@@ -28,4 +28,19 @@ class ProxyService extends Service
     {
         return Db::name('proxy')->paginate(25);
     }
+
+    public function getAvailableProxy($userID): array
+    {
+        $result = Db::name('proxy')
+            ->field('id,protocol,content')
+            ->where('status', 1)
+            ->where('owner', $userID)
+            ->order('RAND()')
+            ->find();
+        if (count($result) == 0) {
+            return [];
+        } else {
+            return $result;
+        }
+    }
 }

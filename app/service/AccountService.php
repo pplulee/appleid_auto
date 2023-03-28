@@ -10,11 +10,6 @@ use think\Service;
 
 class AccountService extends Service
 {
-    /**
-     * 注册服务
-     *
-     * @return mixed
-     */
     public function register(): void
     {
         $this->app->bind('accountService', accountService::class);
