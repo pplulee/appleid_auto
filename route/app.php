@@ -102,7 +102,7 @@ Route::group('admin', function () {
 })->middleware(Admin::class);
 
 // 注册API
-Route::group(api, function () {
+Route::group('api', function () {
     Route::rule('get_task_list', 'api/getTaskList');
     Route::rule('get_task_info', 'api/getTaskInfo');
     Route::rule('update_message', 'api/updateMessage');
