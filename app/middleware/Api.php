@@ -11,7 +11,6 @@ class Api
 {
     public function handle($request, Closure $next)
     {
-        return $next($request);
         if (!$request->isPost()) {
             return json(["code" => 403, "msg" => "请求方式错误"]);
         }
