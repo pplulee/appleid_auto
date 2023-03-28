@@ -80,12 +80,14 @@
             <input type="number" class="form-control" name="check_interval" required autocomplete="off"
                    placeholder="单位：分钟" value="{$account->check_interval}">
         </div>
-        {if $action=="edit"}
-            <div class="input-group mb-3">
-                <span class="input-group-text" id="check_interval">消息</span>
-                <input type="text" class="form-control" disabled value="{$account->message}">
-            </div>
-        {/if}
+        <div class="input-group mb-3">
+            <span class="input-group-text" id="check_interval">消息</span>
+            <input type="text" class="form-control" disabled value="{$account->message}">
+        </div>
+        <div class="input-group mb-3">
+            <span class="input-group-text" id="owner">所有者ID</span>
+            <input type="number" class="form-control" required name="owner" value="{$account->owner}">
+        </div>
         <div class="row">
             <div class="col">
                 <div class="input-group mb-3">

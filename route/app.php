@@ -37,7 +37,6 @@ Route::group('user', function () {
     // 账号相关
     Route::get('account/add', 'user/accountAdd');
     Route::post('account/add', 'user/accountUpdate');
-    Route::get('account/:id/unlock', 'user/accountUnlock');
     Route::get('account/:id/restart', 'user/accountRestart');
     Route::get('account/:id', 'user/accountEdit');
     Route::post('account/:id', 'user/accountUpdate');
@@ -76,6 +75,7 @@ Route::group('admin', function () {
     Route::get('index', 'admin/index');
     Route::post('info', 'admin/updateUser');
     // 账号相关
+    Route::get('account/:id/restart', 'admin/accountRestart');
     Route::post('account/add', 'admin/accountUpdate');
     Route::get('account/:id', 'admin/accountEdit');
     Route::post('account/:id', 'admin/accountUpdate');

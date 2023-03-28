@@ -33,6 +33,10 @@
             <span class="input-group-text" id="expire">过期时间</span>
             <input type="datetime-local" class="form-control" name="expire" value="{$share->expire}">
         </div>
+        <div class="input-group mb-3">
+            <span class="input-group-text" id="owner">所有者ID</span>
+            <input type="number" class="form-control" required name="owner" value="{$share->owner}">
+        </div>
         <div class="alert alert-info" role="alert">
             <div class="d-flex">
                 <div>

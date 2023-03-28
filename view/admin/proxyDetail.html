@@ -16,16 +16,18 @@
             <input type="text" class="form-control" name="content" required autocomplete="off"
                    value="{$proxy->content}">
         </div>
-        {if $action=="edit"}
-            <div class="input-group mb-3">
-                <span class="input-group-text" id="last_use">上次使用</span>
-                <input type="text" class="form-control" disabled value="{$proxy->last_use}">
-            </div>
-        {/if}
+        <div class="input-group mb-3">
+            <span class="input-group-text" id="last_use">上次使用</span>
+            <input type="text" class="form-control" disabled value="{$proxy->last_use}">
+        </div>
         <div class="input-group mb-3">
             <div class='form-check form-switch'>启用
                 <input type="checkbox" class="form-check-input" name="status" {$proxy->status?"checked":""}>
             </div>
+        </div>
+        <div class="input-group mb-3">
+            <span class="input-group-text" id="owner">所有者ID</span>
+            <input type="number" class="form-control" required name="owner" value="{$proxy->owner}">
         </div>
         <input type="hidden" name="action" value="{$action}">
         <input type="submit" name="submit" class="btn btn-primary btn-block" value="{$action=="add"?"添加":"保存"}">

@@ -12,10 +12,6 @@
             <span class="input-group-text" id="password">密码</span>
             <input type="password" class="form-control" name="password" placeholder="不修改请留空">
         </div>
-        <div class="form-check form-switch">
-            管理员<input class="form-check-input" type="checkbox"
-                               name="is_admin" {$user->is_admin?"checked":""}>
-        </div>
         <div class="input-group mb-3">
             <span class="input-group-text" id="tg_bot_token">TELEGRAM机器人令牌</span>
             <input type="text" class="form-control" name="tg_bot_token" autocomplete="off" value="{$user->tg_bot_token}">
@@ -25,8 +21,12 @@
             <input type="text" class="form-control" name="tg_chat_id" autocomplete="off" value="{$user->tg_chat_id}">
         </div>
         <div class="input-group mb-3">
-            <span class="input-group-text" id="wx_pusher_id">微信PUSHER <ID></ID></span>
+            <span class="input-group-text" id="wx_pusher_id">微信PUSHER ID</span>
             <input type="text" class="form-control" name="wx_pusher_id" autocomplete="off" value="{$user->wx_pusher_id}">
+        </div>
+        <div class="form-check form-switch">
+            管理员<input class="form-check-input" type="checkbox"
+                               name="is_admin" {$user->is_admin?"checked":""}>
         </div>
 
         <input type="hidden" name="action" value="{$action}">

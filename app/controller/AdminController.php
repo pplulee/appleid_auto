@@ -82,7 +82,7 @@ class adminController extends BaseController
 
     public function account(): View
     {
-        $accountList = $this->app->accountService->fetchAll(Session::get('user_id'));
+        $accountList = $this->app->accountService->fetchAll();
         return view('/admin/account', ['accounts' => $accountList]);
     }
 
@@ -117,6 +117,7 @@ class adminController extends BaseController
                 'enable_delete_devices' => $this->request->param('enable_delete_devices') !== null,
                 'enable_auto_update_password' => $this->request->param('enable_auto_update_password') !== null,
                 'min_manual_unlock' => $this->request->param('min_manual_unlock'),
+                'owner' => $this->request->param('owner'),
             ];
         } catch (Exception $e) {
             return alert("error", "参数错误", "2000", "/admin/account");
@@ -173,7 +174,7 @@ class adminController extends BaseController
 
     public function share(): View
     {
-        $shareList = $this->app->shareService->fetchByOwner(Session::get('user_id'));
+        $shareList = $this->app->shareService->fetchAll();
         $shareURL = $this->request->domain() . "/share/";
         return view('/admin/share', ['shares' => $shareList, 'shareURL' => $shareURL]);
     }
@@ -185,10 +186,7 @@ class adminController extends BaseController
         if (!$share) {
             return alert("error", "分享页面不存在", "2000", "/admin/share");
         }
-        if ($share->owner != Session::get('user_id')) {
-            return alert("error", "无权操作", "2000", "/admin/share");
-        }
-        $userAccountList = $this->app->accountService->fetchIDByOwner(Session::get('user_id'));
+        $userAccountList = $this->app->accountService->fetchIDByOwner($share->owner);
         return view('/admin/shareDetail', ['share' => $share, 'accounts' => $userAccountList, 'action' => 'edit']);
     }
 
@@ -204,7 +202,7 @@ class adminController extends BaseController
                 'share_link' => $this->request->param('share_link'),
                 'account_list' => $accounts,
                 'password' => $this->request->param('password') == "" ? null : $this->request->param('password'),
-                'owner' => Session::get('user_id'),
+                'owner' => $this->request->param('owner'),
                 'html' => $this->request->param('html'),
                 'remark' => $this->request->param('remark'),
                 'expire' => $this->request->param('expire') == "" ? null : $this->request->param('expire'),
@@ -218,9 +216,6 @@ class adminController extends BaseController
                 $sharePage = $sharePage->fetch($id);
                 if (!$sharePage) {
                     return alert("error", "分享页面不存在", "2000", "/admin/share");
-                }
-                if ($sharePage->owner != Session::get('user_id')) {
-                    return alert("error", "无权操作", "2000", "/admin/share");
                 }
                 return $sharePage->updateSharePage($sharePage->id, $data) ?
                     alert("success", "修改成功", "2000", "/admin/share") :
@@ -251,7 +246,7 @@ class adminController extends BaseController
 
     public function proxy(): View
     {
-        $proxyList = $this->app->proxyService->fetchAll(Session::get('user_id'));
+        $proxyList = $this->app->proxyService->fetchAll();
         return view('/admin/proxy', ['proxies' => $proxyList]);
     }
 
@@ -273,6 +268,7 @@ class adminController extends BaseController
                 'protocol' => $this->request->param('protocol'),
                 'content' => $this->request->param('content'),
                 'status' => $this->request->param('status') !== null,
+                'owner' => $this->request->param('owner'),
             ];
         } catch (Exception $e) {
             return alert("error", "参数错误", "2000", "/admin/proxy" . $id == 0 ? "" : "/$id");
@@ -309,6 +305,21 @@ class adminController extends BaseController
             $result['msg'] = $result['status'] ? "删除成功" : "删除失败";
         }
         return json($result);
+    }
+
+    public function accountRestart($id): string
+    {
+        $account = new Account();
+        $account = $account->fetch($id);
+        if (!$account) {
+            return alert("error", "账号不存在", "2000", "/admin/account");
+        }
+        $backendResult = $this->app->backendService->restartTask($id);
+        if ($backendResult['status']) {
+            return alert("success", "重启成功", "2000", "/admin/account");
+        } else {
+            return alert("error", "重启失败：" . $backendResult['msg'], "2000", "/admin/account");
+        }
     }
 
 }
