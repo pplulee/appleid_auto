@@ -39,7 +39,7 @@ class UserService extends Service
             ->field('tg_bot_token,tg_chat_id,wx_pusher_id,webhook')
             ->where('id', $id)
             ->find();
-        if (count($result) == 0) {
+        if (empty($result)) {
             return [];
         } else {
             return $result;

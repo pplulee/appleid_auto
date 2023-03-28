@@ -21,11 +21,11 @@ class ApiService extends Service
         if (!$account) {
             return false;
         }
-        if ($password != '') {
+        if ($password != null) {
             $account->password = $password;
         }
         $account->message = $message;
-        $account->last_check = time();
+        $account->last_check = date('Y-m-d H:i:s');
         Db::name('unlock_record')->insert([
             'account_id' => $account->id,
             'status' => $status,

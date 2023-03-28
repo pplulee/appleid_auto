@@ -3,7 +3,6 @@ declare (strict_types=1);
 
 namespace app\service;
 
-use think\console\Output;
 use think\facade\Db;
 use think\Paginator;
 use think\Service;
@@ -48,8 +47,6 @@ class UnlockService extends Service
                 'message' => $backendResult['msg'],
                 'ip' => getUserIP()
             ]);
-            $output = new Output();
-            $output->writeln('手动解锁：' . $backendResult['msg']);
             return $backendResult;
         }
     }

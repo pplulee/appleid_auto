@@ -55,18 +55,20 @@ class ApiController extends BaseController
             $data['task_headless'] = true;
         }
         // 处理通知参数
-        $notify_params = $this->app->userService->getNotifyMethods($account_info->user_id);
-        if ($notify_params['tg_bot_token'] != "") {
-            $data['tg_bot_token'] = $notify_params['tg_bot_token'];
-        }
-        if ($notify_params['tg_chat_id'] != "") {
-            $data['tg_chat_id'] = $notify_params['tg_chat_id'];
-        }
-        if ($notify_params['wx_pusher_id'] != "") {
-            $data['wx_pusher_id'] = $notify_params['wx_pusher_id'];
-        }
-        if ($notify_params['webhook'] != "") {
-            $data['webhook'] = $notify_params['webhook'];
+        $notify_params = $this->app->userService->getNotifyMethods($account_info->owner);
+        if (!empty($notify_params)) {
+            if ($notify_params['tg_bot_token'] != "") {
+                $data['tg_bot_token'] = $notify_params['tg_bot_token'];
+            }
+            if ($notify_params['tg_chat_id'] != "") {
+                $data['tg_chat_id'] = $notify_params['tg_chat_id'];
+            }
+            if ($notify_params['wx_pusher_id'] != "") {
+                $data['wx_pusher_id'] = $notify_params['wx_pusher_id'];
+            }
+            if ($notify_params['webhook'] != "") {
+                $data['webhook'] = $notify_params['webhook'];
+            }
         }
         // 处理代理参数
         if (env('enable_proxy_pool', false)) {
@@ -83,7 +85,6 @@ class ApiController extends BaseController
     public function updateAccount(): json
     {
         if (!$this->request->param('username')
-            || !$this->request->param('password')
             || !$this->request->param('status')
             || !$this->request->param('message')) {
             return json(['code' => 400, 'msg' => '缺少参数', 'status' => false]);
@@ -91,7 +92,7 @@ class ApiController extends BaseController
         $result = $this->app->apiService->updateAccount(
             $this->request->param('username'),
             $this->request->param('password'),
-            $this->request->param('status'),
+            $this->request->param('status') == 'True',
             $this->request->param('message')
         );
         if ($result) {
