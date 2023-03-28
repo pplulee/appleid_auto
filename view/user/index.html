@@ -6,7 +6,7 @@
         <h2 class="card-header">用户中心</h2>
         <ul class="list-group">
             <li class="list-group-item">
-                <b>后端API状态</b> {$status=env('enable_backend_api')?"已启用":"未启用"}
+                <b>后端API状态</b> {$status=env('backend.enable_api')?"已启用":"未启用"}
             </li>
             <li class="list-group-item">
                 <b>用户ID:</b> {$user.id}

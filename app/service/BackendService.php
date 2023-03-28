@@ -15,14 +15,14 @@ class BackendService extends Service
 
     public function addTask($id): array
     {
-        $backendUrl = env('backend_url');
-        $backendToken = env('backend_token');
+        $backendUrl = env('backend.api_url');
+        $backendToken = env('backend.token');
         return $this->setCurl($backendUrl, $backendToken, "addTask", $id);
     }
 
     public function setCurl(string $backendUrl, string $backendToken, $operation, $id): array
     {
-        if (!env('enable_backend_api')) return ["status" => true, "msg" => "后端接口未启用"];
+        if (!env('backend.enable_api')) return ["status" => true, "msg" => "后端接口未启用"];
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_URL, $backendUrl . "/$operation");
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
@@ -51,15 +51,15 @@ class BackendService extends Service
 
     public function restartTask($id): array
     {
-        $backendUrl = env('backend_url');
-        $backendToken = env('backend_token');
+        $backendUrl = env('backend.api_url');
+        $backendToken = env('backend.api_token');
         return $this->setCurl($backendUrl, $backendToken, "restartTask", $id);
     }
 
     public function removeTask($id): array
     {
-        $backendUrl = env('backend_url');
-        $backendToken = env('backend_token');
+        $backendUrl = env('backend.api_url');
+        $backendToken = env('backend.api_token');
         return $this->setCurl($backendUrl, $backendToken, "removeTask", $id);
     }
 }

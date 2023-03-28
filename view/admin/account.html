@@ -38,7 +38,7 @@
                     <td>{$account.check_interval}</td>
                     <td>{$account.min_manual_unlock ? $account.min_manual_unlock : "未启用"}</td>
                     <td>
-                        {if env('enable_backend_api')}
+                        {if env('backend.enable_api')}
                         <a class="btn btn-yellow" href="/admin/account/{$account.id}/restart">重启任务</a>
                         {/if}
                         <a class="btn btn-secondary" href="/admin/account/{$account.id}">编辑</a>

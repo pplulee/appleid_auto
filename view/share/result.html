@@ -45,7 +45,7 @@
                                 data-clipboard-text="{$account->password}"
                                 onclick="alert_success()">复制密码
                         </button>
-                        {if $account->min_manual_unlock!=0 && env('enable_backend_api')}
+                        {if $account->min_manual_unlock!=0 && env('backend.enable_api')}
                                 <a href="/share/{$link}/{$account->id}/unlock" class="btn btn-warning">手动解锁</a>
                         {/if}
                     </div>
