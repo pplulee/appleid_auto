@@ -4,7 +4,7 @@ use app\AppService;
 use app\service\AccountService;
 use app\service\AuthService;
 use app\service\BackendService;
-use app\service\ManualUnlockService;
+use app\service\UnlockService;
 use app\service\ProxyService;
 use app\service\ShareService;
 use app\service\UserService;
@@ -19,5 +19,5 @@ return [
     ProxyService::class,
     ShareService::class,
     UserService::class,
-    ManualUnlockService::class
+    UnlockService::class
 ];

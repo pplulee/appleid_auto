@@ -56,6 +56,8 @@ Route::group('user', function () {
     Route::post('proxy/:id', 'user/proxyUpdate');
     Route::delete('proxy/:id', 'user/proxyDelete');
     Route::get('proxy', 'user/proxy');
+    // 任务记录
+    Route::get('record', 'user/unlockRecord');
     //
     Route::get('logout', 'user/logout');
 })->middleware(UserIndex::class);
@@ -99,6 +101,8 @@ Route::group('admin', function () {
     Route::post('proxy/:id', 'admin/proxyUpdate');
     Route::delete('proxy/:id', 'admin/proxyDelete');
     Route::get('proxy', 'admin/proxy');
+    // 任务记录
+    Route::get('record', 'admin/unlockRecord');
 })->middleware(Admin::class);
 
 // 注册API

@@ -9,7 +9,6 @@ use app\model\Proxy;
 use app\model\SharePage;
 use app\model\User;
 use Exception;
-use think\facade\Session;
 use think\response\Json;
 use think\response\View;
 
@@ -320,6 +319,12 @@ class adminController extends BaseController
         } else {
             return alert("error", "重启失败：" . $backendResult['msg'], "2000", "/admin/account");
         }
+    }
+
+    public function unlockRecord(): View
+    {
+        $unlockRecordList = $this->app->unlockService->fetchRecord();
+        return view('/admin/unlockRecord', ['unlockRecords' => $unlockRecordList]);
     }
 
 }

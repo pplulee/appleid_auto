@@ -391,4 +391,10 @@ class UserController extends BaseController
         }
         return json($result);
     }
+
+    public function unlockRecord(): View
+    {
+        $unlockRecordList = $this->app->unlockService->fetchRecord(Session::get('user_id'));
+        return view('/user/unlockRecord', ['unlockRecords' => $unlockRecordList]);
+    }
 }

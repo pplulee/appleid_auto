@@ -1,17 +1,18 @@
 <?php
-declare (strict_types = 1);
+declare (strict_types=1);
 
 namespace app\service;
 
 use think\console\Output;
 use think\facade\Db;
+use think\Paginator;
 use think\Service;
 
-class ManualUnlockService extends Service
+class UnlockService extends Service
 {
     public function register()
     {
-    	$this->app->bind('manualUnlockService', ManualUnlockService::class);
+        $this->app->bind('unlockService', UnlockService::class);
     }
 
     public function unlock($id)
@@ -45,11 +46,21 @@ class ManualUnlockService extends Service
                 'account_id' => $id, 'type' => 'manual',
                 'status' => $backendResult['status'],
                 'message' => $backendResult['msg'],
-                'ip'=>getUserIP()
+                'ip' => getUserIP()
             ]);
             $output = new Output();
             $output->writeln('手动解锁：' . $backendResult['msg']);
             return $backendResult;
         }
+    }
+
+    public function fetchRecord($userID = 0): Paginator
+    {
+        return Db::name('unlock_record')
+            ->join('account', 'unlock_record.account_id=account.id')
+            ->field('unlock_record.*,account.username')
+            ->order('unlock_record.id desc')
+            ->where('account.owner', 'LIKE', $userID == 0 ? "%" : $userID)
+            ->paginate(10);
     }
 }

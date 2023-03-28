@@ -1,0 +1,42 @@
+{include file="admin/header"}
+
+<title>任务记录</title>
+<div class="container" style="padding-top:70px;">
+    <div class="col-md-12 center-block" style="float: none;">
+        <div class="table-responsive">
+            <table class="table table-striped table-nowrap">
+                <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>用户名</th>
+                    <th>类型</th>
+                    <th>状态</th>
+                    <th>日志</th>
+                    <th>IP</th>
+                    <th>时间</th>
+                </tr>
+                </thead>
+                <tbody>
+                {if $unlockRecords->isEmpty()}
+                <tr>
+                    <td class="text-center" colspan="7">暂无数据</td>
+                </tr>
+                {/if}
+                {volist name="unlockRecords" id="record"}
+                <tr>
+                    <td>{$record['id']}</td>
+                    <td>{$record['username']}</td>
+                    <td>{$record['type']}</td>
+                    <td>{$record['status']?"成功":"失败"}</td>
+                    <td>{$record['message']}</td>
+                    <td>{$record['ip']}</td>
+                    <td>{$record['time']}</td>
+                </tr>
+                {/volist}
+                </tbody>
+            </table>
+            {$unlockRecords|raw}
+        </div>
+    </div>
+</div>
+{include file="user/footer"}

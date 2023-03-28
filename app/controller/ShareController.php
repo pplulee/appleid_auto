@@ -35,7 +35,7 @@ class ShareController extends BaseController
     {
         $id = $request->id;
         $link = $request->link;
-        $result = $this->app->manualUnlockService->unlock($id);
+        $result = $this->app->unlockService->unlock($id);
         if ($result['status']) {
             return alert('success', '任务已提交，稍后将会自动解锁', 2000, '/share/' . $link);
         } else {
