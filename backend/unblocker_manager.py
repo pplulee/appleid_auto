@@ -100,7 +100,7 @@ class local_docker:
         result = os.popen("docker ps --format \"{{.Names}}\" -a")
         for line in result.readlines():
             if line.find(prefix) != -1:
-                local_list.append(line.strip().split("_")[1])
+                local_list.append(int(line.strip().split("_")[1]))
         logger.info(f"本地存在{len(local_list)}个容器")
         return local_list
 
