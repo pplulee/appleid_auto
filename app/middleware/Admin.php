@@ -5,10 +5,11 @@ namespace app\middleware;
 
 use app\model\User;
 use think\facade\Session;
+use Closure;
 
 class Admin
 {
-    public function handle($request, \Closure $next)
+    public function handle($request, Closure $next)
     {
         if (!Session::get('user_id')) {
             return response(alert("error", "请先登录", "2000", "/index"));

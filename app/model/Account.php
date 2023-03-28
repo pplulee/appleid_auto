@@ -79,4 +79,9 @@ class Account extends Model
         $account->update($data, ['id' => $id]);
         return true;
     }
+
+    function getTaskList(): array
+    {
+        return $this->column('id');
+    }
 }

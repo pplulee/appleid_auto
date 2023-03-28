@@ -12,6 +12,7 @@ use app\middleware\Admin;
 use app\middleware\Auth;
 use app\middleware\Share;
 use app\middleware\UserIndex;
+use app\middleware\Api;
 use think\facade\Route;
 
 
@@ -99,3 +100,15 @@ Route::group('admin', function () {
     Route::delete('proxy/:id', 'admin/proxyDelete');
     Route::get('proxy', 'admin/proxy');
 })->middleware(Admin::class);
+
+// 注册API
+Route::group(api, function () {
+    Route::rule('get_task_list', 'api/getTaskList');
+    Route::rule('get_task_info', 'api/getTaskInfo');
+    Route::rule('update_message', 'api/updateMessage');
+    Route::rule('get_password', 'api/getPassword');
+    Route::rule('update_password', 'api/updatePassword');
+    Route::rule('check_api', 'api/checkApi');
+    Route::rule('random_sharepage_password', 'api/randomSharePagePassword');
+    Route::rule('report_proxy_error', 'api/reportProxyError');
+})->middleware(Api::class);
