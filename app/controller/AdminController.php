@@ -19,7 +19,8 @@ class adminController extends BaseController
     {
         $account_count = $this->app->accountService->countAll();
         $share_count = $this->app->shareService->countAll();
-        return view('/admin/index', ['account_count' => $account_count, 'share_count' => $share_count]);
+        $user_count = $this->app->userService->countAll();
+        return view('/admin/index', ['account_count' => $account_count, 'share_count' => $share_count, 'user_count' => $user_count]);
     }
 
     public function user()
@@ -30,19 +31,20 @@ class adminController extends BaseController
 
     public function userEdit($id)
     {
-        $user = $this->app->userService->fetch($id);
+        $user = new User();
+        $user = $user->fetch($id);
         if (!$user) {
             return alert("error", "用户不存在", "2000", "/admin/user");
         }
         return view('/admin/userDetail', ['user' => $user, 'action' => 'edit']);
     }
 
-    public function updateUser(): string
+    public function userUpdate(): string
     {
         $user = new User();
-        $user = $user->fetch(Session::get('user_id'));
+        $user = $user->fetch($this->request->param('id'));
         if (!$user) {
-            return alert("error", "用户不存在", "2000", "/index");
+            return alert("error", "用户不存在", "2000", "/admin/user");
         }
         try {
             $data = [
@@ -52,14 +54,15 @@ class adminController extends BaseController
                 'tg_bot_token' => $this->request->param('tg_bot_token'),
                 'tg_chat_id' => $this->request->param('tg_chat_id'),
                 'wx_pusher_id' => $this->request->param('wx_pusher_id'),
+                'is_admin' => $this->request->param('is_admin') == 'on' ? 1 : 0,
             ];
         } catch (Exception $e) {
-            return alert("error", "参数错误", "2000", "/admin/info");
+            return alert("error", "参数错误", "2000", "/admin/user");
         }
         if ($user->updateUser($data)) {
-            return alert("success", "修改成功", "2000", "/admin/info");
+            return alert("success", "修改成功", "2000", "/admin/user");
         } else {
-            return alert("error", "修改失败", "2000", "/admin/info");
+            return alert("error", "修改失败", "2000", "/admin/user");
         }
     }
 
@@ -79,7 +82,7 @@ class adminController extends BaseController
 
     public function account(): View
     {
-        $accountList = $this->app->accountService->fetchByOwner(Session::get('user_id'));
+        $accountList = $this->app->accountService->fetchAll(Session::get('user_id'));
         return view('/admin/account', ['accounts' => $accountList]);
     }
 
@@ -182,6 +185,9 @@ class adminController extends BaseController
         if (!$share) {
             return alert("error", "分享页面不存在", "2000", "/admin/share");
         }
+        if ($share->owner != Session::get('user_id')) {
+            return alert("error", "无权操作", "2000", "/admin/share");
+        }
         $userAccountList = $this->app->accountService->fetchIDByOwner(Session::get('user_id'));
         return view('/admin/shareDetail', ['share' => $share, 'accounts' => $userAccountList, 'action' => 'edit']);
     }
@@ -191,18 +197,20 @@ class adminController extends BaseController
         try {
             $account_list = $this->request->param('account_list');
             if (!$account_list) {
-                return alert("error", "请至少选择一个账号", "2000", "/admin/share" . $id == 0 ? "" : "/$id");
+                return alert("error", "请至少选择一个账号", "2000", "/user/share" . $id == 0 ? "" : "/$id");
             }
             $accounts = implode(',', $account_list);
             $data = [
                 'share_link' => $this->request->param('share_link'),
                 'account_list' => $accounts,
+                'password' => $this->request->param('password') == "" ? null : $this->request->param('password'),
+                'owner' => Session::get('user_id'),
                 'html' => $this->request->param('html'),
                 'remark' => $this->request->param('remark'),
                 'expire' => $this->request->param('expire') == "" ? null : $this->request->param('expire'),
             ];
         } catch (Exception $e) {
-            return alert("error", "参数错误", "2000", "/admin/share" . $id == 0 ? "" : "/$id");
+            return alert("error", "参数错误", "2000", "/user/share" . $id == 0 ? "" : "/$id");
         }
         $sharePage = new SharePage();
         switch ($this->request->param('action')) {
@@ -210,6 +218,9 @@ class adminController extends BaseController
                 $sharePage = $sharePage->fetch($id);
                 if (!$sharePage) {
                     return alert("error", "分享页面不存在", "2000", "/admin/share");
+                }
+                if ($sharePage->owner != Session::get('user_id')) {
+                    return alert("error", "无权操作", "2000", "/admin/share");
                 }
                 return $sharePage->updateSharePage($sharePage->id, $data) ?
                     alert("success", "修改成功", "2000", "/admin/share") :
@@ -240,7 +251,7 @@ class adminController extends BaseController
 
     public function proxy(): View
     {
-        $proxyList = $this->app->proxyService->fetchByOwner(Session::get('user_id'));
+        $proxyList = $this->app->proxyService->fetchAll(Session::get('user_id'));
         return view('/admin/proxy', ['proxies' => $proxyList]);
     }
 

@@ -7,6 +7,7 @@ use app\service\BackendService;
 use app\service\ManualUnlockService;
 use app\service\ProxyService;
 use app\service\ShareService;
+use app\service\UserService;
 
 // 系统服务定义文件
 // 服务在完成全局初始化之后执行
@@ -17,5 +18,6 @@ return [
     BackendService::class,
     ProxyService::class,
     ShareService::class,
+    UserService::class,
     ManualUnlockService::class
 ];
