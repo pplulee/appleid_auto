@@ -57,6 +57,7 @@ class API:
                 return {'enable': False}
 
     def get_task_list(self):
+        return []
         try:
             result = loads(
                 post(f"{self.url}/api/get_task_list",
@@ -120,13 +121,13 @@ class local_docker:
     def sync(self):
         logger.info("开始同步")
         self.local_list = self.get_local_list()
+        remote_list = self.get_remote_list()
         # 处理需要删除的容器（本地存在，云端不存在）
         for id in self.local_list:
-            if id not in self.get_remote_list():
+            if id not in remote_list:
                 self.remove_docker(id)
                 self.local_list.remove(id)
         # 处理需要部署的容器（本地不存在，云端存在）
-        remote_list = self.get_remote_list()
         for id in remote_list:
             if id not in self.local_list:
                 self.deploy_docker(id)
@@ -142,6 +143,7 @@ class local_docker:
 
     def update(self):
         logger.info("开始检查更新")
+        return
         self.local_list = self.get_local_list()
         if len(self.local_list) == 0:
             logger.info("没有容器需要更新")
@@ -196,11 +198,11 @@ def start_app(ip, port, token):
             json_data = dumps(data).encode('utf-8')
             return app.response_class(json_data, mimetype='application/json')
 
-    @app.route('/setTask', methods=['POST'])
-    def set_task():
+    @app.route('/addTask', methods=['POST'])
+    def add_task():
         logging.info("收到设置任务请求")
-        thread_set_task = threading.Thread(target=Local.deploy_docker, args=(request.form['id']))
-        thread_set_task.start()
+        thread_add_task = threading.Thread(target=Local.deploy_docker, args=(request.form['id'],))
+        thread_add_task.start()
         data = {'status': True, 'msg': '设置成功'}
         json_data = dumps(data).encode('utf-8')
         return app.response_class(json_data, mimetype='application/json')
@@ -208,21 +210,22 @@ def start_app(ip, port, token):
     @app.route('/removeTask', methods=['POST'])
     def remove_task():
         logging.info("收到删除任务请求")
-        thread_remove_task = threading.Thread(target=Local.remove_docker, args=(request.form['id']))
+        thread_remove_task = threading.Thread(target=Local.remove_docker, args=(request.form['id'],))
         thread_remove_task.start()
         data = {'status': True, 'msg': '删除成功'}
         json_data = dumps(data).encode('utf-8')
         return app.response_class(json_data, mimetype='application/json')
 
     @app.route('/restartTask', methods=['POST'])
-    def remove_task():
+    def restart_task():
         logging.info("收到重启任务请求")
-        thread_remove_task = threading.Thread(target=Local.restart_docker, args=(request.form['id']))
+        thread_remove_task = threading.Thread(target=Local.restart_docker, args=(request.form['id'],))
         thread_remove_task.start()
-        data = {'status': True, 'msg': '删除成功'}
+        data = {'status': True, 'msg': '重启成功'}
         json_data = dumps(data).encode('utf-8')
         return app.response_class(json_data, mimetype='application/json')
 
+    print("端口", port)
     app.run(host=ip, port=port)
 
 
@@ -238,8 +241,9 @@ def main():
     os.system(f"docker stop $(docker ps -a |  grep \"{prefix}*\"  | awk '{{print $1}}')")
     os.system(f"docker rm $(docker ps -a |  grep \"{prefix}*\"  | awk '{{print $1}}')")
     if backend_api_result is not None and backend_api_result['enable']:
+        print(backend_api_result)
         thread_app = threading.Thread(target=start_app, daemon=True, args=(
-        backend_api_result['ip'], backend_api_result['port'], backend_api_result['token']))
+            backend_api_result['listen_ip'], backend_api_result['listen_port'], backend_api_result['token']))
         thread_app.start()
     job()
     schedule.every(10).minutes.do(job)
