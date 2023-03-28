@@ -183,7 +183,6 @@ def start_app(ip, port, token):
             return app.response_class(json_data, mimetype='application/json')
         if 'token' not in request.headers:
             logging.error("请求头中未包含token")
-            print(request.headers)
             data = {'status': False, 'msg': '请求头中未包含token'}
             json_data = dumps(data).encode('utf-8')
             return app.response_class(json_data, mimetype='application/json')
@@ -225,7 +224,6 @@ def start_app(ip, port, token):
         json_data = dumps(data).encode('utf-8')
         return app.response_class(json_data, mimetype='application/json')
 
-    print("端口", port)
     app.run(host=ip, port=port)
 
 
@@ -241,7 +239,6 @@ def main():
     os.system(f"docker stop $(docker ps -a |  grep \"{prefix}*\"  | awk '{{print $1}}')")
     os.system(f"docker rm $(docker ps -a |  grep \"{prefix}*\"  | awk '{{print $1}}')")
     if backend_api_result is not None and backend_api_result['enable']:
-        print(backend_api_result)
         thread_app = threading.Thread(target=start_app, daemon=True, args=(
             backend_api_result['listen_ip'], backend_api_result['listen_port'], backend_api_result['token']))
         thread_app.start()
