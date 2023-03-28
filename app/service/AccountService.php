@@ -33,6 +33,11 @@ class AccountService extends Service
             ->column('username', 'id');
     }
 
+    public function fetchAll(): Paginator
+    {
+        return Db::name('account')->paginate(25);
+    }
+
     public function countAll($id = 0): int
     {
         if ($id == 0) {

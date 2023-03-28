@@ -19,6 +19,11 @@ class ShareService extends Service
         return Db::name('share')->where('owner', $user_id)->paginate(25);
     }
 
+    public function fetchAll(): Paginator
+    {
+        return Db::name('share')->paginate(25);
+    }
+
     public function countALl($id = 0): int
     {
         if ($id == 0) {

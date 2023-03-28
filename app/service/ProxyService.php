@@ -23,4 +23,9 @@ class ProxyService extends Service
     {
         return Db::name('proxy')->where('owner', $user_id)->paginate(25);
     }
+
+    public function fetchAll(): Paginator
+    {
+        return Db::name('proxy')->paginate(25);
+    }
 }
