@@ -665,8 +665,18 @@ def setup_driver():
         elif config.proxy_type == "socks5":
             proxy.socks_proxy = config.proxy
         options.add_argument(f"--proxy-server={config.proxy}")
-    options.add_argument(
-        "user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/108.0.0.0 Safari/537.36")
+    user_agents = [
+        # Windows Chrome
+        'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/111.0.0.0 Safari/537.36',
+        'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/111.0.0.0 Safari/537.36',
+        'Mozilla/5.0 (Windows NT 10.0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/111.0.0.0 Safari/537.36',
+        # macOS Chrome
+        'Mozilla/5.0 (Macintosh; Intel Mac OS X 13_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/111.0.0.0 Safari/537.36',
+        # Linux Chrome
+        'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/111.0.0.0 Safari/537.36'
+    ]
+    random_index = random.randint(0, len(user_agents) - 1)
+    options.add_argument(f"user-agent={user_agents[random_index]}")
     try:
         if config.webdriver != "local":
             driver = webdriver.Remote(command_executor=config.webdriver, options=options, proxy=proxy)
