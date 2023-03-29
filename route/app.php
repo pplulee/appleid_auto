@@ -62,6 +62,9 @@ Route::group('user', function () {
     Route::get('logout', 'user/logout');
 })->middleware(UserIndex::class);
 
+
+// 注册分享页API
+Route::rule('shareapi/:link/[:password]', 'api/getSharepage');
 // 注册分享页
 Route::rule('share/', 'share/index')->middleware(Share::class);
 Route::group('share', function () {

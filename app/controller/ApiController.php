@@ -168,4 +168,42 @@ class ApiController extends BaseController
         }
         return json(['code' => 200, 'msg' => '获取成功', 'status' => true, 'data' => $data]);
     }
+
+    public function getSharepage($link, $password = ""): json
+    {
+        if (!$link) {
+            return json(['code' => 400, 'msg' => '缺少分享链接', 'status' => false]);
+        }
+        $share_page = new SharePage();
+        $share_page = $share_page->fetchByLink($link);
+        if (!$share_page) {
+            return json(['code' => 404, 'msg' => '分享页不存在', 'status' => false]);
+        }
+        if ($share_page->password) {
+            if (!$password) {
+                return json(['code' => 400, 'msg' => '缺少密码', 'status' => false]);
+            }
+            if ($password != $share_page->password) {
+                return json(['code' => 403, 'msg' => '密码错误', 'status' => false]);
+            }
+        }
+        $accounts = [];
+        foreach ($share_page->account_list as $accountID) {
+            $account = new Account();
+            $account = $account->fetch($accountID);
+            if (!$account) {
+                continue;
+            }
+            $accounts[] = [
+                'username' => $account->username,
+                'password' => $account->password,
+                'status' => $account->message == "正常" && ((time() - strtotime($account->last_check)) < (($account->check_interval + 2) * 60)),
+                'message' => $account->message,
+                'last_check' => $account->last_check,
+                'remark' => $account->frontend_remark,
+            ];
+        }
+        shuffle($accounts);
+        return json(['code' => 200, 'msg' => '获取成功', 'status' => true, 'data' => $accounts]);
+    }
 }
