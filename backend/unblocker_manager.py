@@ -57,7 +57,6 @@ class API:
                 return {'enable': False}
 
     def get_task_list(self):
-        return []
         try:
             result = loads(
                 post(f"{self.url}/api/get_task_list",
@@ -143,7 +142,6 @@ class local_docker:
 
     def update(self):
         logger.info("开始检查更新")
-        return
         self.local_list = self.get_local_list()
         if len(self.local_list) == 0:
             logger.info("没有容器需要更新")
@@ -234,7 +232,7 @@ def main():
     global Local
     Local = local_docker(api)
     logger.info("拉取最新镜像")
-    os.system(f"docker pull sahuidhsu/appleid_auto")
+    os.system(f"docker pull sahuidhsu/appleid_auto:2.0")
     logger.info("删除本地所有容器")
     os.system(f"docker stop $(docker ps -a |  grep \"{prefix}*\"  | awk '{{print $1}}')")
     os.system(f"docker rm $(docker ps -a |  grep \"{prefix}*\"  | awk '{{print $1}}')")
