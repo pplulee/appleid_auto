@@ -31,7 +31,8 @@ class ApiController extends BaseController
         $data = array(
             'username' => $account_info->username,
             'password' => $account_info->password,
-            'dob' => $account_info->dob,
+            // dob转为字符串，格式为mmddyyyy
+            'dob' => date('mdY', strtotime($account_info->dob)),
             'q1' => $account_info->question1,
             'q2' => $account_info->question2,
             'q3' => $account_info->question3,
