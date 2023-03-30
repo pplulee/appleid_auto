@@ -201,12 +201,11 @@ class ApiController extends BaseController
                 'username' => $account->username,
                 'password' => $account->password,
                 'status' => $account->message == "正常" && ((time() - strtotime($account->last_check)) < (($account->check_interval + 2) * 60)),
-                'message' => $account->message,
                 'last_check' => $account->last_check,
                 'remark' => $account->frontend_remark,
             ];
         }
         shuffle($accounts);
-        return json(['code' => 200, 'msg' => '获取成功', 'status' => true, 'data' => $accounts]);
+        return json(['code' => 200, 'msg' => '获取成功', 'status' => true, 'accounts' => $accounts]);
     }
 }
