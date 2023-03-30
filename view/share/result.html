@@ -27,10 +27,10 @@
                         <h3 class="card-title">账号信息</h3>
                         <h3 class="card-text">{$account->username}</h3>
                         {if $account->frontend_remark!=""}
-                            {$account->frontend_remark|raw}
+                            <p class="card-subtitle mb-2 text-muted" style="line-height: 25px">备注：{$account->frontend_remark|raw}</p>
                         {/if}
-                        <p class="card-subtitle mb-2 text-muted">上次检测时间：{$account->last_check}</p>
-                        <p class="card-subtitle mb-2 text-muted">状态：
+                        <p class="card-subtitle mb-2 text-muted" style="line-height: 25px">上次检测时间：{$account->last_check}</p>
+                        <p class="card-subtitle mb-2 text-muted" style="line-height: 25px">状态：
                         {if $account->status}
                             <span class="badge bg-green">正常</span>
                         {else}
@@ -56,5 +56,6 @@
     <br>
     {$html|raw}
 </div>
+{include file="user/footer"}
 </body>
 </html>
