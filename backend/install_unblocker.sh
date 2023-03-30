@@ -108,8 +108,8 @@ rm -rf install_unblocker
 mkdir install_unblocker
 cd install_unblocker
 echo "开始下载文件…… | Start downloading files..."
-wget https://raw.githubusercontent.com/pplulee/appleid_auto/main/backend/requirements.txt -O requirements.txt
-wget https://raw.githubusercontent.com/pplulee/appleid_auto/main/backend/unblocker_manager.py -O unblocker_manager.py
+wget https://raw.githubusercontent.com/pplulee/appleid_auto/backend/backend/requirements.txt -O requirements.txt
+wget https://raw.githubusercontent.com/pplulee/appleid_auto/backend/backend/unblocker_manager.py -O unblocker_manager.py
 SERVICE_FILE="[Unit]
 Description=appleauto
 Wants=network.target
