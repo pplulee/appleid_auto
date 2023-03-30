@@ -161,6 +161,7 @@ class Config:
         self.enable_auto_update_password = "auto_update_password" in config_result.keys()
         self.headless = "headless" in config_result.keys()
         self.fail_retry = "fail_retry" in config_result.keys()
+        self.enable = config_result["enable"]
         if self.proxy_content != "" and self.proxy_type != "":
             # 新版本代理
             if "url" in self.proxy_type:
@@ -740,6 +741,13 @@ def job():
         logger.error(lang_text.getAPIFail)
         exit()
     config = Config(config_result)
+    if not config.enable:
+        # 任务已被禁用
+        logger.info(lang_text.taskDisabled)
+        schedule.every(10).minutes.do(job)
+        logger.info(lang_text.nextRun(10))
+        return
+
     id = ID(config.username, config.password, config.dob, config.answer)
 
     job_success = True
