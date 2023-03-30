@@ -89,7 +89,7 @@ class local_docker:
         -e lang={language} \
         --restart=on-failure \
         --log-opt max-size=1m --log-opt max-file=2 \
-        sahuidhsu/appleid_auto")
+        sahuidhsu/appleid_auto:2.0")
 
     def remove_docker(self, id):
         logger.info(f"删除容器{id}")
