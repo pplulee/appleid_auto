@@ -4,6 +4,7 @@ declare (strict_types=1);
 namespace app\service;
 
 use app\model\Account;
+use app\model\UnlockRecord;
 use think\facade\Db;
 use think\Service;
 
@@ -26,7 +27,8 @@ class ApiService extends Service
         }
         $account->message = $message;
         $account->last_check = date('Y-m-d H:i:s');
-        Db::name('unlock_record')->insert([
+        $record = new UnlockRecord();
+        $record->addRecord([
             'account_id' => $account->id,
             'status' => $status,
             'type' => 'backend',

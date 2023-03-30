@@ -3,6 +3,7 @@ declare (strict_types=1);
 
 namespace app\service;
 
+use app\model\UnlockRecord;
 use think\facade\Db;
 use think\Paginator;
 use think\Service;
@@ -41,7 +42,8 @@ class UnlockService extends Service
             return ['status' => false, 'msg' => '间隔太短，暂不允许手动解锁'];
         } else {
             $backendResult = $this->app->backendService->restartTask($id);
-            Db::name('unlock_record')->insert([
+            $record = new UnlockRecord();
+            $record->addRecord([
                 'account_id' => $id, 'type' => 'manual',
                 'status' => $backendResult['status'],
                 'message' => $backendResult['msg'],

@@ -5,5 +5,7 @@
 return [
     // 指令定义
     'commands' => [
+        'dbclean' => 'app\command\DbClean',
+        'register' => 'app\command\register',
     ],
 ];
