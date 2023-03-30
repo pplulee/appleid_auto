@@ -68,15 +68,7 @@ class adminController extends BaseController
     public function userDelete($id): Json
     {
         $user = new User();
-        $user = $user->fetch($id);
-        if (!$user) {
-            return json(['status' => 'error', 'msg' => '用户不存在']);
-        }
-        if ($user->deleteUser()) {
-            return json(['status' => 'success', 'msg' => '删除成功']);
-        } else {
-            return json(['status' => 'error', 'msg' => '删除失败']);
-        }
+        return json($user->deleteUser($id));
     }
 
     public function account(): View
@@ -124,33 +116,8 @@ class adminController extends BaseController
         $account = new Account();
         switch ($this->request->param('action')) {
             case "edit":
-                $account = $account->fetch($id);
-                if (!$account) {
-                    return alert("error", "账号不存在", "2000", "/admin/account");
-                }
                 $result = $account->updateAccount($account->id, $data);
-                if ($result) {
-                    $backendResult = $this->app->backendService->restartTask($id);
-                    if ($backendResult['status']) {
-                        return alert("success", "修改成功", "2000", "/admin/account");
-                    } else {
-                        return alert("question", "修改成功，但后端重启失败：" . $backendResult['msg'], "2000", "/admin/account");
-                    }
-                } else {
-                    return alert("error", "修改失败", "2000", "/admin/account");
-                }
-            case "add":
-                $result = $account->addAccount($data);
-                if ($result) {
-                    $backendResult = $this->app->backendService->restartTask($result);
-                    if ($backendResult['status']) {
-                        return alert("success", "添加成功", "2000", "/admin/account");
-                    } else {
-                        return alert("question", "添加成功，但后端重启失败：" . $backendResult['msg'], "2000", "/admin/account");
-                    }
-                } else {
-                    return alert("error", "添加失败", "2000", "/admin/account");
-                }
+                return alert($result['status'] ? "success" : "error", $result['msg'], "2000", "/admin/account");
             default:
                 return alert("error", "未知操作", "2000", "/admin/account");
         }
@@ -159,16 +126,7 @@ class adminController extends BaseController
     public function accountDelete($id): Json
     {
         $account = new Account();
-        $result = [];
-        $account = $account->fetch($id);
-        if (!$account) {
-            $result['msg'] = "账号不存在";
-            $result['status'] = false;
-        } else {
-            $result['status'] = $account->deleteAccount($account->id);
-            $result['msg'] = $result['status'] ? "删除成功" : "删除失败";
-        }
-        return json($result);
+        return json($account->deleteAccount($id));
     }
 
     public function share(): View
@@ -216,13 +174,8 @@ class adminController extends BaseController
                 if (!$sharePage) {
                     return alert("error", "分享页面不存在", "2000", "/admin/share");
                 }
-                return $sharePage->updateSharePage($sharePage->id, $data) ?
-                    alert("success", "修改成功", "2000", "/admin/share") :
-                    alert("error", "修改失败", "2000", "/admin/share");
-            case "add":
-                return $sharePage->addSharePage($data) ?
-                    alert("success", "添加成功", "2000", "/admin/share") :
-                    alert("error", "添加失败", "2000", "/admin/share");
+                $result = $sharePage->updateSharePage($sharePage->id, $data);
+                return alert($result['status'] ? "success" : "error", $result['msg'], "2000", "/admin/share");
             default:
                 return alert("error", "未知操作", "2000", "/admin/share");
         }
@@ -231,16 +184,7 @@ class adminController extends BaseController
     public function shareDelete($id): Json
     {
         $sharePage = new SharePage();
-        $result = [];
-        $sharePage = $sharePage->fetch($id);
-        if (!$sharePage) {
-            $result['msg'] = "分享页面不存在";
-            $result['status'] = false;
-        } else {
-            $result['status'] = $sharePage->deleteSharePage($sharePage->id);
-            $result['msg'] = $result['status'] ? "删除成功" : "删除失败";
-        }
-        return json($result);
+        return json($sharePage->deleteSharePage($id));
     }
 
     public function proxy(): View

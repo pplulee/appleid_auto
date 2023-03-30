@@ -106,9 +106,14 @@
                     }).catch(error => {
                         // 处理错误
                         Swal.fire({
-                            title: error.message,
-                            text: error.toString(),
+                            title: '出现错误',
+                            text: error.message,
                             icon: 'error'
+                        }).then(function (result) {
+                            // 如果用户点击了“确定”按钮，则刷新页面
+                            if (result.value) {
+                                location.reload();
+                            }
                         });
                     });
                 }

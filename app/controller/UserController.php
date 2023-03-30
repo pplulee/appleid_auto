@@ -68,10 +68,11 @@ class UserController extends BaseController
     {
         $username = $this->request->param('username');
         $password = $this->request->param('password');
-        if ($this->app->authService->userLogin($username, $password)) {
-            return alert("success", "登录成功", "2000", "/user/index");
+        $result = $this->app->authService->userLogin($username, $password);
+        if ($result['status']) {
+            return alert("success", $result['msg'], "2000", "/user/index");
         } else {
-            return alert("error", "用户名或密码错误", "2000", "/index");
+            return alert("error", $result['msg'], "2000", "/index");
         }
     }
 
@@ -79,11 +80,8 @@ class UserController extends BaseController
     {
         $username = $this->request->param('username');
         $password = $this->request->param('password');
-        if ($this->app->authService->userRegister($username, $password)) {
-            return alert("success", "注册成功", "2000", "/index");
-        } else {
-            return alert("error", "用户已存在", "2000", "/index");
-        }
+        $result = $this->app->authService->userRegister($username, $password);
+        return alert($result['status'] ? "success" : "error", $result['msg'], "2000", "/index");
     }
 
     public function logout(): string
@@ -156,29 +154,11 @@ class UserController extends BaseController
                     return alert("error", "无权操作", "2000", "/user/account");
                 }
                 $result = $account->updateAccount($account->id, $data);
-                if ($result) {
-                    $backendResult = $this->app->backendService->restartTask($id);
-                    if ($backendResult['status']) {
-                        return alert("success", "修改成功", "2000", "/user/account");
-                    } else {
-                        return alert("question", "修改成功，但后端重启失败：" . $backendResult['msg'], "2000", "/user/account");
-                    }
-                } else {
-                    return alert("error", "修改失败", "2000", "/user/account");
-                }
+                return alert($result['status'] ? "success" : "error", $result['msg'], "2000", "/user/account");
             case "add":
                 $data['owner'] = Session::get('user_id');
                 $result = $account->addAccount($data);
-                if ($result) {
-                    $backendResult = $this->app->backendService->addTask($result->id);
-                    if ($backendResult['status']) {
-                        return alert("success", "添加成功", "2000", "/user/account");
-                    } else {
-                        return alert("question", "添加成功，但后端重启失败：" . $backendResult['msg'], "2000", "/user/account");
-                    }
-                } else {
-                    return alert("error", "添加失败", "2000", "/user/account");
-                }
+                return alert($result['status'] ? "success" : "error", $result['msg'], "2000", "/user/account");
             default:
                 return alert("error", "未知操作", "2000", "/user/account");
         }
@@ -214,9 +194,7 @@ class UserController extends BaseController
             $result['msg'] = "无权操作";
             $result['status'] = false;
         } else {
-            $result['status'] = $account->deleteAccount($account->id);
-            if ($result['status']) $this->app->backendService->removeTask($id);
-            $result['msg'] = $result['status'] ? "删除成功" : "删除失败";
+            $result = $account->deleteAccount($account->id);
         }
         return json($result);
     }
@@ -285,13 +263,11 @@ class UserController extends BaseController
                 if ($sharePage->owner != Session::get('user_id')) {
                     return alert("error", "无权操作", "2000", "/user/share");
                 }
-                return $sharePage->updateSharePage($sharePage->id, $data) ?
-                    alert("success", "修改成功", "2000", "/user/share") :
-                    alert("error", "修改失败", "2000", "/user/share");
+                $result = $sharePage->updateSharePage($sharePage->id, $data);
+                return alert($result['status'] ? "success" : "error", $result['msg'], "2000", "/user/share");
             case "add":
-                return $sharePage->addSharePage($data) ?
-                    alert("success", "添加成功", "2000", "/user/share") :
-                    alert("error", "添加失败", "2000", "/user/share");
+                $result = $sharePage->addSharePage($data);
+                return alert($result['status'] ? "success" : "error", $result['msg'], "2000", "/user/share");
             default:
                 return alert("error", "未知操作", "2000", "/user/share");
         }
@@ -300,7 +276,6 @@ class UserController extends BaseController
     public function shareDelete($id): Json
     {
         $sharePage = new SharePage();
-        $result = [];
         $sharePage = $sharePage->fetch($id);
         if (!$sharePage) {
             $result['msg'] = "分享页面不存在";
@@ -309,8 +284,7 @@ class UserController extends BaseController
             $result['msg'] = "无权操作";
             $result['status'] = false;
         } else {
-            $result['status'] = $sharePage->deleteSharePage($sharePage->id);
-            $result['msg'] = $result['status'] ? "删除成功" : "删除失败";
+            $result = $sharePage->deleteSharePage($sharePage->id);
         }
         return json($result);
     }

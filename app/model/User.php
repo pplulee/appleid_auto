@@ -3,6 +3,7 @@ declare (strict_types=1);
 
 namespace app\model;
 
+use think\facade\Db;
 use think\Model;
 
 /**
@@ -13,19 +14,19 @@ class User extends Model
     protected $table = 'user';
     protected $pk = 'id';
 
-    public function addUser($username, $password): bool
+    public function addUser($username, $password): array
     {
         $user = $this->where('username', $username)->find();
         if ($user) {
-            return false;
+            return ['status' => false, 'msg' => '用户名已存在'];
         }
         $user = new User();
         $password = password_hash($password, PASSWORD_DEFAULT);
         $user->create(['username' => $username, 'password' => $password]);
-        return true;
+        return ['status' => true, 'msg' => '注册成功'];
     }
 
-    public function updateUser($data): bool
+    public function updateUser($data): array
     {
         $id = $data['id'];
         $username = $data['username'];
@@ -38,7 +39,7 @@ class User extends Model
             $user = $this;
         }
         if (!$user) {
-            return false;
+            return ['status' => false, 'msg' => '用户不存在'];
         } else {
             $update = [];
             if ($password != null) {
@@ -48,7 +49,7 @@ class User extends Model
             if ($username != $user->username) {
                 // 检查用户名是否重复
                 if ($this->where('username', $username)->find()) {
-                    return false;
+                    return ['status' => false, 'msg' => '用户名已存在'];
                 }
                 $update['username'] = $username;
             }
@@ -61,12 +62,29 @@ class User extends Model
             if (count($update) > 0) {
                 $user->update($update, ['id' => $id]);
             }
-            return true;
+            return ['status' => true, 'msg' => '更新成功'];
         }
     }
 
     public function fetch($id)
     {
         return $this->where('id', $id)->find();
+    }
+
+    public function deleteUser($id): array
+    {
+        $user = $this->fetch($id);
+        if (!$user) {
+            return ['status' => false, 'msg' => '用户不存在'];
+        } else {
+            // 删除代理
+            Db::name('proxy')->where('owner', $id)->delete();
+            // 删除分享页
+            Db::name('share')->where('owner', $id)->delete();
+            // 删除账号
+            Db::name('account')->where('owner', $id)->delete();
+            $result = $user->delete();
+            return ['status' => $result, 'msg' => $result ? '删除成功' : '删除失败'];
+        }
     }
 }

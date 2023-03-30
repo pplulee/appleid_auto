@@ -3,6 +3,7 @@ declare (strict_types=1);
 
 namespace app\model;
 
+use think\Container;
 use think\facade\Db;
 use think\Model;
 
@@ -14,14 +15,25 @@ class Account extends Model
     protected $table = 'account';
     protected $pk = 'id';
 
-    function addAccount($data): ?Account
+    function addAccount($data): array
     {
         if ($this->fetchByUsername($data['username'])) {
-            return null;
+            return ['status' => false, 'msg' => '账号已存在'];
         }
         $account = new Account();
         $data['message'] = "未执行任务";
-        return $account->create($data);
+        $account = $account->create($data);
+        $backendService = Container::getInstance()->make('backendService');
+        $backendResult = $backendService->addTask($account->id);
+        $result = [];
+        if ($backendResult['status']) {
+            $result['status'] = true;
+            $result['msg'] = '添加成功';
+        } else {
+            $result['status'] = true;
+            $result['msg'] = '添加成功，但后端接口调用失败：' . $backendResult['msg'];
+        }
+        return $result;
     }
 
     function fetchByUsername($username)
@@ -29,7 +41,7 @@ class Account extends Model
         return $this->where('username', $username)->find();
     }
 
-    function deleteAccount($id): bool
+    function deleteAccount($id): array
     {
         if (!$this) {
             $account = $this->fetch($id);
@@ -37,7 +49,7 @@ class Account extends Model
             $account = $this;
         }
         if (!$account) {
-            return false;
+            return ['status' => false, 'msg' => '账号不存在'];
         }
         $pages = Db::table('share')
             ->field('id, account_list')
@@ -57,7 +69,22 @@ class Account extends Model
                 ->where('id', $page['id'])
                 ->update(['account_list' => $account_list]);
         }
-        return $account->delete();
+        $result = [];
+        $result['status'] = $account->delete();
+        // 通知后端接口
+        if ($result['status']) {
+            $backendService = Container::getInstance()->make('backendService');
+            $backendResult = $backendService->removeTask($id);
+            if ($backendResult['status']) {
+                $result['msg'] = '删除成功';
+            } else {
+                $result['status'] = false;
+                $result['msg'] = '删除成功，但后端接口错误：' . $backendResult['msg'];
+            }
+        } else {
+            $result['msg'] = '删除失败';
+        }
+        return $result;
     }
 
     function fetch($id)
@@ -65,7 +92,7 @@ class Account extends Model
         return $this->where('id', $id)->find();
     }
 
-    function updateAccount($id, $data): bool
+    function updateAccount($id, $data): array
     {
         if (!$this) {
             $account = $this->fetch($id);
@@ -73,10 +100,27 @@ class Account extends Model
             $account = $this;
         }
         if (!$account) {
-            return false;
+            return ['status' => false, 'msg' => '账号不存在'];
         }
-        $account->update($data, ['id' => $id]);
-        return true;
+        if ($account->username != $data['username']) {
+            if ($this->fetchByUsername($data['username'])) {
+                return ['status' => false, 'msg' => '用户名已存在'];
+            }
+        }
+        $result = [];
+        $result['status'] = $account->update($data, ['id' => $id]);
+        if ($result['status']) {
+            $backendService = Container::getInstance()->make('backendService');
+            $backendResult = $backendService->restartTask($id, $data);
+            if ($backendResult['status']) {
+                $result['msg'] = '修改成功';
+            } else {
+                $result['msg'] = '修改成功，但后端接口错误：' . $backendResult['msg'];
+            }
+        } else {
+            $result['msg'] = '修改失败';
+        }
+        return $result;
     }
 
     function getTaskList(): array
