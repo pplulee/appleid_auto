@@ -42,6 +42,7 @@ class ApiController extends BaseController
             'check_interval' => $account_info->check_interval,
             'webdriver' => env('WEBDRIVER', ''),
             'enable' => $account_info->enable,
+            'fail_retry' => env('FAIL_RETRY'),
         );
         // 获取可选参数
         if ($account_info->enable_check_password_correct) {
