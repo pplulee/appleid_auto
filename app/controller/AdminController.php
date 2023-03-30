@@ -108,6 +108,7 @@ class adminController extends BaseController
                 'enable_delete_devices' => $this->request->param('enable_delete_devices') !== null,
                 'enable_auto_update_password' => $this->request->param('enable_auto_update_password') !== null,
                 'min_manual_unlock' => $this->request->param('min_manual_unlock'),
+                'enable' => $this->request->param('enable') !== null,
                 'owner' => $this->request->param('owner'),
             ];
         } catch (Exception $e) {

@@ -14,6 +14,7 @@
                     <th>备注</th>
                     <th>前端备注</th>
                     <th>状态</th>
+                    <th>消息</th>
                     <th>上次检查</th>
                     <th>检查间隔</th>
                     <th>手动解锁间隔</th>
@@ -33,6 +34,7 @@
                     <td>{$account.password}</td>
                     <td>{$account.remark}</td>
                     <td>{$account.frontend_remark}</td>
+                    <td>{$account.enable ? "启用" : "禁用"}</td>
                     <td>{$account.message}</td>
                     <td>{$account.last_check}</td>
                     <td>{$account.check_interval}</td>

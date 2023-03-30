@@ -45,12 +45,13 @@ class AccountService extends Service
     public function fetchInShare($id): ?Account
     {
         $result = Db::name('account')
-            ->field('id,username,password,frontend_remark,last_check,check_interval,message,min_manual_unlock')
+            ->field('id,username,password,frontend_remark,last_check,check_interval,message,min_manual_unlock,enable')
             ->where('id', $id)
             ->find();
         if (count($result) == 0) {
             return null;
         } else {
+            if (!$result['enable']) return null;
             $account = new Account();
             $account->id = $result['id'];
             $account->username = $result['username'];

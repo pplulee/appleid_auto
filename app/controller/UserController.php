@@ -115,6 +115,7 @@ class UserController extends BaseController
         $account->share_link = random_str(10);
         $account->check_interval = 30;
         $account->min_manual_unlock = 0;
+        $account->enable = true;
         return view('/user/accountDetail', ['account' => $account, 'action' => 'add']);
     }
 
@@ -139,6 +140,7 @@ class UserController extends BaseController
                 'enable_delete_devices' => $this->request->param('enable_delete_devices') !== null,
                 'enable_auto_update_password' => $this->request->param('enable_auto_update_password') !== null,
                 'min_manual_unlock' => $this->request->param('min_manual_unlock'),
+                'enable' => $this->request->param('enable') !== null,
             ];
         } catch (Exception $e) {
             return alert("error", "参数错误", "2000", "/user/account");
