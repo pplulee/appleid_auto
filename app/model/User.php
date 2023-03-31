@@ -59,6 +59,7 @@ class User extends Model
             $update['tg_bot_token'] = $data['tg_bot_token'];
             $update['tg_chat_id'] = $data['tg_chat_id'];
             $update['wx_pusher_id'] = $data['wx_pusher_id'];
+            $update['webhook'] = $data['webhook'];
             if (count($update) > 0) {
                 $user->update($update, ['id' => $id]);
             }

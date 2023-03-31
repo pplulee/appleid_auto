@@ -53,6 +53,7 @@ class adminController extends BaseController
                 'tg_bot_token' => $this->request->param('tg_bot_token'),
                 'tg_chat_id' => $this->request->param('tg_chat_id'),
                 'wx_pusher_id' => $this->request->param('wx_pusher_id'),
+                'webhook' => $this->request->param('webhook'),
                 'is_admin' => $this->request->param('is_admin') == 'on' ? 1 : 0,
             ];
         } catch (Exception $e) {
@@ -117,7 +118,7 @@ class adminController extends BaseController
         $account = new Account();
         switch ($this->request->param('action')) {
             case "edit":
-                $result = $account->updateAccount($account->id, $data);
+                $result = $account->updateAccount($id, $data);
                 return alert($result['status'] ? "success" : "error", $result['msg'], "2000", "/admin/account");
             default:
                 return alert("error", "未知操作", "2000", "/admin/account");

@@ -94,11 +94,7 @@ class Account extends Model
 
     function updateAccount($id, $data): array
     {
-        if (!$this) {
-            $account = $this->fetch($id);
-        } else {
-            $account = $this;
-        }
+        $account = $this->fetch($id);
         if (!$account) {
             return ['status' => false, 'msg' => '账号不存在'];
         }

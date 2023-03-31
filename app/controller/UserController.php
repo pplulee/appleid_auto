@@ -53,6 +53,7 @@ class UserController extends BaseController
                 'tg_bot_token' => $this->request->param('tg_bot_token'),
                 'tg_chat_id' => $this->request->param('tg_chat_id'),
                 'wx_pusher_id' => $this->request->param('wx_pusher_id'),
+                'webhook' => $this->request->param('webhook'),
             ];
         } catch (Exception $e) {
             return alert("error", "参数错误", "2000", "/user/info");
