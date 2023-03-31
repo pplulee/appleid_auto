@@ -16,12 +16,11 @@ prefix = "apple-auto_"
 parser = argparse.ArgumentParser(description="")
 parser.add_argument("-api_url", help="API URL", required=True)
 parser.add_argument("-api_key", help="API key", required=True)
-parser.add_argument('-lang', help='Language', default='zh_cn')
+parser.add_argument('-lang', help='Language', default='1')
 args = parser.parse_args()
 
 api_url = args.api_url
 api_key = args.api_key
-language = args.lang
 
 logger = logging.getLogger()
 logger.setLevel('INFO')
@@ -31,6 +30,16 @@ formatter = logging.Formatter(BASIC_FORMAT, DATE_FORMAT)
 chlr = logging.StreamHandler()
 chlr.setFormatter(formatter)
 logger.addHandler(chlr)
+
+if args.lang == '1':
+    language = 'zh_cn'
+elif args.lang == '2':
+    language = 'en_us'
+elif args.lang == '3':
+    language = 'vi_vn'
+else:
+    logger.error("语言参数错误，默认使用中文")
+    language = 'zh_cn'
 
 
 class API:
