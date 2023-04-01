@@ -16,6 +16,29 @@
             timerProgressBar: true
         });
     }
+
+    function updateCardStyle() {
+      var width = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
+      var styleElement = document.createElement('style');
+
+      if (width < 1040) {
+        styleElement.innerHTML = '.card { margin-top: 1rem; }';
+      } else {
+        styleElement.innerHTML = '.card { margin-top: 1rem; margin-left: 35%; width: 30%; }';
+      }
+
+      var oldStyleElement = document.getElementById('card-style');
+      if (oldStyleElement) {
+        oldStyleElement.parentNode.removeChild(oldStyleElement);
+      }
+
+      styleElement.id = 'card-style';
+      document.getElementsByTagName('head')[0].appendChild(styleElement);
+    }
+    {if count($accounts) == 1}
+    updateCardStyle();
+    window.addEventListener('resize', updateCardStyle);
+    {/if}
 </script>
 
 <div class="container">
@@ -24,7 +47,7 @@
         {if count($accounts) > 1}
         <div class="col-xs-4 col-md-4">
         {/if}
-                <div class="card shadow-lg" style="margin-top: 1rem;{if count($accounts) == 1 && !isMobile()} margin-left: 35%; width: 30%{/if}">
+                <div class="card shadow-lg" style="margin-top: 1rem;">
                     <div class="card-status-start bg-{$account->status?"green":"red"}"></div>
                     <div class="card-body">
                         <h3 class="card-title">账号信息{if isMobile()}test{/if}</h3>
