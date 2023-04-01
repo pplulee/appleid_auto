@@ -845,7 +845,7 @@ logger.info(f"{'=' * 80}\n"
             f"{lang_text.launch}\n"
             f"{lang_text.repoAddress}: https://github.com/pplulee/appleid_auto\n"
             f"{lang_text.TG_Group}: @appleunblocker")
-logger.info(f"{lang_text.version}: v2.0-20230328")
+logger.info(f"{lang_text.version}: v2.0-20230401")
 job()
 while True:
     schedule.run_pending()
