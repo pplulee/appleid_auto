@@ -58,7 +58,7 @@ class API:
             logger.error(e)
             return {'enable': False}
         else:
-            if result['status']:
+            if result['code']==200:
                 return result['data']
             else:
                 logger.error("获取后端接口失败")
@@ -76,7 +76,7 @@ class API:
             logger.error(e)
             return False
         else:
-            if result['status']:
+            if result['code']==200:
                 return result['data']
             else:
                 logger.error("获取任务列表失败")
