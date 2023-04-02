@@ -47,7 +47,7 @@ class Proxy extends Model
         }
         Db::table('proxy')
             ->where('id', $id)
-            ->update(['last_use' => 'now()']);
+            ->update(['last_use' => date('Y-m-d H:i:s')]);
         return true;
     }
 

@@ -47,6 +47,7 @@ class UnlockService extends Service
                 'account_id' => $id, 'type' => 'manual',
                 'status' => $backendResult['status'],
                 'message' => $backendResult['msg'],
+                'time' => date('Y-m-d H:i:s'),
                 'ip' => getUserIP()
             ]);
             return $backendResult;
