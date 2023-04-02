@@ -148,7 +148,6 @@ class Config:
                        config_result["q3"]: config_result["a3"]}
         self.check_interval = config_result["check_interval"]
         self.webdriver = config_result["webdriver"]
-        self.proxy = config_result["proxy"] if "proxy" in config_result.keys() else ""
         self.proxy_id = config_result["proxy_id"] if "proxy_id" in config_result.keys() else -1
         self.proxy_type = config_result["proxy_type"] if "proxy_type" in config_result.keys() else ""
         self.proxy_content = config_result["proxy_content"] if "proxy_content" in config_result.keys() else ""
@@ -156,12 +155,13 @@ class Config:
         self.tg_bot_token = config_result["tg_bot_token"] if "tg_bot_token" in config_result.keys() else ""
         self.wx_pusher_id = config_result["wx_pusher_id"] if "wx_pusher_id" in config_result.keys() else ""
         self.webhook = config_result["webhook"] if "webhook" in config_result.keys() else ""
-        self.enable_check_password_correct = "check_password_correct" in config_result.keys()
-        self.enable_delete_devices = "delete_devices" in config_result.keys()
-        self.enable_auto_update_password = "auto_update_password" in config_result.keys()
+        self.enable_check_password_correct = "enable_check_password_correct" in config_result.keys()
+        self.enable_delete_devices = "enable_delete_devices" in config_result.keys()
+        self.enable_auto_update_password = "enable_auto_update_password" in config_result.keys()
         self.headless = "headless" in config_result.keys()
         self.fail_retry = "fail_retry" in config_result.keys()
         self.enable = config_result["enable"]
+        self.proxy = ""
         if self.proxy_content != "" and self.proxy_type != "":
             # 新版本代理
             if "url" in self.proxy_type:
@@ -845,7 +845,7 @@ logger.info(f"{'=' * 80}\n"
             f"{lang_text.launch}\n"
             f"{lang_text.repoAddress}: https://github.com/pplulee/appleid_auto\n"
             f"{lang_text.TG_Group}: @appleunblocker")
-logger.info(f"{lang_text.version}: v2.0-20230401")
+logger.info(f"{lang_text.version}: v2.0-20230402")
 job()
 while True:
     schedule.run_pending()
