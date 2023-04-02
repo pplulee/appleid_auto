@@ -149,7 +149,7 @@ class Config:
         self.check_interval = config_result["check_interval"]
         self.webdriver = config_result["webdriver"]
         self.proxy_id = config_result["proxy_id"] if "proxy_id" in config_result.keys() else -1
-        self.proxy_type = config_result["proxy_type"] if "proxy_type" in config_result.keys() else ""
+        self.proxy_type = config_result["proxy_protocol"] if "proxy_protocol" in config_result.keys() else ""
         self.proxy_content = config_result["proxy_content"] if "proxy_content" in config_result.keys() else ""
         self.tg_chat_id = config_result["tg_chat_id"] if "tg_chat_id" in config_result.keys() else ""
         self.tg_bot_token = config_result["tg_bot_token"] if "tg_bot_token" in config_result.keys() else ""
