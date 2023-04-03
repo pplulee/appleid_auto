@@ -155,7 +155,7 @@ class Config:
         self.tg_bot_token = config_result["tg_bot_token"] if "tg_bot_token" in config_result.keys() else ""
         self.wx_pusher_id = config_result["wx_pusher_id"] if "wx_pusher_id" in config_result.keys() else ""
         self.webhook = config_result["webhook"] if "webhook" in config_result.keys() else ""
-        self.enable_check_password_correct = "enable_check_password_correct" in config_result.keys()
+        self.enable_check_password_correct = "check_password_correct" in config_result.keys()
         self.enable_delete_devices = "enable_delete_devices" in config_result.keys()
         self.enable_auto_update_password = "enable_auto_update_password" in config_result.keys()
         self.headless = "task_headless" in config_result.keys()
