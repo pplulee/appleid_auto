@@ -277,6 +277,7 @@ class ID:
             else:
                 api.update_message(self.username, lang_text.failOnGettingPage)
                 notification(lang_text.failOnGettingPage)
+            record_error()
             return False
         while True:
             if not self.process_verify():
@@ -305,6 +306,7 @@ class ID:
             logger.error(f"{lang_text.blocked}\n{msg.strip()}")
             api.update_message(self.username, lang_text.loginFailCheckLog)
             notification(lang_text.loginFailCheckLog)
+            record_error()
             get_ip()
             return False
 
@@ -465,6 +467,7 @@ class ID:
                 WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.TAG_NAME, "iframe"))))
         except BaseException:
             logger.error(lang_text.failOnBypass2FA)
+            record_error()
             return False
         try:
             WebDriverWait(driver, 5).until(EC.presence_of_element_located((By.XPATH,
@@ -547,6 +550,7 @@ class ID:
         else:
             logger.error(f"{lang_text.failOnAnswer}\n{msg}")
             api.update_message(self.username, lang_text.failOnAnswer)
+            record_error()
             return False
 
     def process_password(self):
@@ -580,6 +584,7 @@ class ID:
             api.update_message(self.username, lang_text.rejectedByApple)
             api.report_proxy_error(config.proxy_id)
             notification(lang_text.rejectedByApple)
+            record_error()
             get_ip()
             return False
         self.password = new_password
@@ -606,6 +611,7 @@ class ID:
         except BaseException:
             logger.error(lang_text.failToUseSecurityQuestion)
             notification(lang_text.failToUseSecurityQuestion)
+            record_error()
             return False
         if self.process_dob():
             if self.process_security_question():
