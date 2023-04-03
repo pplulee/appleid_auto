@@ -604,16 +604,16 @@ class ID:
             api.update_message(self.username, lang_text.failOnChangePassword)
             notification(lang_text.failOnChangePassword)
             return False
-        try:
-            WebDriverWait(driver, 5).until(EC.presence_of_element_located((By.XPATH,
-                                                                           "//*[@id=\"content\"]/iforgot-v2/app-container/div/iforgot-body/sa/idms-flow/div/section/div/authentication-method/div[2]/div[2]/label/span"))).click()
-            driver.find_element(By.ID, "action").click()
-        except BaseException:
-            logger.error(lang_text.failToUseSecurityQuestion)
-            notification(lang_text.failToUseSecurityQuestion)
-            record_error()
-            return False
         if self.process_dob():
+            try:
+                WebDriverWait(driver, 5).until(EC.presence_of_element_located((By.XPATH,
+                                                                               "//*[@id=\"content\"]/iforgot-v2/app-container/div/iforgot-body/sa/idms-flow/div/section/div/authentication-method/div[2]/div[2]/label/span"))).click()
+                driver.find_element(By.ID, "action").click()
+            except BaseException:
+                logger.error(lang_text.failToUseSecurityQuestion)
+                notification(lang_text.failToUseSecurityQuestion)
+                record_error()
+                return False
             if self.process_security_question():
                 if self.process_password():
                     return True
@@ -851,7 +851,7 @@ logger.info(f"{'=' * 80}\n"
             f"{lang_text.launch}\n"
             f"{lang_text.repoAddress}: https://github.com/pplulee/appleid_auto\n"
             f"{lang_text.TG_Group}: @appleunblocker")
-logger.info(f"{lang_text.version}: v2.0-20230402")
+logger.info(f"{lang_text.version}: v2.0-20230403")
 job()
 while True:
     schedule.run_pending()
