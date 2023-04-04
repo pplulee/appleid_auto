@@ -33,7 +33,7 @@ class Share
                 return view('share/error', ['errorTitle' => '密码错误', 'errorMsg' => '分享链接密码错误']);
             }
         }
-        if ($share->expire_time != null && $share->expire_time < time()) {
+        if ($share->expire != null && strtotime($share->expire) < time()) {
             return view('share/error', ['errorTitle' => '页面已过期', 'errorMsg' => '此分享链接已过期']);
         }
         $request->share = $share;
