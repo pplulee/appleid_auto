@@ -50,7 +50,7 @@
                 <div class="card shadow-lg" style="margin-top: 1rem;">
                     <div class="card-status-start bg-{$account->status?"green":"red"}"></div>
                     <div class="card-body">
-                        <h3 class="card-title">账号信息{if isMobile()}test{/if}</h3>
+                        <h3 class="card-title">账号信息</h3>
                         <h3 class="card-text">{$account->username}</h3>
                         {if $account->frontend_remark!=""}
                             <p class="card-subtitle mb-2 text-muted" style="line-height: 25px">备注：{$account->frontend_remark|raw}</p>
