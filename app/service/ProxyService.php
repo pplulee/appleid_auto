@@ -35,7 +35,7 @@ class ProxyService extends Service
             ->field('id,protocol,content')
             ->where('status', 1)
             ->where('owner', $userID)
-            ->order('id', 'RAND()')
+            ->orderRand()
             ->find();
         if (!$result) {
             return [];
