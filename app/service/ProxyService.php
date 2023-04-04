@@ -3,6 +3,7 @@ declare (strict_types=1);
 
 namespace app\service;
 
+use app\model\Proxy;
 use think\facade\Db;
 use think\Paginator;
 use think\Service;
@@ -40,6 +41,8 @@ class ProxyService extends Service
         if (!$result) {
             return [];
         } else {
+            $proxy = new Proxy();
+            $proxy->update(['last_use' => date('Y-m-d H:i:s')], ['id' => $result['id']]);
             return $result;
         }
     }
