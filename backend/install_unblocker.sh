@@ -73,7 +73,7 @@ else
 fi
 if [ $language == '1' ]; then
   echo "开始安装Apple_Auto后端"
-  echo "请输入API URL（http://xxx.xxx）"
+  echo "请输入API URL（前端域名，格式 http[s]://xxx.xxx）"
   read -e api_url
   echo "请输入API Key"
   read -e api_key
