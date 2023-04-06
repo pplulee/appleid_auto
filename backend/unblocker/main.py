@@ -159,7 +159,7 @@ class Config:
         self.enable_delete_devices = "enable_delete_devices" in config_result.keys()
         self.enable_auto_update_password = "enable_auto_update_password" in config_result.keys()
         self.headless = "task_headless" in config_result.keys()
-        self.fail_retry = "fail_retry" in config_result.keys()
+        self.fail_retry = config_result["fail_retry"]
         self.enable = config_result["enable"]
         self.proxy = ""
         if self.proxy_content != "" and self.proxy_type != "":
@@ -604,20 +604,26 @@ class ID:
             api.update_message(self.username, lang_text.failOnChangePassword)
             notification(lang_text.failOnChangePassword)
             return False
-        if self.process_dob():
-            try:
-                WebDriverWait(driver, 5).until(EC.presence_of_element_located((By.XPATH,
-                                                                               "//*[@id=\"content\"]/iforgot-v2/app-container/div/iforgot-body/sa/idms-flow/div/section/div/authentication-method/div[2]/div[2]/label/span"))).click()
-                driver.find_element(By.ID, "action").click()
-            except BaseException:
-                logger.error(lang_text.failToUseSecurityQuestion)
-                notification(lang_text.failToUseSecurityQuestion)
-                record_error()
+        try:
+            WebDriverWait(driver, 5).until(EC.presence_of_element_located((By.CLASS_NAME, "date-input")))
+        except BaseException:
+            pass
+        else:
+            if not self.process_dob():
                 return False
-            if self.process_security_question():
-                if self.process_password():
-                    return True
-        return False
+        try:
+            WebDriverWait(driver, 5).until(EC.presence_of_element_located((By.XPATH,
+                                                                           "//*[@id=\"content\"]/iforgot-v2/app-container/div/iforgot-body/sa/idms-flow/div/section/div/authentication-method/div[2]/div[2]/label/span"))).click()
+            driver.find_element(By.ID, "action").click()
+        except BaseException:
+            logger.error(lang_text.failToUseSecurityQuestion)
+            notification(lang_text.failToUseSecurityQuestion)
+            record_error()
+            return False
+        self.process_dob()
+        if self.process_security_question():
+            if self.process_password():
+                return True
 
 
 def notification(content):
@@ -745,7 +751,9 @@ def job():
     config_result = api.get_config(args.taskid)
     if not config_result["status"]:
         logger.error(lang_text.getAPIFail)
-        exit()
+        schedule.every(10).minutes.do(job)
+        logger.info(lang_text.nextRun(10))
+        return
     config = Config(config_result)
     if not config.enable:
         # 任务已被禁用
@@ -851,7 +859,7 @@ logger.info(f"{'=' * 80}\n"
             f"{lang_text.launch}\n"
             f"{lang_text.repoAddress}: https://github.com/pplulee/appleid_auto\n"
             f"{lang_text.TG_Group}: @appleunblocker")
-logger.info(f"{lang_text.version}: v2.0-20230403")
+logger.info(f"{lang_text.version}: v2.0-20230406")
 job()
 while True:
     schedule.run_pending()
