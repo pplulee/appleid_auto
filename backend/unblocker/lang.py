@@ -70,7 +70,7 @@ class zh_cn:
         self.CurrentAccount = "当前账号："
         self.invalidProxyType = "无效的代理类型"
         self.failOnSavingScreenshot = "无法保存错误页面截图"
-        self.screenshotSaved = "已保存错误页面到/app目录下error.html和error.png，请与开发者反馈"
+        self.screenshotSaved = "已保存错误页面到容器中/app目录下error.html和error.png"
         self.getIPFail = "无法获取当前IP"
         self.updateFail = "更新账号失败"
         self.getAPIFail = "从API获取配置失败"

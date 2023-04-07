@@ -418,7 +418,14 @@ class ID:
             record_error()
             get_ip()
             return False
-        driver.switch_to.frame(WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.TAG_NAME, "iframe"))))
+        try:
+            driver.switch_to.frame(
+                WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.TAG_NAME, "iframe"))))
+        except BaseException:
+            logger.error(lang_text.loginLoadFail)
+            api.update_message(self.username, lang_text.loginLoadFail)
+            notification(lang_text.loginLoadFail)
+            return False
         WebDriverWait(driver, 10).until(EC.element_to_be_clickable((By.ID, "account_name_text_field"))).send_keys(
             self.username)
         time.sleep(1)
@@ -859,7 +866,7 @@ logger.info(f"{'=' * 80}\n"
             f"{lang_text.launch}\n"
             f"{lang_text.repoAddress}: https://github.com/pplulee/appleid_auto\n"
             f"{lang_text.TG_Group}: @appleunblocker")
-logger.info(f"{lang_text.version}: v2.0-20230406")
+logger.info(f"{lang_text.version}: v2.0-20230407")
 job()
 while True:
     schedule.run_pending()
