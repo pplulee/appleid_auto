@@ -302,7 +302,7 @@ def main():
     schedule.every(sync_time).minutes.do(job)
     if enable_auto_update:
         logger.info("启用自动更新")
-        schedule.every().day.at("00:00").do(update)
+        schedule.every(8).hours.do(update)
     while True:
         schedule.run_pending()
         time.sleep(1)
