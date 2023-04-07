@@ -191,19 +191,17 @@ class local_docker:
         if len(self.local_list) == 0:
             logger.info("没有容器需要更新")
             return
-        current_image_id = client.containers.get(f"{prefix}{self.local_list[0]}").image.id
+        current_image_id = client.images.get(f'{image_name}').id
         try:
-            remote_image_info = client.api.inspect_image(f'{image_name}')
-            update_image_id = remote_image_info['Id']
+            client.images.pull(image_name)
+            update_image_id = client.images.get(f'{image_name}').id
         except BaseException:
             print(f'远程不存在镜像 {image_name}')
             exit()
         if current_image_id != update_image_id:
             logger.info("检测到镜像更新")
-            client.images.pull(image_name)
-            for container in self.local_list:
-                self.restart_docker(container)
-                container.update(image=f'{image_name}', restart_policy={"Name": "on-failure"})
+            remove_local_docker()
+            self.sync()
             logger.info("更新完成")
         else:
             logger.info("无需更新")
@@ -278,6 +276,12 @@ def start_app(ip, port, token):
     app.run(host=ip, port=port)
 
 
+def remove_local_docker():
+    containers = client.containers.list(all=True, filters={"name": f"{prefix}*"})
+    for container in containers:
+        container.remove(force=True)
+
+
 def main():
     logger.info("AppleAuto后端管理服务启动")
     api = API()
@@ -287,9 +291,7 @@ def main():
     logger.info("拉取最新镜像")
     client.images.pull(image_name)
     logger.info("删除本地所有容器")
-    containers = client.containers.list(all=True, filters={"name": f"{prefix}*"})
-    for container in containers:
-        container.remove(force=True)
+    remove_local_docker()
 
     if backend_api_result is not None and backend_api_result['enable']:
         thread_app = threading.Thread(target=start_app, daemon=True, args=(
