@@ -342,8 +342,7 @@ class ID:
                 api.update_message(self.username, lang_text.cantFindDisable2FA)
                 notification(lang_text.cantFindDisable2FA)
                 return False
-            WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.XPATH,
-                                                                            "/html/body/div[5]/div/div/recovery-unenroll-start/div/idms-step/div/div/div/div[3]/idms-toolbar/div/div/div/button[1]"))).click()
+            WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.XPATH,"/html/body/div[4]/div/div/recovery-unenroll-start/div/idms-step/div/div/div/div[3]/idms-toolbar/div/div/div/button[1]"))).click()
             time.sleep(1)
             try:
                 msg = WebDriverWait(driver, 3).until(
@@ -563,7 +562,7 @@ class ID:
     def process_password(self):
         try:
             pwd_input_box = WebDriverWait(driver, 5).until(
-                EC.presence_of_all_elements_located((By.CLASS_NAME, "override")))
+                EC.presence_of_all_elements_located((By.CLASS_NAME, "form-textbox-input")))
         except BaseException:
             logger.error(lang_text.passwordNotFound)
             api.update_message(self.username, lang_text.passwordNotFound)
@@ -578,7 +577,7 @@ class ID:
         time.sleep(3)
         try:
             driver.find_element(By.XPATH,
-                                "/html/body/div[5]/div/div/div[1]/idms-step/div/div/div/div[3]/idms-toolbar/div/div/div/button[1]").click()
+                                "/html/body/div[4]/div/div/div[1]/idms-step/div/div/div/div[3]/idms-toolbar/div/div/div/button[1]").click()
         except BaseException:
             pass
         try:
