@@ -456,7 +456,7 @@ class ID:
             logger.error(lang_text.answerIncorrect)
             api.update_message(self.username, lang_text.answerIncorrect)
             driver.quit()
-            exit()
+            return False
         answer_inputs = WebDriverWait(driver, 10).until(
             EC.presence_of_all_elements_located((By.XPATH, "//*[contains(@class, 'input')]")))
         answer_inputs[0].send_keys(answer0)
