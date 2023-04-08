@@ -146,7 +146,7 @@ class local_docker:
     def restart_docker(self, id):
         try:
             container = client.containers.get(f"{prefix}{id}")
-            container.restart(force=True)
+            container.restart(timeout=0)
         except Exception as e:
             logger.error(f"重启容器{id}失败")
             logger.error(e)
