@@ -419,13 +419,13 @@ class ID:
             return False
         try:
             driver.switch_to.frame(
-                WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.TAG_NAME, "iframe"))))
+                WebDriverWait(driver, 30).until(EC.presence_of_element_located((By.TAG_NAME, "iframe"))))
         except BaseException:
             logger.error(lang_text.loginLoadFail)
             api.update_message(self.username, lang_text.loginLoadFail)
             notification(lang_text.loginLoadFail)
             return False
-        WebDriverWait(driver, 10).until(EC.element_to_be_clickable((By.ID, "account_name_text_field"))).send_keys(
+        WebDriverWait(driver, 30).until(EC.element_to_be_clickable((By.ID, "account_name_text_field"))).send_keys(
             self.username)
         time.sleep(1)
         driver.find_element(By.ID, "account_name_text_field").send_keys(Keys.ENTER)
