@@ -25,6 +25,7 @@ parser.add_argument("-api_url", help="API URL")
 parser.add_argument("-api_key", help="API key")
 parser.add_argument("-taskid", help="Task ID")
 parser.add_argument("-lang", help="Output language", default="zh_cn")
+parser.add_argument("-debug", help="Debug mode", action="store_true")
 args = parser.parse_args()
 
 logger = logging.getLogger()
@@ -46,6 +47,7 @@ else:
     logger.error("未知语言 | Language not supported")
     exit(1)
 lang_text = lang()
+debug = args.debug
 
 
 class API:
@@ -190,6 +192,10 @@ class Config:
             logger.info(lang_text.autoUpdatePassword)
         if self.proxy_id != -1:
             logger.info(f"{lang_text.usingProxyID}: {self.proxy_id}\n{self.proxy}")
+        if debug:
+            logger.info("已启用调试模式 | Debug mode enabled")
+            self.headless = False
+            self.webdriver = "local"
 
 
 class ID:
@@ -342,7 +348,8 @@ class ID:
                 api.update_message(self.username, lang_text.cantFindDisable2FA)
                 notification(lang_text.cantFindDisable2FA)
                 return False
-            WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.XPATH,"/html/body/div[4]/div/div/recovery-unenroll-start/div/idms-step/div/div/div/div[3]/idms-toolbar/div/div/div/button[1]"))).click()
+            WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.XPATH,
+                                                                            "/html/body/div[4]/div/div/recovery-unenroll-start/div/idms-step/div/div/div/div[3]/idms-toolbar/div/div/div/button[1]"))).click()
             time.sleep(1)
             try:
                 msg = WebDriverWait(driver, 3).until(
@@ -676,14 +683,14 @@ def setup_driver():
     if config.headless:
         options.add_argument("--headless")
     if config.proxy != "":
-        proxy = Proxy()
-        proxy.proxy_type = ProxyType.MANUAL
         if config.proxy_type == "http":
-            proxy.http_proxy = config.proxy
-            proxy.ssl_proxy = config.proxy
+            options.add_argument(f"--proxy-server={config.proxy}")
         elif config.proxy_type == "socks5":
-            proxy.socks_proxy = config.proxy
-        options.add_argument(f"--proxy-server={config.proxy}")
+            proxy = Proxy({
+                'proxyType': ProxyType.MANUAL,
+                'socksProxy': config.proxy_content,
+                'socksVersion': 5,
+            })
     user_agents = [
         # Windows Chrome
         'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/111.0.0.0 Safari/537.36',
@@ -698,7 +705,10 @@ def setup_driver():
     options.add_argument(f"user-agent={user_agents[random_index]}")
     try:
         if config.webdriver != "local":
-            driver = webdriver.Remote(command_executor=config.webdriver, options=options, proxy=proxy)
+            if config.proxy_type == "socks5":
+                driver = webdriver.Remote(command_executor=config.webdriver, options=options, proxy=proxy)
+            else:
+                driver = webdriver.Remote(command_executor=config.webdriver, options=options)
         else:
             driver = webdriver.Chrome(options=options)
     except BaseException as e:
@@ -865,7 +875,7 @@ logger.info(f"{'=' * 80}\n"
             f"{lang_text.launch}\n"
             f"{lang_text.repoAddress}: https://github.com/pplulee/appleid_auto\n"
             f"{lang_text.TG_Group}: @appleunblocker")
-logger.info(f"{lang_text.version}: v2.0-20230407")
+logger.info(f"{lang_text.version}: v2.0-20230408")
 job()
 while True:
     schedule.run_pending()
