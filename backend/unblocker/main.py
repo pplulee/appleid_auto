@@ -455,7 +455,7 @@ class ID:
         if answer0 == "" or answer1 == "":
             logger.error(lang_text.answerIncorrect)
             api.update_message(self.username, lang_text.answerIncorrect)
-            driver.quit()
+            record_error()
             return False
         answer_inputs = WebDriverWait(driver, 10).until(
             EC.presence_of_all_elements_located((By.XPATH, "//*[contains(@class, 'input')]")))
