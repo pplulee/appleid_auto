@@ -250,7 +250,6 @@ class ID:
             if config.proxy != "":
                 api.report_proxy_error(config.proxy_id)
             notification(lang_text.seeLog)
-            record_error()
             get_ip()
             return False
 
@@ -313,7 +312,6 @@ class ID:
             api.update_message(self.username, lang_text.loginFailCheckLog)
             notification(lang_text.loginFailCheckLog)
             record_error()
-            get_ip()
             return False
 
     def check(self):
@@ -422,7 +420,6 @@ class ID:
                 api.report_proxy_error(config.proxy_id)
             notification(lang_text.seeLog)
             record_error()
-            get_ip()
             return False
         try:
             driver.switch_to.frame(
@@ -598,7 +595,6 @@ class ID:
             api.report_proxy_error(config.proxy_id)
             notification(lang_text.rejectedByApple)
             record_error()
-            get_ip()
             return False
         self.password = new_password
         logger.info(f"{lang_text.passwordUpdated}: {new_password}")
@@ -731,6 +727,7 @@ def record_error():
         logger.error(lang_text.failOnSavingScreenshot)
     else:
         logger.error(lang_text.screenshotSaved)
+    get_ip()
 
 
 def get_ip():
@@ -850,7 +847,7 @@ def job():
         else:
             logger.error(lang_text.missionFailed)
             job_success = False
-    except BaseException as e:
+    except BaseException:
         logger.error(lang_text.unknownError)
         traceback.print_exc()
         record_error()
