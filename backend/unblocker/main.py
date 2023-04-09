@@ -1,4 +1,3 @@
-VERSION = "v2.0-20230409"
 import argparse
 import logging
 import random
@@ -21,6 +20,7 @@ from selenium.webdriver.support.wait import WebDriverWait
 
 urllib3.disable_warnings()
 
+VERSION = "v2.0-20230409"
 parser = argparse.ArgumentParser(description="")
 parser.add_argument("-api_url", help="API URL")
 parser.add_argument("-api_key", help="API key")
