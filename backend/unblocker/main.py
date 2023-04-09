@@ -430,8 +430,15 @@ class ID:
             api.update_message(self.username, lang_text.loginLoadFail)
             notification(lang_text.loginLoadFail)
             return False
-        WebDriverWait(driver, 30).until(EC.element_to_be_clickable((By.ID, "account_name_text_field"))).send_keys(
-            self.username)
+        try:
+            WebDriverWait(driver, 30).until(EC.element_to_be_clickable((By.ID, "account_name_text_field"))).send_keys(
+                self.username)
+        except BaseException:
+            logger.error(lang_text.failOnLoadingPage)
+            api.update_message(self.username, lang_text.failOnLoadingPage)
+            notification(lang_text.failOnLoadingPage)
+            record_error()
+            return False
         time.sleep(1)
         driver.find_element(By.ID, "account_name_text_field").send_keys(Keys.ENTER)
         WebDriverWait(driver, 5).until(EC.element_to_be_clickable((By.ID, "password_text_field"))).send_keys(
@@ -497,7 +504,14 @@ class ID:
         logger.info(lang_text.startRemoving)
         # 删除设备
         driver.get("https://appleid.apple.com/account/manage/section/devices")
-        WebDriverWait(driver, 10).until_not(EC.presence_of_element_located((By.ID, "loading")))
+        try:
+            WebDriverWait(driver, 10).until_not(EC.presence_of_element_located((By.ID, "loading")))
+        except BaseException:
+            logger.error(lang_text.failOnLoadingPage)
+            api.update_message(self.username, lang_text.failOnLoadingPage)
+            notification(lang_text.failOnLoadingPage)
+            record_error()
+            return False
         time.sleep(2)
         try:
             devices = driver.find_elements(By.CLASS_NAME, "button-expand")
