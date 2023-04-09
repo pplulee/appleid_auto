@@ -1,3 +1,4 @@
+VERSION = "v2.0-20230409"
 import argparse
 import logging
 import random
@@ -69,7 +70,7 @@ class API:
             logger.error(e)
             return {"status": False}
         else:
-            if result["status"]:
+            if result["code"] == 200:
                 result["data"]["status"] = True
                 return result["data"]
             else:
@@ -872,7 +873,7 @@ logger.info(f"{'=' * 80}\n"
             f"{lang_text.launch}\n"
             f"{lang_text.repoAddress}: https://github.com/pplulee/appleid_auto\n"
             f"{lang_text.TG_Group}: @appleunblocker")
-logger.info(f"{lang_text.version}: v2.0-20230408")
+logger.info(f"{lang_text.version}: {VERSION}")
 job()
 while True:
     schedule.run_pending()
