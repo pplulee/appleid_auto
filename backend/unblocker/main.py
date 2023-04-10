@@ -14,13 +14,12 @@ from requests import get, post
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
-from selenium.webdriver.common.proxy import Proxy, ProxyType
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.wait import WebDriverWait
 
 urllib3.disable_warnings()
 
-VERSION = "v2.0-20230409"
+VERSION = "v2.0-20230410"
 parser = argparse.ArgumentParser(description="")
 parser.add_argument("-api_url", help="API URL")
 parser.add_argument("-api_key", help="API key")
@@ -694,14 +693,7 @@ def setup_driver():
     if config.headless:
         options.add_argument("--headless")
     if config.proxy != "":
-        if config.proxy_type == "http":
-            options.add_argument(f"--proxy-server={config.proxy}")
-        elif config.proxy_type == "socks5":
-            proxy = Proxy({
-                'proxyType': ProxyType.MANUAL,
-                'socksProxy': config.proxy_content,
-                'socksVersion': 5,
-            })
+        options.add_argument(f"--proxy-server={config.proxy}")
     user_agents = [
         # Windows Chrome
         'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/111.0.0.0 Safari/537.36',
@@ -716,10 +708,7 @@ def setup_driver():
     options.add_argument(f"user-agent={user_agents[random_index]}")
     try:
         if config.webdriver != "local":
-            if config.proxy_type == "socks5":
-                driver = webdriver.Remote(command_executor=config.webdriver, options=options, proxy=proxy)
-            else:
-                driver = webdriver.Remote(command_executor=config.webdriver, options=options)
+            driver = webdriver.Remote(command_executor=config.webdriver, options=options)
         else:
             driver = webdriver.Chrome(options=options)
     except BaseException as e:
