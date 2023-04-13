@@ -65,4 +65,16 @@ class AccountService extends Service
         }
     }
 
+    public function disableAccount($username): array
+    {
+        $account = new Account();
+        $account = $account->where('username', $username)->find();
+        if (!$account) {
+            return ['status' => false, 'msg' => '账号不存在'];
+        }
+        $account->enable = false;
+        $account->save();
+        return ['status' => true, 'msg' => '账号已禁用'];
+    }
+
 }

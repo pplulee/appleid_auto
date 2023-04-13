@@ -118,4 +118,5 @@ Route::group('api', function () {
     Route::rule('random_sharepage_password', 'api/randomSharePagePassword');
     Route::rule('report_proxy_error', 'api/reportProxyError');
     Route::rule('get_backend_api', 'api/getBackendApi');
+    Route::rule('disable_account', 'api/disableAccount');
 })->middleware(Api::class);

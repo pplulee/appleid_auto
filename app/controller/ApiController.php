@@ -208,4 +208,12 @@ class ApiController extends BaseController
         shuffle($accounts);
         return json(['code' => 200, 'msg' => '获取成功', 'status' => true, 'accounts' => $accounts]);
     }
+
+    public function disableAccount($username): json
+    {
+        if (!$username) {
+            return json(['code' => 400, 'msg' => '缺少用户名', 'status' => false]);
+        }
+        return json($this->app->accountService->disableAccount($username));
+    }
 }
