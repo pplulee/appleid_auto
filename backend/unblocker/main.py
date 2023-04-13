@@ -327,6 +327,11 @@ class ID:
                 api.update_message(self.username, lang_text.accountNotActive)
                 api.disable_account(self.username)
                 notification(lang_text.accountNotActive)
+            elif "not valid" in msg:
+                logger.error(lang_text.accountNotValid)
+                api.update_message(self.username, lang_text.accountNotValid)
+                api.disable_account(self.username)
+                notification(lang_text.accountNotValid)
             elif "Your request could not be completed because of an error" in msg:
                 logger.error(f"{lang_text.blocked}")
                 api.update_message(self.username, lang_text.blocked)

@@ -79,6 +79,7 @@ class zh_cn:
         self.taskDisabled = "任务已被禁用"
         self.accountNotActive = "账号已被停用"
         self.failOnDisablingAccount = "停用账号失败"
+        self.accountNotValid = "账号无效"
 
     def nextRun(self, time):
         return f"下次任务将在{time}分钟后执行"
@@ -169,6 +170,7 @@ class en_us:
         self.taskDisabled = "Task disabled"
         self.accountNotActive = "Account not active"
         self.failOnDisablingAccount = "Failed to disable account"
+        self.accountNotValid = "Account not valid"
         
     def nextRun(self, time):
         return f"Next job will be executed in {time} minutes"
@@ -258,6 +260,7 @@ class vi_vn:
         self.taskDisabled = "Nhiệm vụ đã bị vô hiệu hóa"
         self.accountNotActive = "Tài khoản không hoạt động"
         self.failOnDisablingAccount = "Không thể vô hiệu hóa tài khoản"
+        self.accountNotValid = "Tài khoản không hợp lệ"
 
 
     def nextRun(self, time):
