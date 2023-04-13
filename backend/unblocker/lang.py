@@ -27,8 +27,7 @@ class zh_cn:
         self.captchaFail = "验证码错误，重试中"
         self.login = "登录成功"
         self.loginFail = "登陆失败"
-        self.blocked = "无法处理请求，可能是账号失效或服务器IP被拉黑"
-        self.loginFailCheckLog = "解锁登录失败，可能是账号失效或服务器IP被拉黑，具体请查看后端日志"
+        self.blocked = "无法处理请求，可能是服务器IP被拉黑"
         self.notLocked = "当前账号未被锁定"
         self.locked = "当前账号已被锁定"
         self.twoStepnotEnabled = "当前账号未开启2FA"
@@ -78,6 +77,8 @@ class zh_cn:
         self.WebhookFail = "Webhook发送失败"
         self.WXFail = "微信通知发送失败"
         self.taskDisabled = "任务已被禁用"
+        self.accountNotActive = "账号已被停用"
+        self.failOnDisablingAccount = "停用账号失败"
 
     def nextRun(self, time):
         return f"下次任务将在{time}分钟后执行"
@@ -115,9 +116,7 @@ class en_us:
         self.captchaFail = "Captcha incorrect, retrying"
         self.login = "Login successful"
         self.loginFail = "Login failed"
-        self.blocked = "Unable to process request, account may be invalid or server IP may be blocked"
-        self.loginFailCheckLog = "Login failed, account may be invalid or server IP may be blocked, " \
-                                 "please check the backend log for details"
+        self.blocked = "Unable to process request, server IP may be blocked"
         self.notLocked = "Account is not locked"
         self.locked = "Account is locked"
         self.twoStepnotEnabled = "2FA is not enabled"
@@ -168,6 +167,8 @@ class en_us:
         self.WebhookFail = "Webhook sending failed"
         self.WXFail = "WeChat message sending failed"
         self.taskDisabled = "Task disabled"
+        self.accountNotActive = "Account not active"
+        self.failOnDisablingAccount = "Failed to disable account"
         
     def nextRun(self, time):
         return f"Next job will be executed in {time} minutes"
@@ -205,8 +206,6 @@ class vi_vn:
         self.login = "Đăng nhập thành công"
         self.loginFail = "Đăng nhập thất bại"
         self.blocked = "Không thể xử lý yêu cầu, tài khoản có thể không hợp lệ hoặc địa chỉ IP của máy chủ có thể bị chặn"
-        self.loginFailCheckLog = "Login failed, account may be invalid or server IP may be blocked, " \
-                                 "please check the backend log for details"        
         self.notLocked = "Tài khoản không bị khóa"
         self.locked = "Tài khoản bị khóa"
         self.twoStepnotEnabled = "2FA không được kích hoạt"
@@ -257,6 +256,8 @@ class vi_vn:
         self.WebhookFail = "Webhook Gửi thông báo thất bại"
         self.WXFail = "Gửi thông báo WeChat thất bại"
         self.taskDisabled = "Nhiệm vụ đã bị vô hiệu hóa"
+        self.accountNotActive = "Tài khoản không hoạt động"
+        self.failOnDisablingAccount = "Không thể vô hiệu hóa tài khoản"
 
 
     def nextRun(self, time):

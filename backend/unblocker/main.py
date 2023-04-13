@@ -19,7 +19,7 @@ from selenium.webdriver.support.wait import WebDriverWait
 
 urllib3.disable_warnings()
 
-VERSION = "v2.0-20230410"
+VERSION = "v2.0-20230413"
 parser = argparse.ArgumentParser(description="")
 parser.add_argument("-api_url", help="API URL")
 parser.add_argument("-api_key", help="API key")
@@ -136,6 +136,20 @@ class API:
             if not result["status"]:
                 logger.error(result["msg"])
             return result["status"]
+
+    def disable_account(self, username):
+        try:
+            result = loads(
+                post(f"{self.url}/api/disable_account",
+                     verify=False,
+                     headers={'key': self.key},
+                     data={"username": username}).text)
+        except BaseException as e:
+            logger.error(lang_text.failOnDisablingAccount)
+            logger.error(e)
+            return False
+        else:
+            return True
 
 
 class Config:
@@ -308,9 +322,19 @@ class ID:
             logger.info(lang_text.login)
             return True
         else:
-            logger.error(f"{lang_text.blocked}\n{msg.strip()}")
-            api.update_message(self.username, lang_text.loginFailCheckLog)
-            notification(lang_text.loginFailCheckLog)
+            if "not active" in msg:
+                logger.error(lang_text.accountNotActive)
+                api.update_message(self.username, lang_text.accountNotActive)
+                api.disable_account(self.username)
+                notification(lang_text.accountNotActive)
+            elif "Your request could not be completed because of an error" in msg:
+                logger.error(f"{lang_text.blocked}")
+                api.update_message(self.username, lang_text.blocked)
+                notification(lang_text.blocked)
+            else:
+                logger.error(f"{lang_text.unknownError}: {msg}")
+                api.update_message(self.username, lang_text.unknownError)
+                notification(lang_text.unknownError)
             record_error()
             return False
 
@@ -337,37 +361,35 @@ class ID:
             return True  # 已开启2FA
 
     def unlock_2fa(self):
-        if self.check_2fa():
-            try:
-                driver.find_element(By.XPATH,
-                                    "/html/body/div[1]/iforgot-v2/app-container/div/iforgot-body/hsa-two-v2/recovery-web-app/idms-flow/div/div/trusted-phone-number/div/div/div[1]/idms-step/div/div/div/div[2]/div/div/div/button").click()
-            except BaseException:
-                logger.error(lang_text.cantFindDisable2FA)
-                api.update_message(self.username, lang_text.cantFindDisable2FA)
-                notification(lang_text.cantFindDisable2FA)
-                return False
-            WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.XPATH,
-                                                                            "/html/body/div[4]/div/div/recovery-unenroll-start/div/idms-step/div/div/div/div[3]/idms-toolbar/div/div/div/button[1]"))).click()
-            time.sleep(1)
-            try:
-                msg = WebDriverWait(driver, 3).until(
-                    EC.presence_of_element_located((By.CLASS_NAME, "error-content"))).get_attribute("innerHTML")
-            except BaseException:
-                pass
-            else:
-                logger.error(f"{lang_text.rejectedByApple}\n{msg.strip()}")
-                api.update_message(self.username, lang_text.rejectedByApple)
-                api.report_proxy_error(config.proxy_id)
-                notification(f"{lang_text.rejectedByApple}\nIP:{get_ip()}")
-                return False
-            if self.process_dob():
-                if self.process_security_question():
-                    driver.find_element(By.CLASS_NAME, "button-primary").click()
-                    if self.process_password():
-                        return True
+        try:
+            WebDriverWait(driver, 10).until(EC.presence_of_element_located
+                                            ((By.XPATH,
+                                              "/html/body/div[1]/iforgot-v2/app-container/div/iforgot-body/hsa-two-v2/recovery-web-app/idms-flow/div/div/trusted-phone-number/div/div/div[1]/idms-step/div/div/div/div[2]/div/div/div/button"))).click()
+        except BaseException:
+            logger.error(lang_text.cantFindDisable2FA)
+            api.update_message(self.username, lang_text.cantFindDisable2FA)
+            notification(lang_text.cantFindDisable2FA)
             return False
-        # 无需解锁
-        return True
+        WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.XPATH,
+                                                                        "/html/body/div[4]/div/div/recovery-unenroll-start/div/idms-step/div/div/div/div[3]/idms-toolbar/div/div/div/button[1]"))).click()
+        time.sleep(1)
+        try:
+            msg = WebDriverWait(driver, 3).until(
+                EC.presence_of_element_located((By.CLASS_NAME, "error-content"))).get_attribute("innerHTML")
+        except BaseException:
+            pass
+        else:
+            logger.error(f"{lang_text.rejectedByApple}\n{msg.strip()}")
+            api.update_message(self.username, lang_text.rejectedByApple)
+            api.report_proxy_error(config.proxy_id)
+            notification(f"{lang_text.rejectedByApple}\nIP:{get_ip()}")
+            return False
+        if self.process_dob():
+            if self.process_security_question():
+                driver.find_element(By.CLASS_NAME, "button-primary").click()
+                if self.process_password():
+                    return True
+        return False
 
     def unlock(self):
         if not (self.check()):
