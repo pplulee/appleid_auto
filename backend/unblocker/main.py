@@ -19,7 +19,7 @@ from selenium.webdriver.support.wait import WebDriverWait
 
 urllib3.disable_warnings()
 
-VERSION = "v2.0-20230413"
+VERSION = "v2.0-20230503"
 parser = argparse.ArgumentParser(description="")
 parser.add_argument("-api_url", help="API URL")
 parser.add_argument("-api_key", help="API key")
@@ -345,8 +345,7 @@ class ID:
 
     def check(self):
         try:
-            driver.find_element(By.XPATH,
-                                "/html/body/div[1]/iforgot-v2/app-container/div/iforgot-body/sa/idms-flow/div/section/div/authentication-method/div[1]/p[1]")
+            driver.find_element(By.CLASS_NAME, "date-input")
         except BaseException:
             logger.info(lang_text.notLocked)
             return True  # 未被锁定
@@ -398,28 +397,27 @@ class ID:
 
     def unlock(self):
         if not (self.check()):
+            # 填写生日
+            if not self.process_dob():
+                return False
             # 选择选项
             try:
-                driver.find_element(By.XPATH,
-                                    "/html/body/div[1]/iforgot-v2/app-container/div/iforgot-body/sa/idms-flow/div/section/div/authentication-method/div[2]/div[2]/label/span").click()
+                WebDriverWait(driver, 5).until(EC.presence_of_element_located((By.XPATH,
+                                                                               "/html/body/div[1]/iforgot-v2/app-container/div/iforgot-body/sa/idms-flow/div/section/div/authentication-method/div[2]/div[2]/label/span"))).click()
             except BaseException:
                 logger.error(lang_text.chooseFail)
                 api.update_message(self.username, lang_text.chooseFail)
                 notification(lang_text.chooseFail)
                 return False
             WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.ID, "action"))).click()
-            # 填写生日
-            time.sleep(1)
-            if self.process_dob():
-                if self.process_security_question():
-                    time.sleep(2)
-                    try:
-                        driver.find_element(By.CLASS_NAME, "pwdChange").click()
-                    except BaseException:
-                        pass
-                    # 重置密码
-                    return self.process_password()
-            return False
+            if self.process_security_question():
+                time.sleep(2)
+                try:
+                    driver.find_element(By.CLASS_NAME, "pwdChange").click()
+                except BaseException:
+                    pass
+                # 重置密码
+                return self.process_password()
         return True
 
     def login_appleid(self):
