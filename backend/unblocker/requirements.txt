@@ -2,4 +2,4 @@ ddddocr~=1.4.7
 schedule==1.2.0
 requests~=2.29.0
 selenium~=4.9.0
-urllib3~=2.0.1
+urllib3~=1.26.15
