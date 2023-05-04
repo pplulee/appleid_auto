@@ -762,7 +762,7 @@ def record_error():
 def get_ip():
     global driver
     try:
-        driver.get("https://api.ip.sb/ip")
+        driver.get("https://myip.ipip.net/s")
         ip_address = WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.TAG_NAME, "pre"))).text
         logger.info(f"IP: {ip_address}")
         return ip_address
