@@ -198,6 +198,7 @@ class ApiController extends BaseController
                 continue;
             }
             $accounts[] = [
+                'id' => $account->id,
                 'username' => $account->username,
                 'password' => $account->password,
                 'status' => $account->message == "正常" && ((time() - strtotime($account->last_check)) < (($account->check_interval + 2) * 60)),
