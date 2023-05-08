@@ -27,7 +27,9 @@ class ShareController extends BaseController
             }
         }
         // 账号随机排序
-        shuffle($accounts);
+        if (env("share_random")) {
+            shuffle($accounts);
+        }
         return view('share/result', ['accounts' => $accounts, 'html' => $share->html, 'link' => $share->share_link]);
     }
 

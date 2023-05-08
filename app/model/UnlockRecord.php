@@ -22,6 +22,7 @@ class UnlockRecord extends Model
 
     public function addRecord($data)
     {
+        $data['time'] = date('Y-m-d H:i:s');
         $this->create($data);
     }
 }

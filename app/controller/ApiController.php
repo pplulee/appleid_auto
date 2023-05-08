@@ -205,7 +205,9 @@ class ApiController extends BaseController
                 'remark' => $account->frontend_remark,
             ];
         }
-        shuffle($accounts);
+        if (env("share_random")) {
+            shuffle($accounts);
+        }
         return json(['code' => 200, 'msg' => '获取成功', 'status' => true, 'accounts' => $accounts]);
     }
 

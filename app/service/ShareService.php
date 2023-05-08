@@ -24,7 +24,7 @@ class ShareService extends Service
         return Db::name('share')->paginate(25);
     }
 
-    public function countALl($id = 0): int
+    public function countAll($id = 0): int
     {
         if ($id == 0) {
             return Db::name('share')->count();
