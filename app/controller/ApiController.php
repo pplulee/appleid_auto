@@ -93,6 +93,8 @@ class ApiController extends BaseController
             return json(['code' => 400, 'msg' => '缺少参数', 'status' => false]);
         }
         $result = $this->app->apiService->updateAccount(
+            //添加ID字段唯一对应账号,可用于排序等情况
+            'id' => $account->id,
             $this->request->param('username'),
             $this->request->param('password'),
             $this->request->param('status') == 'True',
