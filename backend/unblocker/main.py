@@ -880,6 +880,7 @@ def job():
                         else:
                             logger.error(lang_text.FailToChangePassword)
                             notification(lang_text.FailToChangePassword)
+                            api.update_message(id.username, lang_text.FailToChangePassword)
 
                 # 自动删除设备
                 if config.enable_delete_devices or config.enable_check_password_correct:
