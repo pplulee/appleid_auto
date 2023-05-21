@@ -1,0 +1,6 @@
+1. 启动数据库&web服务器, 添加管理员admin:admin
+```bash
+docker-compose build && docker-compose up -d && while ! docker exec mysql mysqladmin ping --silent; do sleep 1; done && docker exec $(docker ps -qf 'name=php' --filter status=running) php think register admin admin
+```
+
+2. 访问 127.0.0.1:3939
