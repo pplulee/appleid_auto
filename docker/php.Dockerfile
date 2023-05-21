@@ -1,5 +1,5 @@
 # 使用最新版本的 PHP 和 Apache 镜像作为基础镜像
-FROM php:8.1-apache
+FROM php:7.4-apache
 
 # 设置工作目录
 WORKDIR /var/www/html
