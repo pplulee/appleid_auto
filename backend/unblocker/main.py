@@ -19,7 +19,7 @@ from selenium.webdriver.support.wait import WebDriverWait
 
 urllib3.disable_warnings()
 
-VERSION = "v2.0-20230503"
+VERSION = "v2.0-20230525"
 parser = argparse.ArgumentParser(description="")
 parser.add_argument("-api_url", help="API URL")
 parser.add_argument("-api_key", help="API key")
@@ -347,7 +347,6 @@ class ID:
         try:
             driver.find_element(By.XPATH,
                                 "/html/body/div[1]/iforgot-v2/app-container/div/iforgot-body/sa/idms-flow/div/section/div/authentication-method/div[1]/p[1]")
-
         except BaseException:
             try:
                 driver.find_element(By.CLASS_NAME, "date-input")
@@ -881,6 +880,7 @@ def job():
                             logger.error(lang_text.FailToChangePassword)
                             notification(lang_text.FailToChangePassword)
                             api.update_message(id.username, lang_text.FailToChangePassword)
+                            record_error()
 
                 # 自动删除设备
                 if config.enable_delete_devices or config.enable_check_password_correct:
@@ -896,6 +896,8 @@ def job():
                         else:
                             logger.error(lang_text.FailToChangePassword)
                             notification(lang_text.FailToChangePassword)
+                            api.update_message(id.username, lang_text.FailToChangePassword)
+                            record_error()
                     if config.enable_delete_devices:
                         if need_login:
                             login_result = id.login_appleid()
@@ -903,6 +905,7 @@ def job():
                             id.delete_devices()
                         else:
                             logger.error(lang_text.LoginFail)
+                            record_error()
             else:
                 # 解锁失败
                 logger.error(lang_text.UnlockFail)
