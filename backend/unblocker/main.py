@@ -252,7 +252,6 @@ class ID:
                 api.update_message(self.username, lang_text.failOnLoadingPage)
                 notification(lang_text.failOnLoadingPage)
             record_error()
-            get_ip()
             return False
         try:
             text = driver.find_element(By.XPATH, "/html/body/center[1]/h1").text
