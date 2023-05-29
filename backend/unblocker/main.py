@@ -19,7 +19,7 @@ from selenium.webdriver.support.wait import WebDriverWait
 
 urllib3.disable_warnings()
 
-VERSION = "v2.0-20230525"
+VERSION = "v2.0-20230529"
 parser = argparse.ArgumentParser(description="")
 parser.add_argument("-api_url", help="API URL")
 parser.add_argument("-api_key", help="API key")
@@ -251,6 +251,7 @@ class ID:
             else:
                 api.update_message(self.username, lang_text.failOnLoadingPage)
                 notification(lang_text.failOnLoadingPage)
+            record_error()
             get_ip()
             return False
         try:
