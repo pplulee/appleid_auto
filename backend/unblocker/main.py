@@ -285,7 +285,9 @@ class ID:
             return False
         try:
             WebDriverWait(driver, 7).until(
-                EC.presence_of_element_located((By.CLASS_NAME, "iforgot-apple-id"))).send_keys(self.username)
+                EC.presence_of_element_located((By.CLASS_NAME, "iforgot-apple-id")))
+            time.sleep(1)
+            driver.find_element(By.CLASS_NAME, "iforgot-apple-id").send_keys(self.username)
         except BaseException:
             logger.error(lang_text.failOnRetrievingPage)
             if config.proxy != "":
@@ -306,7 +308,7 @@ class ID:
             try:
                 # 验证码错误
                 WebDriverWait(driver, 3).until(EC.presence_of_element_located((By.XPATH,
-                                                                               "/html/body/div[1]/iforgot-v2/app-container/div/iforgot-body/global-v2/div/idms-flow/div/forgot-password/div/div/div[1]/idms-step/div/div/div/div[2]/div/div[1]/div[2]/div/iforgot-captcha/div/div[2]/idms-textbox/idms-error-wrapper/div/idms-error/div/div/span")))
+                                                                               "/html/body/div[1]/iforgot-v2/app-container/div/iforgot-body/global-v2/div/idms-flow/div/forgot-password/div/div/div[1]/idms-step/div/div/div/div[2]/div/div[1]/div[2]/div/iforgot-captcha/div/div/div[1]/idms-textbox/idms-error-wrapper/div/idms-error/div/div/span")))
             except BaseException:
                 logger.info(lang_text.captchaCorrect)
                 break
