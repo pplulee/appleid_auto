@@ -19,7 +19,7 @@ from selenium.webdriver.support.wait import WebDriverWait
 
 urllib3.disable_warnings()
 
-VERSION = "v2.0-20230529"
+VERSION = "v2.0-20230531"
 parser = argparse.ArgumentParser(description="")
 parser.add_argument("-api_url", help="API URL")
 parser.add_argument("-api_key", help="API key")
@@ -274,8 +274,10 @@ class ID:
                 "src").replace('data:image/jpeg;base64, ', '')
             code = ocr.classification(img)
             driver.find_element(By.CLASS_NAME, "captcha-input").send_keys(code)
-        except BaseException:
+        except BaseException as e:
             logger.error(lang_text.failOnGettingCaptcha)
+            print(e)
+            record_error(getIp=False)
             return False
         else:
             return True
@@ -780,7 +782,7 @@ def setup_driver():
         return True
 
 
-def record_error():
+def record_error(getIp=True):
     try:
         # 保存页面到文件
         with open("error.html", "w", encoding="utf-8") as f:
@@ -791,7 +793,8 @@ def record_error():
         logger.error(lang_text.failOnSavingScreenshot)
     else:
         logger.error(lang_text.screenshotSaved)
-    get_ip()
+    if getIp:
+        get_ip()
 
 
 def get_ip():
