@@ -44,7 +44,7 @@ elif args.lang == "en_us":
 elif args.lang == "vi_vn":
     from lang import vi_vn as lang
 else:
-    logger.error("未知语言 | Language not supported")
+    logger.error("未知语言 | Language not supported | Ngôn ngữ không được hỗ trợ")
     exit(1)
 lang_text = lang()
 debug = args.debug
@@ -458,7 +458,7 @@ class ID:
         return True
 
     def login_appleid(self):
-        logger.info("开始登录AppleID | Start logging in AppleID")
+        logger.info("开始登录AppleID | Start logging in AppleID | Bắt đầu đăng nhập AppleID")
         try:
             driver.get("https://appleid.apple.com/sign-in")
         except BaseException:
