@@ -45,14 +45,42 @@ case $language in
     ;;
 esac
 
-if docker >/dev/null 2>&1; then
-    echo "Docker已安装 | Docker is installed | Docker đã được cài đặt"
-else
-    echo "Docker未安装，开始安装…… | Docker is not installed, start installing... | Docker chưa được cài đặt, bắt đầu cài đặt ..."
-    docker version > /dev/null || curl -fsSL get.docker.com | bash
-    systemctl enable docker && systemctl restart docker
-    echo "Docker安装完成 | Docker installed | Docker đã được cài đặt"
-fi
+case $language in
+  1)
+    if docker >/dev/null 2>&1; then
+        echo "Docker已安装"
+    else
+        echo "Docker未安装，开始安装……"
+        docker version > /dev/null || curl -fsSL get.docker.com | bash
+        systemctl enable docker && systemctl restart docker
+        echo "Docker安装完成"
+    fi
+    ;;
+  2)
+    if docker >/dev/null 2>&1; then
+        echo "Docker is installed"
+    else
+        echo "Docker is not installed, start installing..."
+        docker version > /dev/null || curl -fsSL get.docker.com | bash
+        systemctl enable docker && systemctl restart docker
+        echo "Docker installed"
+    fi
+    ;;
+  3)
+    if docker >/dev/null 2>&1; then
+        echo "Docker đã được cài đặt"
+    else
+        echo "Docker chưa được cài đặt, bắt đầu cài đặt ..."
+        docker version > /dev/null || curl -fsSL get.docker.com | bash
+        systemctl enable docker && systemctl restart docker
+        echo "Docker đã được cài đặt"
+    fi
+    ;;
+  *)
+    echo "输入错误，已退出 | Input error, exit | Lỗi đầu vào, thoát"
+    exit;
+    ;;
+esac
 
 case $language in
   1)
