@@ -44,7 +44,7 @@ elif args.lang == "en_us":
 elif args.lang == "vi_vn":
     from lang import vi_vn as lang
 else:
-    logger.error("未知语言 | Language not supported")
+    logger.error("未知语言 | Language not supported | Ngôn ngữ không được hỗ trợ")
     exit(1)
 lang_text = lang()
 debug = args.debug
@@ -207,7 +207,7 @@ class Config:
         if self.proxy_id != -1:
             logger.info(f"{lang_text.usingProxyID}: {self.proxy_id}\n{self.proxy}")
         if debug:
-            logger.info("已启用调试模式 | Debug mode enabled")
+            logger.info("已启用调试模式 | Debug mode enabled | Chế độ gỡ lỗi được bật")
             self.headless = False
             self.webdriver = "local"
 
