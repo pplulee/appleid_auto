@@ -86,7 +86,7 @@ if [ "$run_webdriver" = "y" ]; then
     echo "Webdriver Docker容器部署完成 | Webdriver Docker container deployed"
 fi
 enable_auto_update=$([ "$auto_update" == "y" ] && echo True || echo False)
-docker run -d --name=appleauto --log-opt max-size=1m --log-opt max-file=2 --restart=always --network=host -e API_URL=$api_url -e API_KEY=$api_key -e SYNC_TIME=$sync_time -e AUTO_UPDATE=$enable_auto_update -e LANG=$language -v /var/run/docker.sock:/var/run/docker.sock sahuidhsu/appleauto_backend
+docker run -d --name=appleauto --log-opt max-size=1m --log-opt max-file=2 --restart=always --network=host -e API_URL=$api_url -e API_KEY=$api_key -e SYNC_TIME=$sync_time -e AUTO_UPDATE=$enable_auto_update -e LANG=$language -v /var/run/docker.sock:/var/run/docker.sock aikocute/appleid_auto
 if [ $language = "1" ]; then
   echo "安装完成，容器已启动"
   echo "默认容器名：appleauto"
