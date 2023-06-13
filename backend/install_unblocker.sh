@@ -137,24 +137,70 @@ case $language in
     ;;
 esac
 
-if [ "$run_webdriver" = "y" ]; then
-    echo "开始部署Selenium Docker容器 | Start deploying Selenium Docker container | Bắt đầu triển khai bộ chứa Docker Selenium"
-    echo "请输入Selenium运行端口（默认4444） | Please enter Selenium running port (default 4444) | Vui lòng nhập cổng chạy Selenium (mặc định 4444)"
-    read -e webdriver_port
-    if [ "$webdriver_port" = "" ]; then
-        webdriver_port=4444
-    fi
-    echo "请输入Selenium最大会话数（默认10） | Please enter the maximum session number (default 10) | Vui lòng nhập số phiên tối đa (mặc định 10)"
-    read -e webdriver_max_session
-    if [ "$webdriver_max_session" = "" ]; then
-        webdriver_max_session=10
-    fi
-    docker pull selenium/standalone-chrome
-    docker run -d --name=webdriver --log-opt max-size=1m --log-opt max-file=1 --shm-size="1g" --restart=always -e SE_NODE_MAX_SESSIONS=$webdriver_max_session -e SE_NODE_OVERRIDE_MAX_SESSIONS=true -e SE_SESSION_RETRY_INTERVAL=1 -e SE_VNC_VIEW_ONLY=1 -p $webdriver_port:4444 -p 5900:5900 selenium/standalone-chrome
-    echo "Webdriver Docker容器部署完成 | Webdriver Docker container deployed | Bộ chứa Docker Webdriver triển khai hoàn tất"
-fi
+case $run_webdriver in
+  [yY])
+    case $language in
+      1)
+        echo "开始部署Selenium Docker容器"
+        echo "请输入Selenium运行端口（默认4444）"
+        read -e webdriver_port
+        if [ "$webdriver_port" = "" ]; then
+            webdriver_port=4444
+        fi
+        echo "请输入Selenium最大会话数（默认10）"
+        read -e webdriver_max_session
+        if [ "$webdriver_max_session" = "" ]; then
+            webdriver_max_session=10
+        fi
+        docker pull selenium/standalone-chrome
+        docker run -d --name=webdriver --log-opt max-size=1m --log-opt max-file=1 --shm-size="1g" --restart=always -e SE_NODE_MAX_SESSIONS=$webdriver_max_session -e SE_NODE_OVERRIDE_MAX_SESSIONS=true -e SE_SESSION_RETRY_INTERVAL=1 -e SE_VNC_VIEW_ONLY=1 -p $webdriver_port:4444 -p 5900:5900 selenium/standalone-chrome
+        echo "Webdriver Docker容器部署完成"
+        ;;
+      2)
+        echo "Start deploying Selenium Docker container"
+        echo "Please enter Selenium running port (default 4444)"
+        read -e webdriver_port
+        if [ "$webdriver_port" = "" ]; then
+            webdriver_port=4444
+        fi
+        echo "Please enter the maximum session number (default 10)"
+        read -e webdriver_max_session
+        if [ "$webdriver_max_session" = "" ]; then
+            webdriver_max_session=10
+        fi
+        docker pull selenium/standalone-chrome
+        docker run -d --name=webdriver --log-opt max-size=1m --log-opt max-file=1 --shm-size="1g" --restart=always -e SE_NODE_MAX_SESSIONS=$webdriver_max_session -e SE_NODE_OVERRIDE_MAX_SESSIONS=true -e SE_SESSION_RETRY_INTERVAL=1 -e SE_VNC_VIEW_ONLY=1 -p $webdriver_port:4444 -p 5900:5900 selenium/standalone-chrome
+        echo "Webdriver Docker container deployed"
+        ;;
+      3)
+        echo "Bắt đầu triển khai bộ chứa Docker Selenium"
+        echo "Vui lòng nhập cổng chạy Selenium (mặc định 4444)"
+        read -e webdriver_port
+        if [ "$webdriver_port" = "" ]; then
+            webdriver_port=4444
+        fi
+        echo "Vui lòng nhập số phiên tối đa (mặc định 10)"
+        read -e webdriver_max_session
+        if [ "$webdriver_max_session" = "" ]; then
+            webdriver_max_session=10
+        fi
+        docker pull selenium/standalone-chrome
+        docker run -d --name=webdriver --log-opt max-size=1m --log-opt max-file=1 --shm-size="1g" --restart=always -e SE_NODE_MAX_SESSIONS=$webdriver_max_session -e SE_NODE_OVERRIDE_MAX_SESSIONS=true -e SE_SESSION_RETRY_INTERVAL=1 -e SE_VNC_VIEW_ONLY=1 -p $webdriver_port:4444 -p 5900:5900 selenium/standalone-chrome
+        echo "Bộ chứa Docker Webdriver triển khai hoàn tất"
+        ;;
+      *)
+        echo "输入错误，已退出 | Input error, exit | Lỗi đầu vào, thoát"
+        exit;
+        ;;
+    esac
+    ;;
+  *)
+    ;;
+esac
+
 enable_auto_update=$([ "$auto_update" == "y" ] && echo True || echo False)
 docker run -d --name=appleauto --log-opt max-size=1m --log-opt max-file=2 --restart=always --network=host -e API_URL=$api_url -e API_KEY=$api_key -e SYNC_TIME=$sync_time -e AUTO_UPDATE=$enable_auto_update -e LANG=$language -v /var/run/docker.sock:/var/run/docker.sock sahuidhsu/appleauto_backend
+
 case $language in
   1)
     echo "安装完成，容器已启动"
