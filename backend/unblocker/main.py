@@ -1,4 +1,5 @@
 import argparse
+import base64
 import logging
 import random
 import re
@@ -19,7 +20,7 @@ from selenium.webdriver.support.wait import WebDriverWait
 
 urllib3.disable_warnings()
 
-VERSION = "v2.0-20230531"
+VERSION = "v2.0-20230629"
 parser = argparse.ArgumentParser(description="")
 parser.add_argument("-api_url", help="API URL")
 parser.add_argument("-api_key", help="API key")
@@ -271,8 +272,9 @@ class ID:
         # 需要先调用login到达页面
         try:
             img = WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.TAG_NAME, "img"))).get_attribute(
-                "src").replace('data:image/jpeg;base64, ', '')
-            code = ocr.classification(img)
+                "src").strip().replace('data:image/jpeg;base64,', '')
+            img_bytes = base64.b64decode(img)
+            code = ocr.classification(img_bytes)
             driver.find_element(By.CLASS_NAME, "captcha-input").send_keys(code)
         except BaseException as e:
             logger.error(lang_text.failOnGettingCaptcha)
@@ -742,7 +744,6 @@ ocr = ddddocr.DdddOcr()
 
 def setup_driver():
     global driver
-    proxy = None
     options = webdriver.ChromeOptions()
     options.add_argument("--no-sandbox")
     options.add_argument("--disable-gpu")
@@ -752,19 +753,25 @@ def setup_driver():
     options.add_argument("--disable-extensions")
     options.add_argument("start-maximized")
     options.add_argument("window-size=1920,1080")
+    # Adding argument to disable the AutomationControlled flag
+    options.add_argument("--disable-blink-features=AutomationControlled")
+    # Exclude the collection of enable-automation switches
+    options.add_experimental_option("excludeSwitches", ["enable-automation"])
+    # Turn-off userAutomationExtension
+    options.add_experimental_option("useAutomationExtension", False)
     if config.headless:
         options.add_argument("--headless")
     if config.proxy != "":
         options.add_argument(f"--proxy-server={config.proxy}")
     user_agents = [
         # Windows Chrome
-        'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/111.0.0.0 Safari/537.36',
-        'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/111.0.0.0 Safari/537.36',
-        'Mozilla/5.0 (Windows NT 10.0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/111.0.0.0 Safari/537.36',
+        'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36',
+        'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36',
+        'Mozilla/5.0 (Windows NT 10.0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36',
         # macOS Chrome
-        'Mozilla/5.0 (Macintosh; Intel Mac OS X 13_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/111.0.0.0 Safari/537.36',
+        'Mozilla/5.0 (Macintosh; Intel Mac OS X 13_4_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36',
         # Linux Chrome
-        'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/111.0.0.0 Safari/537.36'
+        'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36'
     ]
     random_index = random.randint(0, len(user_agents) - 1)
     options.add_argument(f"user-agent={user_agents[random_index]}")
@@ -773,6 +780,8 @@ def setup_driver():
             driver = webdriver.Remote(command_executor=config.webdriver, options=options)
         else:
             driver = webdriver.Chrome(options=options)
+        # Changing the property of the navigator value for webdriver to undefined
+        driver.execute_script("Object.defineProperty(navigator, 'webdriver', {get: () => undefined})")
     except BaseException as e:
         logger.error(lang_text.failOnCallingWD)
         logger.error(e)
