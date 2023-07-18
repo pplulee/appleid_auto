@@ -605,7 +605,14 @@ class ID:
         except BaseException:
             return False
         else:
-            return True
+            try:
+                msg = WebDriverWait(driver, 3).until(
+                    EC.presence_of_element_located((By.CLASS_NAME, "form-message"))).get_attribute("innerHTML")
+            except BaseException:
+                return True
+            else:
+                logger.error(f"{lang_text.TooManyFailAttempts}\n{msg.strip()}")
+                return False
 
     def process_security_question(self):
         try:
