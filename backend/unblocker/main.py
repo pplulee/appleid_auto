@@ -351,7 +351,6 @@ class ID:
 
     def check(self):
         try:
-            input()
             driver.find_element(By.XPATH,
                                 "/html/body/div[1]/iforgot-v2/app-container/div/iforgot-body/sa/idms-flow/div/main/div/authentication-method/div[2]/div[2]/label/span")
         except BaseException:
