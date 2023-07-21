@@ -351,8 +351,9 @@ class ID:
 
     def check(self):
         try:
+            input()
             driver.find_element(By.XPATH,
-                                "/html/body/div[1]/iforgot-v2/app-container/div/iforgot-body/sa/idms-flow/div/section/div/authentication-method/div[1]/p[1]")
+                                "/html/body/div[1]/iforgot-v2/app-container/div/iforgot-body/sa/idms-flow/div/main/div/authentication-method/div[2]/div[2]/label/span")
         except BaseException:
             try:
                 driver.find_element(By.CLASS_NAME, "date-input")
@@ -851,7 +852,7 @@ def job():
         logger.info(lang_text.nextRun(10))
         return
     config = Config(config_result)
-    if not config.enable:
+    if (not config.enable) and (not debug):
         # 任务已被禁用
         logger.info(lang_text.taskDisabled)
         schedule.every(10).minutes.do(job)
