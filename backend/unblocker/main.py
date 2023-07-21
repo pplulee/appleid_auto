@@ -620,7 +620,7 @@ class ID:
             logger.error(lang_text.DOB_Error)
             api.update_message(self.username, lang_text.DOB_Error)
             notification(lang_text.DOB_Error)
-            record_error()
+            # record_error()
             return False
         answer0 = self.get_answer(question_element[0].get_attribute("innerHTML"))
         answer1 = self.get_answer(question_element[1].get_attribute("innerHTML"))
