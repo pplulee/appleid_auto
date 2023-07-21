@@ -20,7 +20,7 @@ from selenium.webdriver.support.wait import WebDriverWait
 
 urllib3.disable_warnings()
 
-VERSION = "v2.0-20230629"
+VERSION = "v2.0-20230721"
 parser = argparse.ArgumentParser(description="")
 parser.add_argument("-api_url", help="API URL")
 parser.add_argument("-api_key", help="API key")
@@ -312,7 +312,7 @@ class ID:
             try:
                 # 验证码错误
                 WebDriverWait(driver, 3).until(EC.presence_of_element_located((By.XPATH,
-                                                                               "/html/body/div[1]/iforgot-v2/app-container/div/iforgot-body/global-v2/div/idms-flow/div/forgot-password/div/div/div[1]/idms-step/div/div/div/div[2]/div/div[1]/div[2]/div/iforgot-captcha/div/div/div[1]/idms-textbox/idms-error-wrapper/div/idms-error/div/div/span")))
+                                                                               "/html/body/div[1]/iforgot-v2/app-container/div/iforgot-body/global-v2/main/idms-flow/div/forgot-password/div/div/div[1]/idms-step/div/div/div/div[2]/div/div[1]/div[2]/div/iforgot-captcha/div/div/div[1]/idms-textbox/idms-error-wrapper/div/idms-error/div/div/span")))
             except BaseException:
                 logger.info(lang_text.captchaCorrect)
                 break
@@ -368,8 +368,7 @@ class ID:
 
     def check_2fa(self):
         try:
-            driver.find_element(By.XPATH,
-                                "/html/body/div[1]/iforgot-v2/app-container/div/iforgot-body/hsa-two-v2/recovery-web-app/idms-flow/div/div/trusted-phone-number/div/h1")
+            driver.find_element(By.CLASS_NAME, "unenroll")
         except BaseException:
             logger.info(lang_text.twoStepnotEnabled)
             return False  # 未开启2FA
@@ -380,8 +379,7 @@ class ID:
     def unlock_2fa(self):
         try:
             WebDriverWait(driver, 10).until(EC.presence_of_element_located
-                                            ((By.XPATH,
-                                              "/html/body/div[1]/iforgot-v2/app-container/div/iforgot-body/hsa-two-v2/recovery-web-app/idms-flow/div/div/trusted-phone-number/div/div/div[1]/idms-step/div/div/div/div[2]/div/div/div/button"))).click()
+                                            ((By.CLASS_NAME, "unenroll"))).click()
         except BaseException:
             logger.error(lang_text.cantFindDisable2FA)
             api.update_message(self.username, lang_text.cantFindDisable2FA)
@@ -416,7 +414,7 @@ class ID:
                 # 选择选项
                 try:
                     driver.find_element(By.XPATH,
-                                        "/html/body/div[1]/iforgot-v2/app-container/div/iforgot-body/sa/idms-flow/div/section/div/authentication-method/div[2]/div[2]/label/span").click()
+                                        "/html/body/div[1]/iforgot-v2/app-container/div/iforgot-body/sa/idms-flow/div/main/div/authentication-method/div[2]/div[2]/label/span").click()
                 except BaseException:
                     logger.error(lang_text.chooseFail)
                     api.update_message(self.username, lang_text.chooseFail)
@@ -691,9 +689,11 @@ class ID:
         logger.info(lang_text.startChangePassword)
         try:
             driver.find_element(By.XPATH,
-                                "//*[@id=\"content\"]/iforgot-v2/app-container/div/iforgot-body/sa/idms-flow/div/section/div/recovery-options/div[2]/div/div[1]/label/span").click()
+                                "//*[@id=\"content\"]/iforgot-v2/app-container/div/iforgot-body/sa/idms-flow/div/main/div/recovery-options/div[2]/div/div[1]/label/span").click()
+            time.sleep(2)
             driver.find_element(By.ID, "action").click()
-        except BaseException:
+        except BaseException as e:
+            print(e)
             logger.error(lang_text.failOnChangePassword)
             api.update_message(self.username, lang_text.failOnChangePassword)
             notification(lang_text.failOnChangePassword)
@@ -707,7 +707,7 @@ class ID:
                 return False
         try:
             WebDriverWait(driver, 5).until(EC.presence_of_element_located((By.XPATH,
-                                                                           "//*[@id=\"content\"]/iforgot-v2/app-container/div/iforgot-body/sa/idms-flow/div/section/div/authentication-method/div[2]/div[2]/label/span"))).click()
+                                                                           "//*[@id=\"content\"]/iforgot-v2/app-container/div/iforgot-body/sa/idms-flow/div/main/div/authentication-method/div[2]/div[2]/label/span"))).click()
             driver.find_element(By.ID, "action").click()
         except BaseException:
             logger.error(lang_text.failToUseSecurityQuestion)
@@ -888,6 +888,7 @@ def job():
             elif login_result:
                 update_account(id.username, "")
 
+            reset_result = True
             if login_result:
                 # 自动重置密码
                 if config.enable_auto_update_password:
@@ -901,10 +902,10 @@ def job():
                             logger.error(lang_text.FailToChangePassword)
                             notification(lang_text.FailToChangePassword)
                             api.update_message(id.username, lang_text.FailToChangePassword)
-                            record_error()
+                            reset_result = False
 
                 # 自动删除设备
-                if config.enable_delete_devices or config.enable_check_password_correct:
+                if reset_result and (config.enable_delete_devices or config.enable_check_password_correct):
                     need_login = False
                     login_result = id.login_appleid()
                     if not login_result and config.enable_check_password_correct:
