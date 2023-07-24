@@ -20,7 +20,7 @@ from selenium.webdriver.support.wait import WebDriverWait
 
 urllib3.disable_warnings()
 
-VERSION = "v2.0-20230721"
+VERSION = "v2.0-20230724"
 parser = argparse.ArgumentParser(description="")
 parser.add_argument("-api_url", help="API URL")
 parser.add_argument("-api_key", help="API key")
@@ -322,7 +322,7 @@ class ID:
 
         try:
             msg = WebDriverWait(driver, 3).until(EC.presence_of_element_located((By.XPATH,
-                                                                                 "/html/body/div[1]/iforgot-v2/app-container/div/iforgot-body/global-v2/div/idms-flow/div/forgot-password/div/div/div[1]/idms-step/div/div/div/div[2]/div/div[1]/div[1]/div/idms-textbox/idms-error-wrapper/div/idms-error/div/div/span"))).get_attribute(
+                                                                                 "/html/body/div[1]/iforgot-v2/app-container/div/iforgot-body/global-v2/main/idms-flow/div/forgot-password/div/div/div[1]/idms-step/div/div/div/div[2]/div/div[1]/div[1]/div/idms-textbox/idms-error-wrapper/div/idms-error/div/div/span"))).get_attribute(
                 "innerHTML")
         except BaseException:
             logger.info(lang_text.login)
