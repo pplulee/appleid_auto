@@ -20,7 +20,7 @@ from selenium.webdriver.support.wait import WebDriverWait
 
 urllib3.disable_warnings()
 
-VERSION = "v2.0-20230724"
+VERSION = "v2.0-20230803"
 parser = argparse.ArgumentParser(description="")
 parser.add_argument("-api_url", help="API URL")
 parser.add_argument("-api_key", help="API key")
@@ -492,8 +492,10 @@ class ID:
             notification(lang_text.loginLoadFail)
             return False
         try:
-            WebDriverWait(driver, 30).until(EC.element_to_be_clickable((By.ID, "account_name_text_field"))).send_keys(
-                self.username)
+            WebDriverWait(driver, 30).until(EC.element_to_be_clickable((By.ID, "account_name_text_field")))
+            for char in self.username:
+                driver.find_element(By.ID, "account_name_text_field").send_keys(char)
+            driver.find_element(By.ID, "account_name_text_field").send_keys(Keys.ENTER)
         except BaseException:
             logger.error(lang_text.failOnLoadingPage)
             api.update_message(self.username, lang_text.failOnLoadingPage)
@@ -501,7 +503,6 @@ class ID:
             record_error()
             return False
         time.sleep(1)
-        driver.find_element(By.ID, "account_name_text_field").send_keys(Keys.ENTER)
         WebDriverWait(driver, 5).until(EC.element_to_be_clickable((By.ID, "password_text_field"))).send_keys(
             self.password)
         time.sleep(1)
