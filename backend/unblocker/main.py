@@ -179,7 +179,7 @@ class Config:
         self.fail_retry = config_result["fail_retry"]
         self.enable = config_result["enable"]
         self.proxy = ""
-        if self.proxy_content != "" and self.proxy_type != "":
+        if not debug and self.proxy_content != "" and self.proxy_type != "":
             # 新版本代理
             if "url" in self.proxy_type:
                 try:
