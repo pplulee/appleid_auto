@@ -20,7 +20,7 @@ from selenium.webdriver.support.wait import WebDriverWait
 
 urllib3.disable_warnings()
 
-VERSION = "v2.0-20230804"
+VERSION = "v2.0-20230827"
 parser = argparse.ArgumentParser(description="")
 parser.add_argument("-api_url", help="API URL")
 parser.add_argument("-api_key", help="API key")
@@ -368,7 +368,7 @@ class ID:
 
     def check_2fa(self):
         try:
-            driver.find_element(By.CLASS_NAME, "unenroll")
+            driver.find_element(By.ID, "phoneNumber")
         except BaseException:
             logger.info(lang_text.twoStepnotEnabled)
             return False  # 未开启2FA
@@ -378,7 +378,7 @@ class ID:
 
     def unlock_2fa(self):
         try:
-            WebDriverWait(driver, 10).until(EC.presence_of_element_located
+            WebDriverWait(driver, 5).until(EC.presence_of_element_located
                                             ((By.CLASS_NAME, "unenroll"))).click()
         except BaseException:
             logger.error(lang_text.cantFindDisable2FA)
