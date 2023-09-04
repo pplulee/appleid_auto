@@ -20,7 +20,7 @@ from selenium.webdriver.support.wait import WebDriverWait
 
 urllib3.disable_warnings()
 
-VERSION = "v2.0-20230827"
+VERSION = "v2.0-20230904"
 parser = argparse.ArgumentParser(description="")
 parser.add_argument("-api_url", help="API URL")
 parser.add_argument("-api_key", help="API key")
@@ -833,7 +833,7 @@ def update_account(username, password):
             post(config.webhook, data={"username": username, "password": password})
         except BaseException as e:
             logger.error(f"{lang_text.WebhookFail}\nError: {e}")
-    if api.update(username, password, True, "正常"):
+    if api.update(username, password, True, lang_text.normal):
         logger.info(lang_text.updateSuccess)
         return True
     else:
