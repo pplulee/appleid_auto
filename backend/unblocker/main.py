@@ -310,6 +310,11 @@ class ID:
             time.sleep(1)
             WebDriverWait(driver, 5).until(EC.presence_of_element_located((By.CLASS_NAME, "button-primary"))).click()
             try:
+                WebDriverWait(driver, 15).until_not(EC.presence_of_element_located((By.CLASS_NAME, "loading")))
+            except BaseException:
+                logger.error(lang_text.failOnLoadingPage)
+                return False
+            try:
                 # 验证码错误
                 WebDriverWait(driver, 3).until(EC.presence_of_element_located((By.XPATH,
                                                                                "/html/body/div[1]/iforgot-v2/app-container/div/iforgot-body/global-v2/main/idms-flow/div/forgot-password/div/div/div[1]/idms-step/div/div/div/div[2]/div/div[1]/div[2]/div/iforgot-captcha/div/div/div[1]/idms-textbox/idms-error-wrapper/div/idms-error/div/div/span")))
@@ -597,8 +602,9 @@ class ID:
 
     def process_dob(self):
         try:
-            WebDriverWait(driver, 5).until(EC.presence_of_element_located((By.CLASS_NAME, "date-input"))).send_keys(
-                self.dob)
+            WebDriverWait(driver, 5).until(EC.presence_of_element_located((By.CLASS_NAME, "date-input")))
+            for char in self.dob:
+                driver.find_element(By.CLASS_NAME, "date-input").send_keys(char)
             time.sleep(1)
             driver.find_element(By.CLASS_NAME, "date-input").send_keys(Keys.ENTER)
         except BaseException:
