@@ -20,7 +20,7 @@ from selenium.webdriver.support.wait import WebDriverWait
 
 urllib3.disable_warnings()
 
-VERSION = "v2.0-20230904"
+VERSION = "v2.0-20230909"
 parser = argparse.ArgumentParser(description="")
 parser.add_argument("-api_url", help="API URL")
 parser.add_argument("-api_key", help="API key")
@@ -516,7 +516,10 @@ class ID:
         try:
             msg = driver.find_element(By.ID, "errMsg").get_attribute("innerHTML")
         except BaseException:
-            pass
+            # 若未开启删除设备，则不继续登录
+            if not config.enable_delete_devices:
+                logger.info(lang_text.login)
+                return True
         else:
             logger.error(f"{lang_text.LoginFail}\n{msg.strip()}")
             return False
@@ -603,10 +606,11 @@ class ID:
     def process_dob(self):
         try:
             WebDriverWait(driver, 5).until(EC.presence_of_element_located((By.CLASS_NAME, "date-input")))
+            input_box = driver.find_element(By.CLASS_NAME, "date-input")
             for char in self.dob:
-                driver.find_element(By.CLASS_NAME, "date-input").send_keys(char)
+                input_box.send_keys(char)
             time.sleep(1)
-            driver.find_element(By.CLASS_NAME, "date-input").send_keys(Keys.ENTER)
+            input_box.send_keys(Keys.ENTER)
         except BaseException:
             return False
         else:
