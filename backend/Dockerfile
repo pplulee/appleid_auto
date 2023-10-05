@@ -1,4 +1,4 @@
-FROM python:3.9-slim
+FROM python:3.11-alpine
 
 WORKDIR /app
 ADD unblocker_manager_docker.py /app

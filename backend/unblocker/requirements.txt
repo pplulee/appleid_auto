@@ -1,6 +1,6 @@
-ddddocr~=1.4.7
-schedule==1.2.0
-requests==2.31.0
-selenium==4.10.0
+ddddocr>=1.4.8
+schedule>=1.2.0
+requests>=2.31.0
+selenium>=4.13.0
 Pillow==9.5.0
 urllib3==1.26.15

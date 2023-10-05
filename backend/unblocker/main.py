@@ -20,7 +20,7 @@ from selenium.webdriver.support.wait import WebDriverWait
 
 urllib3.disable_warnings()
 
-VERSION = "v2.0-20230909"
+VERSION = "v2.0-20231005"
 parser = argparse.ArgumentParser(description="")
 parser.add_argument("-api_url", help="API URL")
 parser.add_argument("-api_key", help="API key")
@@ -607,6 +607,7 @@ class ID:
         try:
             WebDriverWait(driver, 5).until(EC.presence_of_element_located((By.CLASS_NAME, "date-input")))
             input_box = driver.find_element(By.CLASS_NAME, "date-input")
+            time.sleep(1)
             for char in self.dob:
                 input_box.send_keys(char)
             time.sleep(1)
@@ -631,7 +632,7 @@ class ID:
             logger.error(lang_text.DOB_Error)
             api.update_message(self.username, lang_text.DOB_Error)
             notification(lang_text.DOB_Error)
-            # record_error()
+            record_error()
             return False
         answer0 = self.get_answer(question_element[0].get_attribute("innerHTML"))
         answer1 = self.get_answer(question_element[1].get_attribute("innerHTML"))
@@ -930,7 +931,6 @@ def job():
                             logger.error(lang_text.FailToChangePassword)
                             notification(lang_text.FailToChangePassword)
                             api.update_message(id.username, lang_text.FailToChangePassword)
-                            record_error()
                     if config.enable_delete_devices:
                         if need_login:
                             login_result = id.login_appleid()
