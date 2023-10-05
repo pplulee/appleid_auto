@@ -384,7 +384,7 @@ class ID:
     def unlock_2fa(self):
         try:
             WebDriverWait(driver, 5).until(EC.presence_of_element_located
-                                            ((By.CLASS_NAME, "unenroll"))).click()
+                                           ((By.CLASS_NAME, "unenroll"))).click()
         except BaseException:
             logger.error(lang_text.cantFindDisable2FA)
             api.update_message(self.username, lang_text.cantFindDisable2FA)
@@ -920,25 +920,30 @@ def job():
                 if reset_result and (config.enable_delete_devices or config.enable_check_password_correct):
                     need_login = False
                     login_result = id.login_appleid()
-                    if not login_result and config.enable_check_password_correct:
-                        logger.info(lang_text.passwordChanged)
-                        reset_pw_result = id.change_password()
-                        if reset_pw_result:
-                            need_login = True
-                            update_account(id.username, id.password)
-                            notification(f"{lang_text.updateSuccess}\n{lang_text.newPassword}{id.password}")
-                        else:
-                            logger.error(lang_text.FailToChangePassword)
-                            notification(lang_text.FailToChangePassword)
-                            api.update_message(id.username, lang_text.FailToChangePassword)
-                    if config.enable_delete_devices:
-                        if need_login:
-                            login_result = id.login_appleid()
-                        if login_result:
-                            id.delete_devices()
-                        else:
-                            logger.error(lang_text.LoginFail)
-                            record_error()
+                    # 启用自动重置密码，但密码错误
+                    if config.enable_auto_update_password and not login_result:
+                        logger.error(lang_text.loginFail)
+                        record_error()
+                    else:
+                        if not login_result and config.enable_check_password_correct:
+                            logger.info(lang_text.passwordChanged)
+                            reset_pw_result = id.change_password()
+                            if reset_pw_result:
+                                need_login = True
+                                update_account(id.username, id.password)
+                                notification(f"{lang_text.updateSuccess}\n{lang_text.newPassword}{id.password}")
+                            else:
+                                logger.error(lang_text.FailToChangePassword)
+                                notification(lang_text.FailToChangePassword)
+                                api.update_message(id.username, lang_text.FailToChangePassword)
+                        if config.enable_delete_devices:
+                            if need_login:
+                                login_result = id.login_appleid()
+                            if login_result:
+                                id.delete_devices()
+                            else:
+                                logger.error(lang_text.LoginFail)
+                                record_error()
             else:
                 # 解锁失败
                 logger.error(lang_text.UnlockFail)
