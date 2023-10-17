@@ -166,16 +166,16 @@ class local_docker:
         logger.info("开始同步")
         self.local_list = self.get_local_list()
         remote_list = self.get_remote_list()
-        # 处理需要删除的容器（本地存在，云端不存在）
-        for id in self.local_list:
-            if id not in remote_list:
-                self.remove_docker(id)
-                self.local_list.remove(id)
-        # 处理需要部署的容器（本地不存在，云端存在）
-        for id in remote_list:
-            if id not in self.local_list:
-                self.deploy_docker(id)
-                self.local_list.append(id)
+        local_set = set(self.local_list)
+        remote_set = set(remote_list)
+
+        for id in local_set - remote_set:
+            self.remove_docker(id)
+            self.local_list.remove(id)
+
+        for id in remote_set - local_set:
+            self.deploy_docker(id)
+            self.local_list.append(id)
         logger.info("同步完成")
 
     def clean_local_docker(self):
@@ -245,6 +245,15 @@ def start_app(ip, port, token):
             data = {'status': False, 'msg': '缺少任务id'}
             json_data = dumps(data).encode('utf-8')
             return app.response_class(json_data, mimetype='application/json')
+
+    @app.route('/syncTask', methods=['POST'])
+    def add_task():
+        logging.info("收到同步任务请求")
+        thread_add_task = threading.Thread(target=Local.sync)
+        thread_add_task.start()
+        data = {'status': True, 'msg': '同步成功'}
+        json_data = dumps(data).encode('utf-8')
+        return app.response_class(json_data, mimetype='application/json')
 
     @app.route('/addTask', methods=['POST'])
     def add_task():
