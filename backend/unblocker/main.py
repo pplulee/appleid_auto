@@ -157,8 +157,8 @@ class Config:
     def __init__(self, config_result):
         self.password_length = 10
         self.username = config_result["username"]
-        self.password = config_result["password"] if "password" in config_result.keys() else api.get_password(
-            self.username)
+        self.password = config_result["password"] if "password" in config_result.keys() else "123456"
+        self.password_prefix = config_result["password_prefix"] if "password_prefix" in config_result.keys() else ""
         self.dob = config_result["dob"]
         self.answer = {config_result["q1"]: config_result["a1"],
                        config_result["q2"]: config_result["a2"],
@@ -668,7 +668,7 @@ class ID:
             notification(lang_text.passwordNotFound)
             record_error()
             return False
-        new_password = self.generate_password()
+        new_password = config.password_prefix + self.generate_password()
         for item in pwd_input_box:
             item.send_keys(new_password)
         time.sleep(1)
