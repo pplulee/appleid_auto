@@ -247,7 +247,7 @@ def start_app(ip, port, token):
             return app.response_class(json_data, mimetype='application/json')
 
     @app.route('/syncTask', methods=['POST'])
-    def add_task():
+    def resync():
         logging.info("收到同步任务请求")
         thread_add_task = threading.Thread(target=Local.sync)
         thread_add_task.start()
