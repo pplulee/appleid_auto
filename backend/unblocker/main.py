@@ -20,7 +20,7 @@ from selenium.webdriver.support.wait import WebDriverWait
 
 urllib3.disable_warnings()
 
-VERSION = "v2.0-20231018"
+VERSION = "v2.0-20231021"
 parser = argparse.ArgumentParser(description="")
 parser.add_argument("-api_url", help="API URL")
 parser.add_argument("-api_key", help="API key")
@@ -291,7 +291,9 @@ class ID:
             WebDriverWait(driver, 7).until(
                 EC.presence_of_element_located((By.CLASS_NAME, "iforgot-apple-id")))
             time.sleep(1)
-            driver.find_element(By.CLASS_NAME, "iforgot-apple-id").send_keys(self.username)
+            input_element = driver.find_element(By.CLASS_NAME, "iforgot-apple-id")
+            for char in self.username:
+                input_element.send_keys(char)
         except BaseException:
             logger.error(lang_text.failOnRetrievingPage)
             if config.proxy != "":
@@ -424,6 +426,7 @@ class ID:
                     logger.error(lang_text.chooseFail)
                     api.update_message(self.username, lang_text.chooseFail)
                     notification(lang_text.chooseFail)
+                    record_error()
                     return False
                 WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.ID, "action"))).click()
                 # 填写生日
@@ -498,9 +501,10 @@ class ID:
             return False
         try:
             WebDriverWait(driver, 30).until(EC.element_to_be_clickable((By.ID, "account_name_text_field")))
+            input_element = driver.find_element(By.ID, "account_name_text_field")
             for char in self.username:
-                driver.find_element(By.ID, "account_name_text_field").send_keys(char)
-            driver.find_element(By.ID, "account_name_text_field").send_keys(Keys.ENTER)
+                input_element.send_keys(char)
+            input_element.send_keys(Keys.ENTER)
         except BaseException:
             logger.error(lang_text.failOnLoadingPage)
             api.update_message(self.username, lang_text.failOnLoadingPage)
@@ -508,10 +512,11 @@ class ID:
             record_error()
             return False
         time.sleep(1)
-        WebDriverWait(driver, 5).until(EC.element_to_be_clickable((By.ID, "password_text_field"))).send_keys(
-            self.password)
+        input_element = WebDriverWait(driver, 5).until(EC.element_to_be_clickable((By.ID, "password_text_field")))
+        for char in self.password:
+            input_element.send_keys(char)
         time.sleep(1)
-        driver.find_element(By.ID, "password_text_field").send_keys(Keys.ENTER)
+        input_element.send_keys(Keys.ENTER)
         time.sleep(5)
         try:
             msg = driver.find_element(By.ID, "errMsg").get_attribute("innerHTML")
@@ -534,9 +539,11 @@ class ID:
             return False
         answer_inputs = WebDriverWait(driver, 10).until(
             EC.presence_of_all_elements_located((By.XPATH, "//*[contains(@class, 'input')]")))
-        answer_inputs[0].send_keys(answer0)
+        for char in answer0:
+            answer_inputs[0].send_keys(char)
         time.sleep(1)
-        answer_inputs[1].send_keys(answer1)
+        for char in answer1:
+            answer_inputs[1].send_keys(char)
         time.sleep(1)
         driver.find_element(By.CSS_SELECTOR, 'button[type="submit"]').click()
         time.sleep(5)
@@ -642,9 +649,11 @@ class ID:
             notification(lang_text.answerNotMatch)
             return False
         answer_inputs = driver.find_elements(By.CLASS_NAME, "generic-input-field")
-        answer_inputs[0].send_keys(answer0)
+        for char in answer0:
+            answer_inputs[0].send_keys(char)
         time.sleep(1)
-        answer_inputs[1].send_keys(answer1)
+        for char in answer1:
+            answer_inputs[1].send_keys(char)
         time.sleep(1)
         answer_inputs[1].send_keys(Keys.ENTER)
         try:
