@@ -155,7 +155,7 @@ class local_docker:
 
     def get_remote_list(self):
         result_list = self.api.get_task_list()
-        if result_list is None:
+        if result_list is None or result_list is False:
             logger.info("获取云端任务列表失败，使用本地列表")
             return self.local_list
         else:
