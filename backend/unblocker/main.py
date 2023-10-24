@@ -20,7 +20,7 @@ from selenium.webdriver.support.wait import WebDriverWait
 
 urllib3.disable_warnings()
 
-VERSION = "v2.0-20231021"
+VERSION = "v2.0-20231024"
 parser = argparse.ArgumentParser(description="")
 parser.add_argument("-api_url", help="API URL")
 parser.add_argument("-api_key", help="API key")
@@ -628,7 +628,8 @@ class ID:
             except BaseException:
                 return True
             else:
-                logger.error(f"{lang_text.TooManyFailAttempts}\n{msg.strip()}")
+                logger.error(f"{lang_text.WrongSecurityAnswer}\n{msg.strip()}")
+                api.update_message(self.username, lang_text.WrongSecurityAnswer)
                 return False
 
     def process_security_question(self):
@@ -922,7 +923,6 @@ def job():
                         else:
                             logger.error(lang_text.FailToChangePassword)
                             notification(lang_text.FailToChangePassword)
-                            api.update_message(id.username, lang_text.FailToChangePassword)
                             reset_result = False
 
                 # 自动删除设备
@@ -944,7 +944,6 @@ def job():
                             else:
                                 logger.error(lang_text.FailToChangePassword)
                                 notification(lang_text.FailToChangePassword)
-                                api.update_message(id.username, lang_text.FailToChangePassword)
                         if config.enable_delete_devices:
                             if need_login:
                                 login_result = id.login_appleid()

@@ -82,6 +82,7 @@ class zh_cn:
         self.failOnDisablingAccount = "停用账号失败"
         self.accountNotValid = "账号无效"
         self.TooManyFailAttempts = "安全信息错误次数过多"
+        self.WrongSecurityAnswer = "安全问题答案错误"
 
     def nextRun(self, time):
         return f"下次任务将在{time}分钟后执行"
@@ -175,6 +176,7 @@ class en_us:
         self.failOnDisablingAccount = "Failed to disable account"
         self.accountNotValid = "Account not valid"
         self.TooManyFailAttempts = "Too many failed attempts"
+        self.WrongSecurityAnswer = "Wrong security answer"
         
     def nextRun(self, time):
         return f"Next job will be executed in {time} minutes"
@@ -268,6 +270,7 @@ class vi_vn:
         self.accountNotValid = "Tài khoản không hợp lệ"
         self.TooManyFailAttempts = "Quá nhiều lần thử đăng nhập thất bại, tài khoản đã bị khóa"
         self.usingProxyID = "Hiện đang sử dụng Proxy ID"
+        self.WrongSecurityAnswer = "Câu trả lời bảo mật không chính xác"
 
 
     def nextRun(self, time):
