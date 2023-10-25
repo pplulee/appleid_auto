@@ -20,7 +20,7 @@ from selenium.webdriver.support.wait import WebDriverWait
 
 urllib3.disable_warnings()
 
-VERSION = "v2.0-20231024"
+VERSION = "v2.0-20231025"
 parser = argparse.ArgumentParser(description="")
 parser.add_argument("-api_url", help="API URL")
 parser.add_argument("-api_key", help="API key")
@@ -614,10 +614,10 @@ class ID:
         try:
             WebDriverWait(driver, 5).until(EC.presence_of_element_located((By.CLASS_NAME, "date-input")))
             input_box = driver.find_element(By.CLASS_NAME, "date-input")
-            time.sleep(1)
+            time.sleep(3)
             for char in self.dob:
                 input_box.send_keys(char)
-            time.sleep(1)
+                time.sleep(0.1)
             input_box.send_keys(Keys.ENTER)
         except BaseException:
             return False
@@ -712,7 +712,7 @@ class ID:
         try:
             driver.find_element(By.XPATH,
                                 "//*[@id=\"content\"]/iforgot-v2/app-container/div/iforgot-body/sa/idms-flow/div/main/div/recovery-options/div[2]/div/div[1]/label/span").click()
-            time.sleep(2)
+            time.sleep(3)
             driver.find_element(By.ID, "action").click()
         except BaseException as e:
             print(e)
@@ -730,6 +730,7 @@ class ID:
         try:
             WebDriverWait(driver, 5).until(EC.presence_of_element_located((By.XPATH,
                                                                            "//*[@id=\"content\"]/iforgot-v2/app-container/div/iforgot-body/sa/idms-flow/div/main/div/authentication-method/div[2]/div[2]/label/span"))).click()
+            time.sleep(1)
             driver.find_element(By.ID, "action").click()
         except BaseException:
             logger.error(lang_text.failToUseSecurityQuestion)
