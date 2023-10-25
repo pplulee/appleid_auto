@@ -730,9 +730,10 @@ class ID:
         try:
             WebDriverWait(driver, 5).until(EC.presence_of_element_located((By.XPATH,
                                                                            "//*[@id=\"content\"]/iforgot-v2/app-container/div/iforgot-body/sa/idms-flow/div/main/div/authentication-method/div[2]/div[2]/label/span"))).click()
-            time.sleep(1)
+            time.sleep(3)
             driver.find_element(By.ID, "action").click()
-        except BaseException:
+        except BaseException as e:
+            logger.error(e)
             logger.error(lang_text.failToUseSecurityQuestion)
             notification(lang_text.failToUseSecurityQuestion)
             record_error()
