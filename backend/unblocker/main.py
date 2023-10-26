@@ -20,7 +20,7 @@ from selenium.webdriver.support.wait import WebDriverWait
 
 urllib3.disable_warnings()
 
-VERSION = "v2.0-20231025"
+VERSION = "v2.0-20231026"
 parser = argparse.ArgumentParser(description="")
 parser.add_argument("-api_url", help="API URL")
 parser.add_argument("-api_key", help="API key")
@@ -240,7 +240,7 @@ class ID:
                 driver.switch_to.alert.accept()
             except BaseException:
                 pass
-            WebDriverWait(driver, 30 if config.proxy != "" else 10).until(
+            WebDriverWait(driver, 30).until(
                 EC.presence_of_element_located((By.CLASS_NAME, "iforgot-apple-id")))
         except BaseException:
             logger.error(lang_text.failOnRefreshingPage)
@@ -265,7 +265,6 @@ class ID:
             if config.proxy != "":
                 api.report_proxy_error(config.proxy_id)
             notification(lang_text.seeLog)
-            get_ip()
             return False
 
     def process_verify(self):
@@ -275,11 +274,13 @@ class ID:
                 "src").strip().replace('data:image/jpeg;base64,', '')
             img_bytes = base64.b64decode(img)
             code = ocr.classification(img_bytes)
-            driver.find_element(By.CLASS_NAME, "captcha-input").send_keys(code)
+            captcha_element = driver.find_element(By.CLASS_NAME, "captcha-input")
+            for char in code:
+                captcha_element.send_keys(char)
         except BaseException as e:
             logger.error(lang_text.failOnGettingCaptcha)
             print(e)
-            record_error(getIp=False)
+            record_error()
             return False
         else:
             return True
@@ -404,7 +405,7 @@ class ID:
             logger.error(f"{lang_text.rejectedByApple}\n{msg.strip()}")
             api.update_message(self.username, lang_text.rejectedByApple)
             api.report_proxy_error(config.proxy_id)
-            notification(f"{lang_text.rejectedByApple}\nIP:{get_ip()}")
+            notification(f"{lang_text.rejectedByApple}")
             return False
         if self.process_dob():
             if self.process_security_question():
@@ -528,7 +529,7 @@ class ID:
         else:
             logger.error(f"{lang_text.LoginFail}\n{msg.strip()}")
             return False
-        question_element = WebDriverWait(driver, 5).until(
+        question_element = WebDriverWait(driver, 20).until(
             EC.presence_of_all_elements_located((By.XPATH, "//*[contains(@class, 'question')]")))
         answer0 = self.get_answer(question_element[1].get_attribute("innerHTML"))
         answer1 = self.get_answer(question_element[2].get_attribute("innerHTML"))
@@ -582,7 +583,7 @@ class ID:
         # 删除设备
         driver.get("https://appleid.apple.com/account/manage/section/devices")
         try:
-            WebDriverWait(driver, 10).until_not(EC.presence_of_element_located((By.ID, "loading")))
+            WebDriverWait(driver, 20).until_not(EC.presence_of_element_located((By.ID, "loading")))
         except BaseException:
             logger.error(lang_text.failOnLoadingPage)
             api.update_message(self.username, lang_text.failOnLoadingPage)
@@ -822,7 +823,7 @@ def setup_driver():
         return True
 
 
-def record_error(getIp=True):
+def record_error():
     try:
         # 保存页面到文件
         with open("error.html", "w", encoding="utf-8") as f:
@@ -833,20 +834,25 @@ def record_error(getIp=True):
         logger.error(lang_text.failOnSavingScreenshot)
     else:
         logger.error(lang_text.screenshotSaved)
-    if getIp:
-        get_ip()
 
 
 def get_ip():
     global driver
     try:
-        driver.get("https://myip.ipip.net/s")
-        ip_address = WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.TAG_NAME, "pre"))).text
+        driver.get("https://api.ip.sb/ip")
+        ip_address = WebDriverWait(driver, 5).until(EC.presence_of_element_located((By.TAG_NAME, "pre"))).text
         logger.info(f"IP: {ip_address}")
         return ip_address
     except BaseException:
-        logger.error(lang_text.getIPFail)
-        return ""
+        try:
+            # 尝试ipip.net
+            driver.get("https://myip.ipip.net/s")
+            ip_address = WebDriverWait(driver, 5).until(EC.presence_of_element_located((By.TAG_NAME, "pre"))).text
+            logger.info(f"IP: {ip_address}")
+            return ip_address
+        except BaseException:
+            logger.error(lang_text.getIPFail)
+            return ""
 
 
 def update_account(username, password):
@@ -883,7 +889,6 @@ def job():
         return
 
     id = ID(config.username, config.password, config.dob, config.answer)
-
     job_success = True
     driver_result = setup_driver()
     logger.info(f"{lang_text.CurrentAccount}{id.username}")
@@ -891,6 +896,7 @@ def job():
         api.update_message(id.username, lang_text.failOnCallingWD)
         notification(lang_text.failOnCallingWD)
         job_success = False
+    get_ip()
     try:
         if driver_result and id.login():
             origin_password = id.password
@@ -986,7 +992,8 @@ def job():
 logger.info(f"{'=' * 80}\n"
             f"{lang_text.launch}\n"
             f"{lang_text.repoAddress}: https://github.com/pplulee/appleid_auto\n"
-            f"{lang_text.TG_Group}: @appleunblocker")
+            f"{lang_text.TG_Group}: @appleunblocker\n"
+            f"{lang_text.proVersion} https://docs.appleidauto.org/\n")
 logger.info(f"{lang_text.version}: {VERSION}")
 job()
 while True:

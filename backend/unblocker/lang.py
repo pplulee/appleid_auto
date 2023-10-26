@@ -1,6 +1,7 @@
 class zh_cn:
     def __init__(self):
         self.normal = "正常"
+        self.proVersion = "现已推出AppleAutoPro，详细请见"
         self.ErrorRetrievingConfig = "获取配置失败"
         self.launch = "启动AppleID_Auto"
         self.failOnPasswordUpdate = "更新密码失败"
@@ -94,6 +95,7 @@ class zh_cn:
 class en_us:
     def __init__(self):
         self.normal = "Normal"
+        self.proVersion = "AppleAutoPro is now available, see details at"
         self.ErrorRetrievingConfig = "Error retrieving config"
         self.launch = "Launch AppleID_Auto"
         self.failOnPasswordUpdate = "Password update failed"
@@ -187,6 +189,7 @@ class en_us:
 class vi_vn:
     def __init__(self):
         self.normal = "Normal"
+        self.proVersion = "AppleAutoPro đã có mặt, xem chi tiết tại"
         self.ErrorRetrievingConfig = "Lỗi khi truy xuất cấu hình"
         self.launch = "Khởi động AppleID_Auto"
         self.failOnPasswordUpdate = "Cập nhật mật khẩu thất bại"
