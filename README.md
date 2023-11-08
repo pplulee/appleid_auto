@@ -16,7 +16,10 @@
 <h3 align="center">中文文档 | <a href="README_en.md">English</a> </h3>
 <h3 align="center">请仔细阅读本文档以及使用说明，再使用。</h3>
 <h3 align="center">使用本项目可能需要一定的基础知识。</h3>
-<h3 align="center">本项目仍在更新当中。</h3>
+
+---
+
+## 本项目前端已停止维护，请移步至授权版[AppleAutoPro](https://docs.appleidauto.org/)。后端仍正常维护。
 
 # 基本简介
 
@@ -44,22 +47,7 @@
 - 允许手动触发解锁
 - ……
 
-# 使用文档
-
-我们已将所有文档与使用说明整理到了GitBook上，欢迎前往查看：
-
-https://appleid-auto.gitbook.io/doc_zhcn/
-
 # 问题反馈&交流
 
 开发者水平和能力有限，程序可能存在诸多bug，欢迎提出 Issue 或 Pull Request ，也欢迎各位大佬加入项目，贡献代码！ \
 Telegram群：[@appleunblocker](https://t.me/appleunblocker)
-
----
-
-# 请我喝杯可乐
-
-[![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/baiyimiao) \
-USDT-TRC20: TV1su1RnQny27YEF9WG4DbC8AAz3udt6d4 \
-ETH-ERC20：0xea8fbe1559b1eb4b526c3bb69285203969b774c5 \
-其余赞助方式欢迎联系开发者
