@@ -81,11 +81,18 @@ if [ "$run_webdriver" = "y" ]; then
     if [ "$webdriver_max_session" = "" ]; then
         webdriver_max_session=10
     fi
+    if docker ps -a --format '{{.Names}}' | grep -q '^webdriver$'; then
+    docker rm -f webdriver
+    fi
     docker pull selenium/standalone-chrome
-    docker run -d --name=webdriver --log-opt max-size=1m --log-opt max-file=1 --shm-size="1g" --restart=always -e SE_NODE_MAX_SESSIONS=$webdriver_max_session -e SE_NODE_OVERRIDE_MAX_SESSIONS=true -e SE_SESSION_RETRY_INTERVAL=1 -e SE_VNC_VIEW_ONLY=1 -p $webdriver_port:4444 -p 5900:5900 selenium/standalone-chrome
+    docker run -d --name=webdriver --log-opt max-size=1m --log-opt max-file=1 --shm-size="1g" --restart=always -e SE_NODE_MAX_SESSIONS=$webdriver_max_session -e SE_NODE_OVERRIDE_MAX_SESSIONS=true -e SE_SESSION_RETRY_INTERVAL=1 -e SE_START_VNC=false -p $webdriver_port:4444 selenium/standalone-chrome
     echo "Webdriver Docker容器部署完成 | Webdriver Docker container deployed"
 fi
 enable_auto_update=$([ "$auto_update" == "y" ] && echo True || echo False)
+if docker ps -a --format '{{.Names}}' | grep -q '^appleauto$'; then
+    docker rm -f appleauto
+fi
+docker pull sahuidhsu/appleauto_backend
 docker run -d --name=appleauto --log-opt max-size=1m --log-opt max-file=2 --restart=always --network=host -e API_URL=$api_url -e API_KEY=$api_key -e SYNC_TIME=$sync_time -e AUTO_UPDATE=$enable_auto_update -e LANG=$language -v /var/run/docker.sock:/var/run/docker.sock sahuidhsu/appleauto_backend
 if [ $language = "1" ]; then
   echo "安装完成，容器已启动"
