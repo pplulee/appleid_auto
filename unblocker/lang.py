@@ -179,16 +179,17 @@ class en_us:
         self.accountNotValid = "Account not valid"
         self.TooManyFailAttempts = "Too many failed attempts"
         self.WrongSecurityAnswer = "Wrong security answer"
-        
+
     def nextRun(self, time):
         return f"Next job will be executed in {time} minutes"
 
     def totalDevices(self, total):
         return f"{total} devices in total"
-        
+
+
 class vi_vn:
     def __init__(self):
-        self.normal = "Normal"
+        self.normal = "Bình thường"
         self.proVersion = "AppleAutoPro đã có mặt, xem chi tiết tại"
         self.ErrorRetrievingConfig = "Lỗi khi truy xuất cấu hình"
         self.launch = "Khởi động AppleID_Auto"
@@ -220,47 +221,47 @@ class vi_vn:
         self.blocked = "Không thể xử lý yêu cầu, tài khoản có thể không hợp lệ hoặc địa chỉ IP của máy chủ có thể bị chặn"
         self.notLocked = "Tài khoản không bị khóa"
         self.locked = "Tài khoản bị khóa"
-        self.twoStepnotEnabled = "2FA không được kích hoạt"
-        self.twoStepEnabled = "2FA đã được kích hoạt"
-        self.cantFindDisable2FA = "Không thể tắt 2FA, tài khoản có thể không cho phép tắt 2FA"
+        self.twoStepnotEnabled = "Xác thực 2 yếu tố không được kích hoạt"
+        self.twoStepEnabled = "Xác thực 2 yếu tố đã được kích hoạt"
+        self.cantFindDisable2FA = "Không thể tắt xác thực 2 yếu tố, tài khoản có thể không cho phép tắt xác thực 2 yếu tố"
         self.rejectedByApple = "Hành động bị từ chối bởi Apple, có nghi ngờ về rủi ro"
         self.chooseFail = "Không thể chọn tùy chọn, không thể mở khóa bằng câu hỏi bảo mật"
         self.loginLoadFail = "Tải trang đăng nhập thất bại"
         self.answerIncorrect = "Câu trả lời cho câu hỏi bảo mật không chính xác, chương trình đã thoát"
         self.answerNotMatch = "Không tìm thấy câu trả lời cho câu hỏi bảo mật, vui lòng kiểm tra cấu hình"
-        self.failOnBypass2FA = "Bỏ qua 2FA thất bại"
+        self.failOnBypass2FA = "Bỏ qua xác thực 2 yếu tố thất bại"
         self.startRemoving = "Bắt đầu xóa thiết bị"
         self.noRemoveRequired = "Không có thiết bị để xóa"
         self.finishRemoving = "Hoàn thành xóa thiết bị"
         self.DOB_Error = "Không thể lấy câu hỏi bảo mật, ngày sinh có thể không chính xác"
         self.failOnAnswer = "Câu trả lời cho câu hỏi bảo mật không chính xác"
-        self.passwordNotFound = "Không tìm thấy hộp mật khẩu"
+        self.passwordNotFound = "Không tìm thấy mật khẩu"
         self.unknownError = "Đã xảy ra lỗi không xác định khi thực hiện nhiệm vụ"
         self.passwordUpdated = "Mật khẩu đã được cập nhật, mật khẩu mới là "
         self.startChangePassword = "Bắt đầu thay đổi mật khẩu"
-        self.failOnChangePassword = "Không thể thay đổi mật khẩu ngay bây giờ, có thể 2FA không được tắt"
+        self.failOnChangePassword = "Không thể thay đổi mật khẩu ngay bây giờ, có thể xác thực 2 yếu tố không được tắt"
         self.failToUseSecurityQuestion = "Không thể sử dụng câu hỏi bảo mật để đặt lại mật khẩu, thay đổi mật khẩu thất bại"
         self.TGFail = "Gửi tin nhắn Telegram thất bại"
         self.cnTG = "Nếu máy chủ của bạn ở Trung Quốc đại lục, vui lòng không kích hoạt thông báo Telegram"
         self.failOnCallingWD = "Gọi Webdriver thất bại"
-        self.twoStepDetected = "2FA đã được kích hoạt, bắt đầu mở khóa"
+        self.twoStepDetected = "Xác thực 2 yếu tố đã được kích hoạt, bắt đầu mở khóa"
         self.accountLocked = "Tài khoản bị khóa, bắt đầu mở khóa"
-        self.updateSuccess = "Cập nhật tài khoản thành công"
-        self.newPassword = "Mật khẩu mới: "
+        self.updateSuccess = "\nCập Nhật Tài Khoản Thành Công\n"
+        self.newPassword = "Mật Khẩu Mới: "
         self.passwordChanged = "Mật khẩu không chính xác, bắt đầu thay đổi mật khẩu"
         self.LoginFail = "Đăng nhập Apple ID thất bại, không thể xóa thiết bị"
-        self.missionFailed = "Nhiệm vụ thất bại, đang chờ kiểm tra tiếp theo"
+        self.missionFailed = "Nhiệm vụ thất bại, đang chờ đợt kiểm tra tiếp theo"
         self.WDCloseError = "Đóng Webdriver thất bại"
         self.repoAddress = "Địa chỉ repo dự án"
         self.TG_Group = "Nhóm Telegram"
         self.version = "Phiên bản hiện tại"
         self.UnlockFail = "Mở khóa thất bại"
         self.FailToChangePassword = "Thay đổi mật khẩu thất bại"
-        self.CurrentAccount = "Tài khoản hiện tại:"
+        self.CurrentAccount = "Tài khoản hiện tại: "
         self.invalidProxyType = "Loại proxy không hợp lệ"
         self.failOnSavingScreenshot = "Không thể lưu ảnh chụp màn hình của trang lỗi"
-        self.screenshotSaved = "Screenshot of error page saved to /app/error.html and /app/error.png, " \
-                               "please contact the developer"        
+        self.screenshotSaved = "Ảnh chụp màn hình của trang lỗi được lưu vào /app/error.html and /app/error.png, " \
+                               "Vui lòng liên hệ với nhà phát triển"
         self.getIPFail = "Không thể lấy địa chỉ IP hiện tại"
         self.updateFail = "Cập nhật tài khoản thất bại"
         self.getAPIFail = "Lấy cấu hình từ API thất bại"
@@ -274,7 +275,6 @@ class vi_vn:
         self.TooManyFailAttempts = "Quá nhiều lần thử đăng nhập thất bại, tài khoản đã bị khóa"
         self.usingProxyID = "Hiện đang sử dụng Proxy ID"
         self.WrongSecurityAnswer = "Câu trả lời bảo mật không chính xác"
-
 
     def nextRun(self, time):
         return f"Việc tiếp theo sẽ được thực hiện trong {time} phút"

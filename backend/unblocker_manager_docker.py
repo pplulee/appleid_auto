@@ -145,10 +145,11 @@ class local_docker:
 
     def restart_docker(self, id):
         try:
-            if id not in self.local_list:
+            if int(id) not in self.local_list:
                 return self.sync()
-            container = client.containers.get(f"{prefix}{id}")
-            container.restart(timeout=0)
+            else:
+                container = client.containers.get(f"{prefix}{id}")
+                container.restart(timeout=0)
         except Exception as e:
             logger.error(f"重启容器{id}失败")
             logger.error(e)
