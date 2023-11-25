@@ -19,7 +19,7 @@
 
 ---
 
-## 本项目前端已停止维护，请移步至授权版[AppleAutoPro](https://docs.appleidauto.org/)。后端仍正常维护。
+## 本项目前后端已停止维护，若要继续使用，可更换至[AppleAutoPro](https://docs.appleidauto.org/)
 
 # 基本简介
 
