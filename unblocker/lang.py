@@ -1,7 +1,7 @@
 class zh_cn:
     def __init__(self):
         self.normal = "正常"
-        self.proVersion = "现已推出AppleAutoPro，详细请见"
+        self.proVersion = "此版本已停止维护，如需继续使用，可更换AppleAutoPro，详细请见"
         self.ErrorRetrievingConfig = "获取配置失败"
         self.launch = "启动AppleID_Auto"
         self.failOnPasswordUpdate = "更新密码失败"
