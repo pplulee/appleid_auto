@@ -74,7 +74,7 @@
                                                                             <button class="btn btn-primary copy-text" type="button" data-clipboard-text="{$account['password']}">复制密码</button>
                                                                         </div>
                                                                     </div>
-                                                                    <div class="input-group mb-3 col-md-8 col-lg-4">
+                                                                    <div class="input-group mb-3 col-md-8 col-lg-8">
                                                                         <input type="text" class="form-control" value="上次检查：{$account['last_check']} 账号状态：{($account['status'])?"正常":"异常"}" disabled="disabled">
                                                                     </div>
                                                                 </div>
