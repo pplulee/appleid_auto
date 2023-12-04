@@ -20,7 +20,7 @@ from selenium.webdriver.support.wait import WebDriverWait
 
 urllib3.disable_warnings()
 
-VERSION = "v2.0-20231114"
+VERSION = "v2.0-20231204"
 parser = argparse.ArgumentParser(description="")
 parser.add_argument("-api_url", help="API URL")
 parser.add_argument("-api_key", help="API key")
@@ -742,6 +742,7 @@ class ID:
         if self.process_security_question():
             if self.process_password():
                 return True
+        return False
 
 
 def notification(content):

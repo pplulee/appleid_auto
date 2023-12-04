@@ -104,14 +104,15 @@ class UserController extends BaseController
             $paybacks_sum = 0;
         }
         $class_left_days = floor((strtotime($this->user->class_expire)-time())/86400)+1;
+        $ios_accounts = $this->apple();
         return $this->view()
             ->assign('class_left_days', $class_left_days)
             ->assign('paybacks_sum', $paybacks_sum)
             ->assign('ssr_sub_token', $ssr_sub_token)
             ->assign('display_ios_class', $_ENV['display_ios_class'])
             ->assign('display_ios_topup', $_ENV['display_ios_topup'])
-            ->assign('ios_account', $_ENV['ios_account'])
-            ->assign('ios_password', $_ENV['ios_password'])
+            ->assign('ios_account', $ios_accounts[0]['username'])
+            ->assign('ios_password', $ios_accounts[0]['password'])
             ->assign('ann', $Ann)
             ->assign('geetest_html', $GtSdk)
             ->assign('mergeSub', $_ENV['mergeSub'])
