@@ -239,7 +239,7 @@ class ID:
                 driver.switch_to.alert.accept()
             except BaseException:
                 pass
-            WebDriverWait(driver, 30).until(
+            WebDriverWait(driver, 10).until(
                 EC.presence_of_element_located((By.CLASS_NAME, "iforgot-apple-id")))
         except BaseException:
             logger.error(lang_text.failOnRefreshingPage)
@@ -312,7 +312,7 @@ class ID:
             time.sleep(1)
             WebDriverWait(driver, 5).until(EC.presence_of_element_located((By.CLASS_NAME, "button-primary"))).click()
             try:
-                WebDriverWait(driver, 15).until_not(EC.presence_of_element_located((By.CLASS_NAME, "loading")))
+                WebDriverWait(driver, 8).until_not(EC.presence_of_element_located((By.CLASS_NAME, "loading")))
             except BaseException:
                 logger.error(lang_text.failOnLoadingPage)
                 return False
@@ -572,7 +572,6 @@ class ID:
         except BaseException:
             pass
         driver.switch_to.default_content()
-        time.sleep(5)
         logger.info(lang_text.login)
         return True
 

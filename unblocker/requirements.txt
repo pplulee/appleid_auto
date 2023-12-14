@@ -1,5 +1,4 @@
-ddddocr>=1.4.9
+ddddocr>=1.4.10
 schedule>=1.2.1
 requests>=2.31.0
 selenium>=4.15.2
-Pillow==9.5.0
